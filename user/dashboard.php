@@ -56,38 +56,60 @@ $available_plans = $stmt->fetchAll();
 
         <h2 class="text-xl font-bold mb-8 uppercase tracking-widest flex items-center gap-3">
             <span class="w-8 h-[1px] bg-emerald-500"></span>
-            Your Exclusive Content
+            Your Health Profile
+        </h2>
+        <div class="grid grid-cols-3 gap-4 mb-12">
+            <div class="bg-zinc-900 border border-white/10 p-4 rounded-2xl text-center">
+                <span class="text-[10px] text-zinc-500 uppercase tracking-widest block mb-1">Weight</span>
+                <span class="text-xl font-black text-emerald-500"><?php echo htmlspecialchars($user['weight']); ?> kg</span>
+            </div>
+            <div class="bg-zinc-900 border border-white/10 p-4 rounded-2xl text-center">
+                <span class="text-[10px] text-zinc-500 uppercase tracking-widest block mb-1">Height</span>
+                <span class="text-xl font-black text-emerald-500"><?php echo htmlspecialchars($user['height']); ?> cm</span>
+            </div>
+            <div class="bg-zinc-900 border border-white/10 p-4 rounded-2xl text-center">
+                <span class="text-[10px] text-zinc-500 uppercase tracking-widest block mb-1">Age</span>
+                <span class="text-xl font-black text-emerald-500"><?php echo htmlspecialchars($user['age']); ?></span>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-bold mb-8 uppercase tracking-widest flex items-center gap-3">
+            <span class="w-8 h-[1px] bg-emerald-500"></span>
+            Exclusive Content & Resources
         </h2>
         
         <div class="grid md:grid-cols-2 gap-6">
-            <?php if (empty($available_plans)): ?>
-                <p class="text-zinc-500 italic">No plans assigned to your package yet.</p>
-            <?php endif; ?>
-            
             <?php foreach ($available_plans as $plan): ?>
                 <div class="bg-zinc-900 border border-white/10 p-8 rounded-3xl group hover:border-emerald-500/50 transition-all">
                     <div class="flex justify-between items-start mb-6">
                         <div class="text-4xl">📄</div>
-                        <?php if ($user['status'] === 'approved' && $plan['file_url']): ?>
-                            <span class="text-[10px] bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full font-bold uppercase border border-emerald-500/20">Ready</span>
-                        <?php else: ?>
-                            <span class="text-[10px] bg-zinc-800 text-zinc-500 px-3 py-1 rounded-full font-bold uppercase border border-white/5">Locked</span>
-                        <?php endif; ?>
+                        <div class="flex gap-2">
+                            <?php if ($plan['preview_image']): ?>
+                                <button onclick="alert('Look Inside Feature Coming Soon!')" class="text-[10px] bg-white/10 text-white px-3 py-1 rounded-full font-bold uppercase border border-white/10">Look Inside</button>
+                            <?php endif; ?>
+                            <?php if ($user['status'] === 'approved' && $plan['file_url']): ?>
+                                <span class="text-[10px] bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full font-bold uppercase border border-emerald-500/20">Unlocked</span>
+                            <?php else: ?>
+                                <span class="text-[10px] bg-zinc-800 text-zinc-500 px-3 py-1 rounded-full font-bold uppercase border border-white/5">Locked</span>
+                            <?php endif; ?>
+                        </div>
                     </div>
                     <h3 class="text-xl font-bold mb-2 uppercase tracking-tight"><?php echo htmlspecialchars($plan['title']); ?></h3>
-                    <p class="text-zinc-500 text-sm mb-8">High-performance nutritional guide specifically calibrated for your goal.</p>
                     
                     <?php if ($user['status'] === 'approved'): ?>
-                        <?php if ($plan['file_url']): ?>
-                            <a href="../download.php?id=<?php echo $plan['id']; ?>" class="block text-center bg-emerald-600 text-white px-6 py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-900/20">Secure Download</a>
-                        <?php else: ?>
-                            <button class="w-full bg-zinc-800 text-zinc-500 px-6 py-4 rounded-xl font-bold uppercase text-xs tracking-widest cursor-not-allowed">Preparing File</button>
-                        <?php endif; ?>
+                        <a href="../download.php?id=<?php echo $plan['id']; ?>" class="mt-4 block text-center bg-emerald-600 text-white px-6 py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-emerald-500 transition-all">Secure Download</a>
                     <?php else: ?>
-                        <a href="payment.php" class="block text-center border border-white/10 text-zinc-400 px-6 py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-white hover:text-black transition-all">Unlock Access</a>
+                        <a href="payment.php" class="mt-4 block text-center border border-white/10 text-zinc-400 px-6 py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-white hover:text-black transition-all">Pay to Unlock</a>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
+
+            <div class="bg-zinc-900 border border-white/10 p-8 rounded-3xl group hover:border-emerald-500/50 transition-all">
+                <div class="text-4xl mb-6">📚</div>
+                <h3 class="text-xl font-bold mb-2 uppercase tracking-tight">Nutrition Resources</h3>
+                <p class="text-zinc-500 text-xs mb-6 uppercase tracking-widest">Coming Soon: Recipes & Tips</p>
+                <div class="opacity-30 pointer-events-none border border-white/10 text-center py-4 rounded-xl text-[10px] font-bold uppercase">Private Library</div>
+            </div>
         </div>
     </div>
 </body>

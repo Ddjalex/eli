@@ -7,18 +7,34 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 $message = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['pdf_file'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $plan_id = $_POST['plan_id'];
-    $protected_dir = '../protected_files/';
-    if (!is_dir($protected_dir)) mkdir($protected_dir, 0777, true);
     
-    $filename = 'plan_' . $plan_id . '_' . time() . '.pdf';
-    $target = $protected_dir . $filename;
-    
-    if (move_uploaded_file($_FILES['pdf_file']['tmp_name'], $target)) {
-        $stmt = $pdo->prepare("UPDATE meal_plans SET file_url = ? WHERE id = ?");
-        $stmt->execute([$target, $plan_id]);
-        $message = "Meal plan PDF updated successfully!";
+    if (isset($_FILES['pdf_file'])) {
+        $protected_dir = '../protected_files/';
+        if (!is_dir($protected_dir)) mkdir($protected_dir, 0777, true);
+        
+        $filename = 'plan_' . $plan_id . '_' . time() . '.pdf';
+        $target = $protected_dir . $filename;
+        
+        if (move_uploaded_file($_FILES['pdf_file']['tmp_name'], $target)) {
+            $stmt = $pdo->prepare("UPDATE meal_plans SET file_url = ? WHERE id = ?");
+            $stmt->execute([$target, $plan_id]);
+            $message = "Meal plan PDF updated successfully!";
+        }
+    } elseif (isset($_POST['upload_preview']) && isset($_FILES['preview_image'])) {
+        $preview_dir = '../uploads/previews/';
+        if (!is_dir($preview_dir)) mkdir($preview_dir, 0777, true);
+        
+        $filename = 'preview_' . $plan_id . '_' . time() . '_' . basename($_FILES['preview_image']['name']);
+        $target = $preview_dir . $filename;
+        
+        if (move_uploaded_file($_FILES['preview_image']['tmp_name'], $target)) {
+            $db_path = 'uploads/previews/' . $filename;
+            $stmt = $pdo->prepare("UPDATE meal_plans SET preview_image = ? WHERE id = ?");
+            $stmt->execute([$db_path, $plan_id]);
+            $message = "Plan preview updated successfully!";
+        }
     }
 }
 
@@ -69,7 +85,14 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
                     <form method="POST" enctype="multipart/form-data" class="flex gap-4 items-center">
                         <input type="hidden" name="plan_id" value="<?php echo $p['id']; ?>">
                         <input type="file" name="pdf_file" accept=".pdf" class="text-xs text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-zinc-300 hover:file:bg-zinc-700" required>
-                        <button type="submit" class="bg-white text-black px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Upload PDF</button>
+                        <button type="submit" class="bg-white text-black px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Upload Full PDF</button>
+                    </form>
+                    <form method="POST" enctype="multipart/form-data" class="mt-4 pt-4 border-t border-white/5 flex gap-4 items-center">
+                        <input type="hidden" name="plan_id" value="<?php echo $p['id']; ?>">
+                        <input type="hidden" name="upload_preview" value="1">
+                        <label class="text-[10px] uppercase font-bold text-zinc-500 w-24">Preview Image:</label>
+                        <input type="file" name="preview_image" accept="image/*" class="text-xs text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-zinc-300">
+                        <button type="submit" class="bg-zinc-800 text-white px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-zinc-700 transition-all">Upload Preview</button>
                     </form>
                 </div>
             <?php endforeach; ?>
