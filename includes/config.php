@@ -36,10 +36,11 @@ if ($db_url) {
     $dsn = "pgsql:host=$host;port=$port;dbname=$db;sslmode=require";
 } else {
     // CPANEL ENVIRONMENT (MySQL)
-    $host = '127.0.0.1';
-    $user = 'neodiqqi_eleni_user';
-    $pass = 'a1e2y3t4h5';
-    $db   = 'neodiqgi_Eli';
+    // Using credentials provided by user to fix Access Denied error
+    $host = 'localhost';
+    $db   = 'neodigqi_Eli';        // Database name with 'g'
+    $user = 'neodiqgi_eleni_user';  // User that has privileges
+    $pass = 'a1e2y3t4h5';           // Password
     $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
 }
 
