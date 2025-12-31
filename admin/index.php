@@ -20,7 +20,7 @@ $stats = [
     'plans' => $pdo->query("SELECT COUNT(*) FROM meal_plans")->fetchColumn(),
 ];
 
-$stmt = $pdo->query("SELECT u.*, p.receipt_path FROM users u LEFT JOIN payments p ON u.id = p.user_id WHERE u.role = 'user' ORDER BY u.created_at DESC");
+$stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number FROM users u LEFT JOIN payments p ON u.id = p.user_id WHERE u.role = 'user' ORDER BY u.created_at DESC");
 $users = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
@@ -131,7 +131,8 @@ $users = $stmt->fetchAll();
                                 <th class="px-8 py-5 font-bold">Client Information</th>
                                 <th class="px-8 py-5 font-bold">Registration Date</th>
                                 <th class="px-8 py-5 font-bold">Status</th>
-                                <th class="px-8 py-5 font-bold">Payment</th>
+                                <th class="px-8 py-5 font-bold">TRX Number</th>
+                                <th class="px-8 py-5 font-bold">Receipt</th>
                                 <th class="px-8 py-5 font-bold text-right">Actions</th>
                             </tr>
                         </thead>
@@ -164,10 +165,17 @@ $users = $stmt->fetchAll();
                                         <?php endif; ?>
                                     </td>
                                     <td class="px-8 py-6">
+                                        <?php if ($u['trx_number']): ?>
+                                            <span class="text-sm font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-lg"><?php echo htmlspecialchars($u['trx_number']); ?></span>
+                                        <?php else: ?>
+                                            <span class="text-zinc-600 text-sm italic">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="px-8 py-6">
                                         <?php if ($u['receipt_path']): ?>
                                             <a href="../<?php echo $u['receipt_path']; ?>" target="_blank" class="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors group/link">
                                                 <svg class="w-5 h-5 group-hover/link:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                                <span class="text-sm font-medium">View Receipt</span>
+                                                <span class="text-sm font-medium">View</span>
                                             </a>
                                         <?php else: ?>
                                             <span class="text-zinc-600 text-sm flex items-center gap-2 italic">
