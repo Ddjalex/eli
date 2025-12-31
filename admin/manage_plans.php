@@ -131,7 +131,7 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
                         <div class="flex flex-col md:flex-row gap-8">
                             <div class="w-full md:w-1/3">
                                 <div class="aspect-square rounded-3xl overflow-hidden bg-black border border-white/5 mb-4 relative">
-                                    <?php if (str_ends_with(strtolower($p['preview_image']), '.heic')): ?>
+                                    <?php if ($p['preview_image'] && str_ends_with(strtolower((string)$p['preview_image']), '.heic')): ?>
                                          <div class="absolute inset-0 flex items-center justify-center bg-zinc-900 text-[10px] text-zinc-500 font-bold uppercase text-center p-2 italic">Format: HEIC (Please Re-upload)</div>
                                     <?php elseif ($p['preview_image']): ?>
                                         <img src="../<?php echo $p['preview_image']; ?>" class="w-full h-full object-cover">
