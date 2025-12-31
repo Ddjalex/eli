@@ -44,25 +44,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
         <?php endif; ?>
 
         <div class="mb-10 p-6 bg-white/5 border border-white/5 rounded-2xl">
-            <h3 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-4">Official Bank Details</h3>
-            <div class="space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">Select Payment Method</h3>
+            <div class="space-y-4">
                 <?php
-                $bank_name = $pdo->query("SELECT value FROM site_settings WHERE key = 'bank_name'")->fetchColumn() ?: 'CBE (Commercial Bank)';
-                $bank_account = $pdo->query("SELECT value FROM site_settings WHERE key = 'bank_account'")->fetchColumn() ?: '1000425432348';
-                $bank_holder = $pdo->query("SELECT value FROM site_settings WHERE key = 'bank_holder'")->fetchColumn() ?: 'Eleni Mekuria';
+                $payment_options = $pdo->query("SELECT * FROM payment_options WHERE is_active = TRUE ORDER BY display_order ASC")->fetchAll();
+                foreach ($payment_options as $index => $opt):
                 ?>
-                <div class="flex justify-between">
-                    <span class="text-zinc-500 text-xs uppercase tracking-widest">Bank</span>
-                    <span class="font-bold text-sm"><?php echo htmlspecialchars($bank_name); ?></span>
+                <div class="p-4 rounded-xl border border-white/5 bg-black/40 hover:border-emerald-500/50 transition-all">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-emerald-500 text-[10px] font-black uppercase tracking-widest"><?php echo htmlspecialchars($opt['name']); ?></span>
+                        <span class="text-[8px] text-zinc-600 font-bold uppercase">Option #<?php echo $index + 1; ?></span>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-zinc-500 text-[9px] uppercase tracking-widest">Account</span>
+                            <span class="font-bold text-xs text-white"><?php echo htmlspecialchars($opt['account_number']); ?></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-zinc-500 text-[9px] uppercase tracking-widest">Name</span>
+                            <span class="font-bold text-xs text-zinc-300"><?php echo htmlspecialchars($opt['account_holder']); ?></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex justify-between border-t border-white/5 pt-3">
-                    <span class="text-zinc-500 text-xs uppercase tracking-widest">Account</span>
-                    <span class="font-black text-emerald-500 text-sm"><?php echo htmlspecialchars($bank_account); ?></span>
-                </div>
-                <div class="flex justify-between border-t border-white/5 pt-3">
-                    <span class="text-zinc-500 text-xs uppercase tracking-widest">Name</span>
-                    <span class="font-bold text-sm"><?php echo htmlspecialchars($bank_holder); ?></span>
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
 
