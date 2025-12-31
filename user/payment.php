@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
                     <span class="text-zinc-500 text-[9px] uppercase tracking-widest">Service</span>
                     <div class="flex items-center gap-2">
                         <span class="font-bold text-xs text-white" id="methodName">-</span>
-                        <button type="button" onclick="copyToClipboard('methodName')" class="text-emerald-500 hover:text-emerald-400 transition-colors" title="Copy">
+                        <button type="button" onclick="copyToClipboard('methodName', event)" class="text-emerald-500 hover:text-emerald-400 transition-colors" title="Copy">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                         </button>
                     </div>
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
                     <span class="text-zinc-500 text-[9px] uppercase tracking-widest">Account</span>
                     <div class="flex items-center gap-2">
                         <span class="font-bold text-xs text-white" id="methodAccount">-</span>
-                        <button type="button" onclick="copyToClipboard('methodAccount')" class="text-emerald-500 hover:text-emerald-400 transition-colors" title="Copy">
+                        <button type="button" onclick="copyToClipboard('methodAccount', event)" class="text-emerald-500 hover:text-emerald-400 transition-colors" title="Copy">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                         </button>
                     </div>
@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
                     <span class="text-zinc-500 text-[9px] uppercase tracking-widest">Holder Name</span>
                     <div class="flex items-center gap-2">
                         <span class="font-bold text-xs text-zinc-300" id="methodHolder">-</span>
-                        <button type="button" onclick="copyToClipboard('methodHolder')" class="text-emerald-500 hover:text-emerald-400 transition-colors" title="Copy">
+                        <button type="button" onclick="copyToClipboard('methodHolder', event)" class="text-emerald-500 hover:text-emerald-400 transition-colors" title="Copy">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                         </button>
                     </div>
@@ -124,26 +124,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
                 }
             }
 
-            function copyToClipboard(elementId) {
+            function copyToClipboard(elementId, event) {
+                event.preventDefault();
                 const element = document.getElementById(elementId);
-                const text = element.textContent;
+                const text = element.textContent.trim();
+                const button = event.currentTarget;
                 
-                navigator.clipboard.writeText(text).then(() => {
-                    const button = event.target.closest('button');
-                    const originalSvg = button.innerHTML;
-                    
-                    // Show checkmark feedback
-                    button.innerHTML = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
-                    button.classList.add('text-emerald-600');
-                    
-                    // Reset after 2 seconds
-                    setTimeout(() => {
-                        button.innerHTML = originalSvg;
-                        button.classList.remove('text-emerald-600');
-                    }, 2000);
-                }).catch(() => {
-                    alert('Failed to copy. Please try again.');
-                });
+                // Try modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showCopySuccess(button);
+                    }).catch(() => {
+                        // Fallback method
+                        fallbackCopy(text, button);
+                    });
+                } else {
+                    // Fallback for older browsers
+                    fallbackCopy(text, button);
+                }
+            }
+
+            function fallbackCopy(text, button) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    showCopySuccess(button);
+                } catch (err) {
+                    alert('Copy failed. Please try again.');
+                }
+                document.body.removeChild(textarea);
+            }
+
+            function showCopySuccess(button) {
+                const originalSvg = button.innerHTML;
+                button.innerHTML = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+                button.classList.add('text-emerald-600');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalSvg;
+                    button.classList.remove('text-emerald-600');
+                }, 2000);
             }
         </script>
         
