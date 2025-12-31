@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .auth-bg {
-            background-image: linear-gradient(to right, rgba(0,0,0,0.9) 40%, rgba(0,0,0,0.4)), url('<?php echo $reg_bg; ?>');
+            background-image: linear-gradient(to left, rgba(0,0,0,0.9) 40%, rgba(0,0,0,0.4)), url('<?php echo $reg_bg; ?>');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -40,8 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </style>
 </head>
-<body class="bg-black text-white min-h-screen auth-bg flex items-center justify-start p-6 md:p-24 relative">
-    <a href="index.php" class="absolute top-8 left-8 bg-black/50 backdrop-blur-md border border-white/10 text-white px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-2">
+<body class="bg-black text-white min-h-screen auth-bg flex items-center justify-end p-6 md:p-24 relative">
+    <a href="index.php" class="absolute top-8 right-8 bg-black/50 backdrop-blur-md border border-white/10 text-white px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-2">
         <span>←</span> Back to Home
     </a>
     <div class="max-w-xl w-full bg-zinc-900/80 backdrop-blur-xl p-10 rounded-3xl border border-white/10 shadow-2xl">
