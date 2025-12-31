@@ -120,7 +120,7 @@ $available_plans = $stmt->fetchAll();
                     <?php endif; ?>
                     
                     <?php if ($user['status'] === 'approved'): ?>
-                        <a href="../download.php?id=<?php echo $plan['id']; ?>" class="mt-4 block text-center bg-emerald-600 text-white px-6 py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-emerald-500 transition-all">Secure Download</a>
+                        <a href="../preview.php?id=<?php echo $plan['id']; ?>" class="mt-4 block text-center bg-emerald-600 text-white px-6 py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-emerald-500 transition-all">View Plan</a>
                     <?php else: ?>
                         <a href="payment.php" class="mt-4 block text-center border border-white/10 text-zinc-400 px-6 py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-white hover:text-black transition-all">Pay to Unlock</a>
                     <?php endif; ?>
