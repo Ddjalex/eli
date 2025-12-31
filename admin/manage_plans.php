@@ -51,8 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $filename = 'plan_' . $plan_id . '_' . time() . '.pdf';
             $target = $protected_dir . $filename;
             if (move_uploaded_file($_FILES['pdf_file']['tmp_name'], $target)) {
+                $db_path = 'protected_files/' . $filename;
                 $stmt = $pdo->prepare("UPDATE meal_plans SET file_url = ? WHERE id = ?");
-                $stmt->execute([$target, $plan_id]);
+                $stmt->execute([$db_path, $plan_id]);
             }
         }
         
