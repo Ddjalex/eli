@@ -21,7 +21,11 @@ if ($db_url) {
     $dsn = "pgsql:host=$host;port=$port;dbname=$db;sslmode=require";
 } else {
     // CPANEL ENVIRONMENT (MySQL)
-    $host = 'localhost';
+    // NOTE: If you still get 'Access denied', please check:
+    // 1. The database name is exactly 'neodiqgi_Eli' (check for typos like q vs g)
+    // 2. The user 'neodiqqi_eleni_user' is added to 'neodiqgi_Eli' with ALL PRIVILEGES
+    // 3. The password 'a1e2y3t4h5' is correct
+    $host = '127.0.0.1'; // Using 127.0.0.1 instead of localhost can sometimes bypass socket issues
     $user = 'neodiqqi_eleni_user';
     $pass = 'a1e2y3t4h5';
     $db   = 'neodiqgi_Eli';
