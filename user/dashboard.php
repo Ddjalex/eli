@@ -51,17 +51,17 @@ $available_plans = $stmt->fetchAll();
 
         <div class="bg-zinc-900 border border-white/10 p-8 rounded-3xl mb-12 relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-3xl"></div>
-            <h2 class="text-sm font-bold text-zinc-500 uppercase tracking-[0.3em] mb-2">Account Status</h2>
+            <h2 class="text-sm font-bold text-zinc-500 uppercase tracking-[0.3em] mb-2"><?php echo $user['status'] === 'approved' ? 'Payment Status' : 'Account Status'; ?></h2>
             <div class="flex items-center gap-3">
                 <div class="w-3 h-3 rounded-full <?php echo $user['status'] === 'approved' ? 'bg-emerald-500 animate-pulse' : 'bg-yellow-500'; ?>"></div>
                 <span class="text-2xl font-black uppercase tracking-tighter">
-                    <?php echo $user['status'] === 'approved' ? '✓ Approved' : '🔒 Pending'; ?>
+                    <?php echo $user['status'] === 'approved' ? '✓ Payment Approved' : '🔒 Pending'; ?>
                 </span>
             </div>
             
             <?php if ($user['status'] === 'approved'): ?>
                 <div class="mt-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl">
-                    <p class="text-emerald-400 text-sm font-semibold">✓ Your account has been approved! All meal plans are now unlocked and ready to view.</p>
+                    <p class="text-emerald-400 text-sm font-semibold">✓ Your payment has been approved! Your <?php echo str_replace('_', ' ', ucfirst($user['package'])); ?> meal plan is now unlocked and ready to view.</p>
                 </div>
             <?php else: ?>
                 <div class="mt-6 p-4 bg-white/5 border border-white/10 rounded-2xl">
