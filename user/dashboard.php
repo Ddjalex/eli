@@ -9,8 +9,16 @@ $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
+// Handle package change
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_package'])) {
+    $new_package = $_POST['new_package'];
+    $stmt = $pdo->prepare("UPDATE users SET package = ? WHERE id = ?");
+    $stmt->execute([$new_package, $_SESSION['user_id']]);
+    $user['package'] = $new_package;
+}
+
 // Fetch meal plans from database
-$stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE package_type = ? OR package_type IS NULL");
+$stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE package_type = ? OR package_type IS NULL ORDER BY id ASC");
 $stmt->execute([$user['package']]);
 $available_plans = $stmt->fetchAll();
 ?>
@@ -52,6 +60,18 @@ $available_plans = $stmt->fetchAll();
                     <a href="payment.php" class="inline-block bg-white text-black px-8 py-3 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Submit Receipt</a>
                 </div>
             <?php endif; ?>
+        </div>
+
+        <div class="bg-zinc-900 border border-white/10 p-8 rounded-3xl mb-12">
+            <h2 class="text-sm font-bold text-zinc-500 uppercase tracking-[0.3em] mb-4">Change Your Package</h2>
+            <form method="POST" class="flex gap-4">
+                <select name="new_package" class="flex-1 bg-black border border-white/10 p-4 rounded-xl text-white font-bold uppercase text-xs focus:border-emerald-500 outline-none">
+                    <option value="weight_loss" <?php echo $user['package'] === 'weight_loss' ? 'selected' : ''; ?>>Weight Loss Plan</option>
+                    <option value="muscle_gain" <?php echo $user['package'] === 'muscle_gain' ? 'selected' : ''; ?>>Muscle Gain Plan</option>
+                    <option value="sports_performance" <?php echo $user['package'] === 'sports_performance' ? 'selected' : ''; ?>>Sports Performance</option>
+                </select>
+                <button type="submit" name="change_package" value="1" class="bg-emerald-600 text-white px-8 py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-emerald-500 transition-all">Update Plan</button>
+            </form>
         </div>
 
         <h2 class="text-xl font-bold mb-8 uppercase tracking-widest flex items-center gap-3">
