@@ -1,32 +1,32 @@
 <?php
-// Database configuration using PostgreSQL (from Replit environment)
+// Unified Database configuration for Replit (PostgreSQL) and cPanel (MySQL)
 $db_url = getenv('DATABASE_URL');
 
-if (!$db_url) {
-    die("Database connection failed: DATABASE_URL not set.");
-}
-
-// Robust parsing for DATABASE_URL
-if (preg_match('/^postgres(?:ql)?:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)$/', $db_url, $matches)) {
-    $user = $matches[1];
-    $pass = $matches[2];
-    $host = $matches[3];
-    $port = $matches[4];
-    $db   = $matches[5];
-} else {
-    // Fallback to parse_url
-    $db_opts = parse_url($db_url);
-    if (!$db_opts) {
-        die("Database connection failed: Malformed DATABASE_URL.");
+if ($db_url) {
+    // REPLIT ENVIRONMENT (PostgreSQL)
+    if (preg_match('/^postgres(?:ql)?:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)$/', $db_url, $matches)) {
+        $user = $matches[1];
+        $pass = $matches[2];
+        $host = $matches[3];
+        $port = $matches[4];
+        $db   = $matches[5];
+    } else {
+        $db_opts = parse_url($db_url);
+        $host = $db_opts['host'] ?? 'localhost';
+        $port = $db_opts['port'] ?? '5432';
+        $db   = ltrim($db_opts['path'] ?? '', '/');
+        $user = $db_opts['user'] ?? '';
+        $pass = $db_opts['pass'] ?? '';
     }
-    $host = $db_opts['host'] ?? 'localhost';
-    $port = $db_opts['port'] ?? '5432';
-    $db   = ltrim($db_opts['path'] ?? '', '/');
-    $user = $db_opts['user'] ?? '';
-    $pass = $db_opts['pass'] ?? '';
+    $dsn = "pgsql:host=$host;port=$port;dbname=$db;sslmode=require";
+} else {
+    // CPANEL ENVIRONMENT (MySQL)
+    $host = 'localhost';
+    $user = 'neodiqqi_eleni_user';
+    $pass = 'a1e2y3t4h5';
+    $db   = 'neodiqgi_Eli';
+    $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
 }
-
-$dsn = "pgsql:host=$host;port=$port;dbname=$db;sslmode=require";
 
 try {
     $pdo = new PDO($dsn, $user, $pass, [
