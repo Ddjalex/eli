@@ -78,24 +78,27 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                 <div class="text-4xl mb-6">🤝</div>
                 <h3 class="text-xl font-bold mb-4 uppercase">1-on-1 Counseling</h3>
                 <p class="text-zinc-500 text-sm mb-8">Personalized Online & In-person sessions tailored to your unique biology.</p>
-                <div class="mt-auto">
-                    <a href="register.php" class="inline-block bg-white text-black px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Join Now</a>
+                <div class="mt-auto flex gap-4">
+                    <a href="service-detail.php?id=counseling" class="inline-block border border-white/10 text-white px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-white hover:text-black transition-all">Details</a>
+                    <a href="register.php" class="inline-block bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-emerald-500 transition-all">Join Now</a>
                 </div>
             </div>
             <div class="bg-zinc-900/50 p-10 rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all flex flex-col">
                 <div class="text-4xl mb-6">📋</div>
                 <h3 class="text-xl font-bold mb-4 uppercase">Custom Meal Planning</h3>
                 <p class="text-zinc-500 text-sm mb-8">Science-backed protocols for weight loss, muscle gain, or performance.</p>
-                <div class="mt-auto">
-                    <a href="register.php" class="inline-block bg-white text-black px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Join Now</a>
+                <div class="mt-auto flex gap-4">
+                    <a href="service-detail.php?id=meal-planning" class="inline-block border border-white/10 text-white px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-white hover:text-black transition-all">Details</a>
+                    <a href="register.php" class="inline-block bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-emerald-500 transition-all">Join Now</a>
                 </div>
             </div>
             <div class="bg-zinc-900/50 p-10 rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all flex flex-col">
                 <div class="text-4xl mb-6">🏢</div>
                 <h3 class="text-xl font-bold mb-4 uppercase">Corporate Wellness</h3>
                 <p class="text-zinc-500 text-sm mb-8">Group coaching and wellness strategy for high-performance teams.</p>
-                <div class="mt-auto">
-                    <a href="register.php" class="inline-block bg-white text-black px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Join Now</a>
+                <div class="mt-auto flex gap-4">
+                    <a href="service-detail.php?id=wellness" class="inline-block border border-white/10 text-white px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-white hover:text-black transition-all">Details</a>
+                    <a href="register.php" class="inline-block bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-emerald-500 transition-all">Join Now</a>
                 </div>
             </div>
         </div>
