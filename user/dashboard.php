@@ -53,17 +53,9 @@ $available_plans = $stmt->fetchAll();
             <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-3xl"></div>
             <h2 class="text-sm font-bold text-zinc-500 uppercase tracking-[0.3em] mb-2">Account Status</h2>
             <div class="flex items-center gap-3">
-                <div class="w-3 h-3 rounded-full <?php echo $user['status'] === 'approved' ? 'bg-emerald-500 animate-pulse' : ($has_payment ? 'bg-blue-500 animate-pulse' : 'bg-yellow-500'); ?>"></div>
+                <div class="w-3 h-3 rounded-full <?php echo $user['status'] === 'approved' ? 'bg-emerald-500 animate-pulse' : 'bg-yellow-500'; ?>"></div>
                 <span class="text-2xl font-black uppercase tracking-tighter">
-                    <?php 
-                    if ($user['status'] === 'approved') {
-                        echo '✓ Fully Unlocked';
-                    } elseif ($has_payment) {
-                        echo '⏳ Waiting for Approval';
-                    } else {
-                        echo '🔒 Verification Pending';
-                    }
-                    ?>
+                    <?php echo $user['status'] === 'approved' ? '✓ Approved' : '🔒 Pending'; ?>
                 </span>
             </div>
             
@@ -71,18 +63,34 @@ $available_plans = $stmt->fetchAll();
                 <div class="mt-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl">
                     <p class="text-emerald-400 text-sm font-semibold">✓ Your account has been approved! All meal plans are now unlocked and ready to view.</p>
                 </div>
-            <?php elseif ($has_payment): ?>
-                <div class="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-2xl">
-                    <p class="text-blue-400 text-sm mb-3">Your payment receipt is under verification. Admin typically approves within 24 hours.</p>
-                    <p class="text-blue-300 text-xs text-opacity-70">Once approved, you'll receive instant access to all meal plans in this dashboard.</p>
-                </div>
             <?php else: ?>
                 <div class="mt-6 p-4 bg-white/5 border border-white/10 rounded-2xl">
-                    <p class="text-zinc-400 text-sm mb-4">Your personalized meal plans are currently in the secure vault. Complete your verification to gain full access.</p>
-                    <a href="payment.php" class="inline-block bg-white text-black px-8 py-3 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Submit Receipt</a>
+                    <p class="text-zinc-400 text-sm">Your account is awaiting verification. Submit a payment receipt to unlock premium meal plans.</p>
                 </div>
             <?php endif; ?>
         </div>
+
+        <?php if ($has_payment): ?>
+            <div class="bg-zinc-900 border border-blue-500/30 bg-blue-500/5 p-8 rounded-3xl mb-12 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl"></div>
+                <h2 class="text-sm font-bold text-blue-500 uppercase tracking-[0.3em] mb-2">Payment Status</h2>
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></div>
+                    <span class="text-2xl font-black uppercase tracking-tighter text-blue-400">⏳ Waiting for Approval</span>
+                </div>
+                <div class="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl">
+                    <p class="text-blue-400 text-sm mb-3">Your payment receipt is under verification by the admin. This typically takes within 24 hours.</p>
+                    <p class="text-blue-300 text-xs">Once approved, you'll receive instant access to all your meal plans.</p>
+                </div>
+            </div>
+        <?php elseif ($user['status'] === 'pending'): ?>
+            <div class="bg-zinc-900 border border-yellow-500/30 bg-yellow-500/5 p-8 rounded-3xl mb-12">
+                <h2 class="text-sm font-bold text-yellow-500 uppercase tracking-[0.3em] mb-4">Payment Required</h2>
+                <p class="text-yellow-400 text-sm mb-6">Submit a payment receipt to unlock access to your personalized meal plans.</p>
+                <a href="payment.php" class="inline-block bg-white text-black px-8 py-3 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Submit Receipt Now</a>
+            </div>
+        <?php endif; ?>
+
 
         <div class="bg-zinc-900 border border-white/10 p-8 rounded-3xl mb-12">
             <h2 class="text-sm font-bold text-zinc-500 uppercase tracking-[0.3em] mb-4">Change Your Package</h2>
