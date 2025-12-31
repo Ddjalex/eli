@@ -33,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Image updated successfully!";
     }
 }
-}
 
 $settings = $pdo->query("SELECT * FROM site_settings WHERE key NOT LIKE 'contact_%' AND key NOT LIKE 'footer_%'")->fetchAll();
 ?>

@@ -25,8 +25,10 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
     <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
     <style>
         :root { --accent-green: #10b981; }
+        .hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease-in-out; }
+        .hero-slide.active { opacity: 1; }
         .hero-bg-image { 
-            background-image: url('<?php echo $hero_bg; ?>');
+            position: absolute; inset: 0;
             background-size: cover; background-position: center; filter: brightness(0.4);
         }
         .scroll-reveal { opacity: 0; transform: scale(0.95); }
@@ -46,15 +48,44 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
     </nav>
 
     <div id="home" class="relative h-screen flex items-center justify-center overflow-hidden">
-        <div class="absolute inset-0 hero-bg-image"></div>
-        <div class="relative z-10 text-center px-4">
-            <h1 class="text-7xl md:text-9xl font-black uppercase tracking-tighter mb-4 leading-none">
-                Fuel Your <br><span class="text-emerald-500">Potential</span>
-            </h1>
-            <p class="text-xl tracking-[0.3em] uppercase text-zinc-400 mb-8"><?php echo $about_philosophy; ?></p>
-            <a href="register.php" class="bg-white text-black px-10 py-4 rounded-full font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all transform hover:scale-105 inline-block">Start Your Journey</a>
-        </div>
+        <?php
+        $slides = $pdo->query("SELECT * FROM hero_slides ORDER BY display_order ASC, id DESC")->fetchAll();
+        if (empty($slides)) {
+            // Fallback to static if no slides
+            $slides = [[
+                'image_url' => 'attached_assets/stock_images/modern_nutrition_hea_7726d1af.jpg',
+                'title_main' => 'FUEL YOUR',
+                'title_accent' => 'POTENTIAL',
+                'subtitle' => 'SCIENCE & EMPATHY'
+            ]];
+        }
+        
+        foreach ($slides as $index => $slide): ?>
+            <div class="hero-slide <?php echo $index === 0 ? 'active' : ''; ?>">
+                <div class="absolute inset-0 hero-bg-image" style="background-image: url('<?php echo $slide['image_url']; ?>');"></div>
+                <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+                    <h1 class="text-7xl md:text-9xl font-black uppercase tracking-tighter mb-4 leading-none">
+                        <?php echo $slide['title_main']; ?> <br><span class="text-emerald-500"><?php echo $slide['title_accent']; ?></span>
+                    </h1>
+                    <p class="text-xl tracking-[0.3em] uppercase text-zinc-400 mb-8"><?php echo $slide['subtitle']; ?></p>
+                    <a href="register.php" class="bg-white text-black px-10 py-4 rounded-full font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all transform hover:scale-105 inline-block">Start Your Journey</a>
+                </div>
+            </div>
+        <?php endforeach; ?>
     </div>
+
+    <script>
+        // Hero Slider Logic
+        const slides = document.querySelectorAll('.hero-slide');
+        if (slides.length > 1) {
+            let currentSlide = 0;
+            setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, 5000);
+        }
+    </script>
 
     <section id="about" class="py-32 px-6 md:px-24 bg-zinc-950">
         <div class="grid md:grid-cols-2 gap-16 items-center">
