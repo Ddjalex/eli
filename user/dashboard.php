@@ -70,7 +70,7 @@ $available_plans = $stmt->fetchAll();
             <?php endif; ?>
         </div>
 
-        <?php if ($has_payment): ?>
+        <?php if ($has_payment && $user['status'] === 'pending'): ?>
             <div class="bg-zinc-900 border border-blue-500/30 bg-blue-500/5 p-8 rounded-3xl mb-12 relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl"></div>
                 <h2 class="text-sm font-bold text-blue-500 uppercase tracking-[0.3em] mb-2">Payment Status</h2>
@@ -83,7 +83,7 @@ $available_plans = $stmt->fetchAll();
                     <p class="text-blue-300 text-xs">Once approved, you'll receive instant access to all your meal plans.</p>
                 </div>
             </div>
-        <?php elseif ($user['status'] === 'pending'): ?>
+        <?php elseif ($user['status'] === 'pending' && !$has_payment): ?>
             <div class="bg-zinc-900 border border-yellow-500/30 bg-yellow-500/5 p-8 rounded-3xl mb-12">
                 <h2 class="text-sm font-bold text-yellow-500 uppercase tracking-[0.3em] mb-4">Payment Required</h2>
                 <p class="text-yellow-400 text-sm mb-6">Submit a payment receipt to unlock access to your personalized meal plans.</p>
