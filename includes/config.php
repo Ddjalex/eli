@@ -4,11 +4,17 @@ $db_url = getenv('DATABASE_URL');
 
 // Enable error logging for cPanel debugging
 if (!$db_url) {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
+    ini_set('display_errors', 0); // Don't show errors on the screen
     ini_set('log_errors', 1);
-    ini_set('error_log', dirname(__FILE__) . '/../error_log.php');
+    // Explicitly set the absolute path for the error log file
+    $log_file = $_SERVER['DOCUMENT_ROOT'] . '/error_log.php';
+    ini_set('error_log', $log_file);
+    
+    // Create the file if it doesn't exist and ensure it's writable
+    if (!file_exists($log_file)) {
+        file_put_contents($log_file, "<?php /* Error Log File */ die(); ?>\n");
+        chmod($log_file, 0644);
+    }
 }
 
 if ($db_url) {
