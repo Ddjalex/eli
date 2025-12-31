@@ -45,10 +45,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $upload_dir = '../uploads/site/';
         if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
         
-        $filename = $key . '_' . time() . '_' . basename($_FILES['image']['name']);
+        $filename = $key . '_' . time() . '_' . str_replace(' ', '_', basename($_FILES['image']['name']));
         $target = $upload_dir . $filename;
         
         if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
+            // Check if it's a HEIC file and convert it
+            $ext = strtolower(pathinfo($target, PATHINFO_EXTENSION));
+            if ($ext === 'heic') {
+                $new_target = str_replace('.heic', '.jpg', strtolower($target));
+                shell_exec("convert \"$target\" \"$new_target\"");
+                if (file_exists($new_target)) {
+                    unlink($target);
+                    $filename = str_replace('.heic', '.jpg', strtolower($filename));
+                }
+            }
+            
             $db_path = 'uploads/site/' . $filename;
             $stmt = $pdo->prepare("UPDATE site_settings SET value = ? WHERE key = ?");
             $stmt->execute([$db_path, $key]);
