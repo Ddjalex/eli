@@ -12,7 +12,7 @@ if (!$db_url) {
     
     // Create the file if it doesn't exist and ensure it's writable
     if (!file_exists($log_file)) {
-        file_put_contents($log_file, "<?php /* Error Log File */ die(); ?>\n");
+        file_put_contents($log_file, "<?php /* Error Log File */ \n");
         chmod($log_file, 0644);
     }
 }
