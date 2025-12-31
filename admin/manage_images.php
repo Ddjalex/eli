@@ -53,7 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $ext = strtolower(pathinfo($target, PATHINFO_EXTENSION));
             if ($ext === 'heic') {
                 $new_target = str_replace('.heic', '.jpg', strtolower($target));
-                shell_exec("convert \"$target\" \"$new_target\"");
+                // Use mogrify or convert with fallback
+                shell_exec("mogrify -format jpg \"$target\"");
                 if (file_exists($new_target)) {
                     unlink($target);
                     $filename = str_replace('.heic', '.jpg', strtolower($filename));
