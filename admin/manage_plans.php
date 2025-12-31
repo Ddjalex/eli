@@ -7,6 +7,27 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 $message = '';
 
+function convertHEIC($target, $upload_dir, $filename) {
+    $ext = strtolower(pathinfo($target, PATHINFO_EXTENSION));
+    if ($ext === 'heic') {
+        $new_filename = str_replace('.heic', '.jpg', strtolower($filename));
+        $new_target = $upload_dir . $new_filename;
+        
+        shell_exec("convert \"heic:$target\" -quality 90 -flatten \"$new_target\"");
+        if (file_exists($new_target)) {
+            unlink($target);
+            return $new_filename;
+        }
+        
+        shell_exec("mogrify -format jpg -quality 90 \"$target\"");
+        if (file_exists($new_target)) {
+            unlink($target);
+            return $new_filename;
+        }
+    }
+    return $filename;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add_plan'])) {
         $stmt = $pdo->prepare("INSERT INTO meal_plans (title, package_type) VALUES (?, ?)");
@@ -42,16 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $filename = 'preview_' . $plan_id . '_' . time() . '_' . str_replace(' ', '_', basename($_FILES['preview_image']['name']));
             $target = $preview_dir . $filename;
             if (move_uploaded_file($_FILES['preview_image']['tmp_name'], $target)) {
-                $ext = strtolower(pathinfo($target, PATHINFO_EXTENSION));
-                if ($ext === 'heic') {
-                    $new_filename = str_replace('.heic', '.jpg', strtolower($filename));
-                    $new_target = $preview_dir . $new_filename;
-                    shell_exec("convert \"$target\" -quality 90 -flatten \"$new_target\"");
-                    if (file_exists($new_target)) {
-                        unlink($target);
-                        $filename = $new_filename;
-                    }
-                }
+                $filename = convertHEIC($target, $preview_dir, $filename);
                 $db_path = 'uploads/previews/' . $filename;
                 $stmt = $pdo->prepare("UPDATE meal_plans SET preview_image = ? WHERE id = ?");
                 $stmt->execute([$db_path, $plan_id]);
@@ -118,8 +130,10 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
                         
                         <div class="flex flex-col md:flex-row gap-8">
                             <div class="w-full md:w-1/3">
-                                <div class="aspect-square rounded-3xl overflow-hidden bg-black border border-white/5 mb-4">
-                                    <?php if ($p['preview_image']): ?>
+                                <div class="aspect-square rounded-3xl overflow-hidden bg-black border border-white/5 mb-4 relative">
+                                    <?php if (str_ends_with(strtolower($p['preview_image']), '.heic')): ?>
+                                         <div class="absolute inset-0 flex items-center justify-center bg-zinc-900 text-[10px] text-zinc-500 font-bold uppercase text-center p-2 italic">Format: HEIC (Please Re-upload)</div>
+                                    <?php elseif ($p['preview_image']): ?>
                                         <img src="../<?php echo $p['preview_image']; ?>" class="w-full h-full object-cover">
                                     <?php else: ?>
                                         <div class="w-full h-full flex items-center justify-center text-zinc-700 font-bold uppercase tracking-widest text-[10px]">No Preview</div>

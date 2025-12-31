@@ -7,6 +7,29 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 $message = '';
 
+function convertHEIC($target, $upload_dir, $filename) {
+    $ext = strtolower(pathinfo($target, PATHINFO_EXTENSION));
+    if ($ext === 'heic') {
+        $new_filename = str_replace('.heic', '.jpg', strtolower($filename));
+        $new_target = $upload_dir . $new_filename;
+        
+        // Strategy 1: Flattened HEIC with explicit format
+        shell_exec("convert \"heic:$target\" -quality 90 -flatten \"$new_target\"");
+        if (file_exists($new_target)) {
+            unlink($target);
+            return $new_filename;
+        }
+        
+        // Strategy 2: Using mogrify which is sometimes more robust for HEIC
+        shell_exec("mogrify -format jpg -quality 90 \"$target\"");
+        if (file_exists($new_target)) {
+            unlink($target);
+            return $new_filename;
+        }
+    }
+    return $filename;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add_slide']) && isset($_FILES['slide_image'])) {
         $upload_dir = '../uploads/slides/';
@@ -16,18 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $target = $upload_dir . $filename;
         
         if (move_uploaded_file($_FILES['slide_image']['tmp_name'], $target)) {
-            // HEIC Support
-            $ext = strtolower(pathinfo($target, PATHINFO_EXTENSION));
-            if ($ext === 'heic') {
-                $new_filename = str_replace('.heic', '.jpg', strtolower($filename));
-                $new_target = $upload_dir . $new_filename;
-                shell_exec("convert \"$target\" -quality 90 -flatten \"$new_target\"");
-                if (file_exists($new_target)) {
-                    unlink($target);
-                    $filename = $new_filename;
-                }
-            }
-            
+            $filename = convertHEIC($target, $upload_dir, $filename);
             $db_path = 'uploads/slides/' . $filename;
             $stmt = $pdo->prepare("INSERT INTO hero_slides (image_url, title_main, title_accent, subtitle, display_order) VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([
@@ -46,16 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $filename = 'slide_' . time() . '_' . str_replace(' ', '_', basename($_FILES['slide_image']['name']));
             $target = $upload_dir . $filename;
             if (move_uploaded_file($_FILES['slide_image']['tmp_name'], $target)) {
-                $ext = strtolower(pathinfo($target, PATHINFO_EXTENSION));
-                if ($ext === 'heic') {
-                    $new_filename = str_replace('.heic', '.jpg', strtolower($filename));
-                    $new_target = $upload_dir . $new_filename;
-                    shell_exec("convert \"$target\" -quality 90 -flatten \"$new_target\"");
-                    if (file_exists($new_target)) {
-                        unlink($target);
-                        $filename = $new_filename;
-                    }
-                }
+                $filename = convertHEIC($target, $upload_dir, $filename);
                 $db_path = 'uploads/slides/' . $filename;
                 $stmt = $pdo->prepare("UPDATE hero_slides SET image_url = ? WHERE id = ?");
                 $stmt->execute([$db_path, $slide_id]);
@@ -136,7 +139,11 @@ $slides = $pdo->query("SELECT * FROM hero_slides ORDER BY display_order ASC, id 
             <?php foreach ($slides as $slide): ?>
                 <div class="glass rounded-[2rem] overflow-hidden group">
                     <div class="aspect-video relative overflow-hidden">
-                        <img src="../<?php echo $slide['image_url']; ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <?php if (str_ends_with(strtolower($slide['image_url']), '.heic')): ?>
+                             <div class="absolute inset-0 flex items-center justify-center bg-zinc-900 text-[10px] text-zinc-500 font-bold uppercase text-center p-2 italic">Format: HEIC (Please Re-upload)</div>
+                        <?php else: ?>
+                            <img src="../<?php echo $slide['image_url']; ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <?php endif; ?>
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent p-8 flex flex-col justify-end">
                             <h3 class="text-2xl font-black uppercase leading-none mb-2"><?php echo $slide['title_main']; ?> <span class="text-emerald-500"><?php echo $slide['title_accent']; ?></span></h3>
                             <p class="text-xs text-zinc-400 uppercase tracking-[0.3em]"><?php echo $slide['subtitle']; ?></p>
