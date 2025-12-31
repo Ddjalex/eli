@@ -116,7 +116,6 @@ $settings = $pdo->query("SELECT * FROM site_settings WHERE key NOT LIKE 'contact
                     </div>
                     <div class="flex-1 w-full">
                         <h3 class="text-xl font-bold uppercase tracking-tight mb-1 text-white"><?php echo str_replace('_', ' ', $s['key']); ?></h3>
-                        <p class="text-zinc-500 text-xs mb-4 uppercase tracking-widest"><?php echo $s['description']; ?></p>
                         <form method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-4">
                             <input type="hidden" name="setting_key" value="<?php echo $s['key']; ?>">
                             <input type="file" name="image" class="text-[10px] text-zinc-500 file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:uppercase file:tracking-widest file:bg-zinc-800 file:text-zinc-300 hover:file:bg-zinc-700 transition-all flex-1" required>
