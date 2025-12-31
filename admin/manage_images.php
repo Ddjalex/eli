@@ -82,7 +82,7 @@ $settings = $pdo->query("SELECT * FROM site_settings WHERE key NOT LIKE 'contact
             <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <input type="hidden" name="update_links" value="1">
                 <?php 
-                $links = $pdo->query("SELECT * FROM site_settings WHERE key LIKE 'contact_%' OR key LIKE 'footer_%'")->fetchAll();
+                $links = $pdo->query("SELECT * FROM site_settings WHERE key LIKE 'contact_%' OR key LIKE 'footer_%' ORDER BY key ASC")->fetchAll();
                 foreach ($links as $link): ?>
                     <div class="flex flex-col gap-1">
                         <label class="text-xs uppercase text-zinc-500 font-bold"><?php echo str_replace(['contact_', 'footer_'], '', $link['key']); ?></label>
