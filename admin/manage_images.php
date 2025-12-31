@@ -10,13 +10,13 @@ $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_links'])) {
         foreach ($_POST as $key => $value) {
-            if (strpos($key, 'link_contact_') === 0) {
+            if (strpos($key, 'link_') === 0) {
                 $setting_key = substr($key, 5);
                 $stmt = $pdo->prepare("UPDATE site_settings SET value = ? WHERE key = ?");
                 $stmt->execute([$value, $setting_key]);
             }
         }
-        $message = "Contact links updated successfully!";
+        $message = "Links and info updated successfully!";
     } elseif (isset($_FILES['image'])) {
         $key = $_POST['setting_key'];
     $upload_dir = '../uploads/site/';
@@ -33,8 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Image updated successfully!";
     }
 }
+}
 
-$settings = $pdo->query("SELECT * FROM site_settings")->fetchAll();
+$settings = $pdo->query("SELECT * FROM site_settings WHERE key NOT LIKE 'contact_%' AND key NOT LIKE 'footer_%'")->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -56,18 +57,20 @@ $settings = $pdo->query("SELECT * FROM site_settings")->fetchAll();
 
         <div class="grid gap-8">
             <div class="bg-zinc-900 p-8 rounded-2xl border border-white/10 mb-8">
-                <h2 class="text-2xl font-bold mb-6">Contact Links</h2>
-                <form method="POST" class="space-y-4">
+                <h2 class="text-2xl font-bold mb-6">Business Info & Links</h2>
+                <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <input type="hidden" name="update_links" value="1">
                     <?php 
-                    $links = $pdo->query("SELECT * FROM site_settings WHERE key LIKE 'contact_%'")->fetchAll();
+                    $links = $pdo->query("SELECT * FROM site_settings WHERE key LIKE 'contact_%' OR key LIKE 'footer_%'")->fetchAll();
                     foreach ($links as $link): ?>
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs uppercase text-zinc-500 font-bold"><?php echo str_replace('_', ' ', $link['key']); ?></label>
+                            <label class="text-xs uppercase text-zinc-500 font-bold"><?php echo str_replace(['contact_', 'footer_'], '', $link['key']); ?></label>
                             <input type="text" name="link_<?php echo $link['key']; ?>" value="<?php echo htmlspecialchars($link['value']); ?>" class="bg-black border border-white/10 p-3 rounded-lg text-sm focus:border-emerald-500 outline-none">
                         </div>
                     <?php endforeach; ?>
-                    <button type="submit" class="bg-emerald-600 px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-emerald-500 transition-all">Save Links</button>
+                    <div class="md:col-span-2">
+                        <button type="submit" class="bg-emerald-600 px-8 py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-emerald-500 transition-all">Save Business Info</button>
+                    </div>
                 </form>
             </div>
             <?php foreach ($settings as $s): 

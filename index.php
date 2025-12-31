@@ -118,14 +118,72 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
         </div>
     </section>
 
-    <footer id="contact" class="py-20 bg-black border-t border-white/10 px-6 text-center">
-        <h2 class="text-4xl font-bold mb-10 uppercase tracking-tighter">Get In <span class="text-emerald-500">Touch</span></h2>
-        <div class="flex justify-center gap-12 mb-12">
-            <a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_telehealth_link'")->fetchColumn() ?: '#'; ?>" class="text-zinc-500 hover:text-white uppercase tracking-[0.2em] text-xs">Telehealth</a>
-            <a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_social_ig'")->fetchColumn() ?: '#'; ?>" class="text-zinc-500 hover:text-white uppercase tracking-[0.2em] text-xs">Instagram</a>
-            <a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_whatsapp_link'")->fetchColumn() ?: '#'; ?>" class="text-zinc-500 hover:text-white uppercase tracking-[0.2em] text-xs">WhatsApp</a>
+    <footer id="contact" class="py-24 bg-black border-t border-white/10 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 text-left">
+            <!-- Address List -->
+            <div>
+                <h3 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-8">Address List</h3>
+                <div class="space-y-6">
+                    <div class="flex items-start gap-4">
+                        <span class="text-emerald-500 text-xl">📍</span>
+                        <p class="text-zinc-400 text-sm leading-relaxed">
+                            <?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'footer_address'")->fetchColumn() ?: 'Addis Ababa, Ethiopia'; ?>
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-emerald-500 text-xl">📱</span>
+                        <p class="text-zinc-400 text-sm font-bold">
+                            <?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_phone'")->fetchColumn() ?: '+251 911 000 000'; ?>
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-emerald-500 text-xl">✉️</span>
+                        <p class="text-zinc-400 text-sm">
+                            <?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'footer_email'")->fetchColumn() ?: 'info@elenimekuria.com'; ?>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-8">Quick Links</h3>
+                <ul class="space-y-4 text-sm">
+                    <li><a href="#home" class="text-zinc-400 hover:text-emerald-500 transition-all uppercase tracking-widest font-bold text-[10px]">Home</a></li>
+                    <li><a href="#about" class="text-zinc-400 hover:text-emerald-500 transition-all uppercase tracking-widest font-bold text-[10px]">About Us</a></li>
+                    <li><a href="#services" class="text-zinc-400 hover:text-emerald-500 transition-all uppercase tracking-widest font-bold text-[10px]">Our Services</a></li>
+                    <li><a href="#testimonials" class="text-zinc-400 hover:text-emerald-500 transition-all uppercase tracking-widest font-bold text-[10px]">Success Stories</a></li>
+                </ul>
+            </div>
+
+            <!-- Social Networks -->
+            <div>
+                <h3 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-8">Social Networks</h3>
+                <ul class="space-y-4 text-sm">
+                    <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'footer_tiktok'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-3 uppercase tracking-widest font-bold text-[10px]"><span>🎵</span> Tiktok</a></li>
+                    <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_social_ig'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-3 uppercase tracking-widest font-bold text-[10px]"><span>📸</span> Instagram</a></li>
+                    <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_whatsapp_link'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-3 uppercase tracking-widest font-bold text-[10px]"><span>💬</span> Whatsapp</a></li>
+                    <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'footer_telegram'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-3 uppercase tracking-widest font-bold text-[10px]"><span>✈️</span> Telegram</a></li>
+                </ul>
+            </div>
+
+            <!-- Branding -->
+            <div class="flex flex-col items-start">
+                <div class="text-3xl font-black text-emerald-500 uppercase tracking-tighter mb-4">Eleni</div>
+                <p class="text-zinc-500 text-xs italic leading-relaxed mb-8">
+                    Elevating the standard of nutritional health in Ethiopia through science and empathy.
+                </p>
+                <a href="#home" class="bg-zinc-900 border border-white/10 p-3 rounded-xl hover:bg-emerald-600 transition-all">
+                    <span class="text-white">↑</span>
+                </a>
+            </div>
         </div>
-        <p class="text-zinc-600 text-[10px] uppercase tracking-widest">&copy; 2025 Eleni Mekuria. All Rights Reserved.</p>
+        
+        <div class="mt-20 pt-10 border-t border-white/5 text-center">
+            <p class="text-zinc-600 text-[10px] uppercase tracking-[0.4em] font-bold">
+                Copyright &copy; 2026 Eleni Mekuria. All Rights Reserved.
+            </p>
+        </div>
     </footer>
 
     <script>
