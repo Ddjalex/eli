@@ -1,7 +1,7 @@
 run = "php -S 0.0.0.0:8000 -t ."
 
 entrypoint = "index.php"
-modules = ["php-8.2", "nix", "postgresql-16"]
+modules = ["php-8.2", "nix", "php-8.4", "postgresql-16"]
 
 [nix]
 channel = "stable-25_05"
@@ -38,5 +38,5 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "php -S 0.0.0.0:5000 -t ."
+args = "php -S 0.0.0.0:5000"
 waitForPort = 5000
