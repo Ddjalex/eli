@@ -2,9 +2,16 @@
 require_once '../includes/config.php';
 if (!isset($_SESSION['user_id'])) exit;
 
+$message = '';
+if (isset($_GET['reason']) && $_GET['reason'] === 'unauthorized') {
+    $message = "Your access is currently locked. Please upload your receipt for manual verification.";
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
     $upload_dir = '../uploads/receipts/';
-    $filename = time() . '_' . $_FILES['receipt']['name'];
+    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+    
+    $filename = time() . '_' . basename($_FILES['receipt']['name']);
     $target = $upload_dir . $filename;
 
     if (move_uploaded_file($_FILES['receipt']['tmp_name'], $target)) {
@@ -19,25 +26,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Payment - Eleni Mekuria</title>
+    <title>Secure Verification | Eleni Mekuria</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-black text-white p-8">
-    <div class="max-w-md mx-auto bg-zinc-900 border border-zinc-800 p-8 rounded-xl">
-        <h2 class="text-3xl font-bold mb-6">Payment</h2>
-        <div class="mb-8 p-4 bg-zinc-800 rounded">
-            <h3 class="font-bold mb-2">Bank Details</h3>
-            <p>Admin Bank Name: CBE</p>
-            <p>Account: 1000XXXXXXXXX</p>
-            <p>Name: Eleni Mekuria</p>
+<body class="bg-black text-white p-6 md:p-24 flex items-center justify-center min-h-screen">
+    <div class="max-w-xl w-full bg-zinc-900 border border-white/10 p-10 rounded-3xl shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
+        <div class="mb-10">
+            <h2 class="text-3xl font-black uppercase tracking-tighter mb-2">Secure <span class="text-emerald-500">Vault</span> Access</h2>
+            <p class="text-zinc-400 text-sm">To unlock your premium meal plans, please complete the bank transfer and upload your receipt below.</p>
         </div>
-        <form method="POST" enctype="multipart/form-data">
-            <div class="mb-6">
-                <label class="block mb-2 text-zinc-400">Upload Receipt Screenshot</label>
-                <input type="file" name="receipt" class="w-full bg-black border border-zinc-800 p-3 rounded" required>
+
+        <?php if ($message): ?>
+            <div class="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl mb-8 text-emerald-500 text-xs font-bold uppercase tracking-widest text-center">
+                <?php echo $message; ?>
             </div>
-            <button type="submit" class="w-full bg-white text-black font-bold py-3 rounded">Submit for Approval</button>
+        <?php endif; ?>
+
+        <div class="mb-10 p-6 bg-white/5 border border-white/5 rounded-2xl">
+            <h3 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-4">Official Bank Details</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between">
+                    <span class="text-zinc-500 text-xs uppercase tracking-widest">Bank</span>
+                    <span class="font-bold text-sm">CBE (Commercial Bank)</span>
+                </div>
+                <div class="flex justify-between border-t border-white/5 pt-3">
+                    <span class="text-zinc-500 text-xs uppercase tracking-widest">Account</span>
+                    <span class="font-black text-emerald-500 text-sm">1000425432348</span>
+                </div>
+                <div class="flex justify-between border-t border-white/5 pt-3">
+                    <span class="text-zinc-500 text-xs uppercase tracking-widest">Name</span>
+                    <span class="font-bold text-sm">Eleni Mekuria</span>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            <div>
+                <label class="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-3">Upload Receipt Screenshot</label>
+                <div class="relative">
+                    <input type="file" name="receipt" class="w-full bg-black border border-white/10 p-4 rounded-xl focus:border-emerald-500 transition-all text-xs" required>
+                </div>
+            </div>
+            <button type="submit" class="w-full bg-emerald-600 text-white font-black uppercase tracking-[0.2em] py-5 rounded-xl hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-900/20">Submit for Approval</button>
         </form>
+        
+        <p class="mt-8 text-center text-zinc-600 text-[10px] uppercase tracking-widest">Your receipt is being verified. Once approved by Eleni, your download will be unlocked.</p>
+        <a href="dashboard.php" class="block text-center mt-6 text-zinc-500 hover:text-white text-[10px] uppercase font-bold tracking-widest">Back to Dashboard</a>
     </div>
 </body>
 </html>
