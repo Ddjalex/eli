@@ -160,10 +160,18 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
             <div>
                 <h3 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-8">Social Networks</h3>
                 <ul class="space-y-4 text-sm">
-                    <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'footer_tiktok'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-3 uppercase tracking-widest font-bold text-[10px]"><span>🎵</span> Tiktok</a></li>
-                    <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_social_ig'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-3 uppercase tracking-widest font-bold text-[10px]"><span>📸</span> Instagram</a></li>
-                    <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_whatsapp_link'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-3 uppercase tracking-widest font-bold text-[10px]"><span>💬</span> Whatsapp</a></li>
-                    <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'footer_telegram'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-3 uppercase tracking-widest font-bold text-[10px]"><span>✈️</span> Telegram</a></li>
+                    <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'footer_tiktok'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-3 uppercase tracking-widest font-bold text-[10px]">
+                        <img src="https://www.svgrepo.com/show/333611/tiktok.svg" class="w-4 h-4 invert opacity-50 hover:opacity-100" alt="TikTok"> Tiktok
+                    </a></li>
+                    <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_social_ig'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-3 uppercase tracking-widest font-bold text-[10px]">
+                        <img src="https://www.svgrepo.com/show/521711/instagram.svg" class="w-4 h-4 invert opacity-50 hover:opacity-100" alt="Instagram"> Instagram
+                    </a></li>
+                    <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_whatsapp_link'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-3 uppercase tracking-widest font-bold text-[10px]">
+                        <img src="https://www.svgrepo.com/show/513060/whatsapp.svg" class="w-4 h-4 invert opacity-50 hover:opacity-100" alt="WhatsApp"> Whatsapp
+                    </a></li>
+                    <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'footer_telegram'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-3 uppercase tracking-widest font-bold text-[10px]">
+                        <img src="https://www.svgrepo.com/show/354443/telegram.svg" class="w-4 h-4 invert opacity-50 hover:opacity-100" alt="Telegram"> Telegram
+                    </a></li>
                 </ul>
             </div>
 
