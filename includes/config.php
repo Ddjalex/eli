@@ -2,6 +2,15 @@
 // Unified Database configuration for Replit (PostgreSQL) and cPanel (MySQL)
 $db_url = getenv('DATABASE_URL');
 
+// Enable error logging for cPanel debugging
+if (!$db_url) {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+    ini_set('log_errors', 1);
+    ini_set('error_log', dirname(__FILE__) . '/../error_log.php');
+}
+
 if ($db_url) {
     // REPLIT ENVIRONMENT (PostgreSQL)
     if (preg_match('/^postgres(?:ql)?:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)$/', $db_url, $matches)) {
@@ -21,11 +30,7 @@ if ($db_url) {
     $dsn = "pgsql:host=$host;port=$port;dbname=$db;sslmode=require";
 } else {
     // CPANEL ENVIRONMENT (MySQL)
-    // NOTE: If you still get 'Access denied', please check:
-    // 1. The database name is exactly 'neodiqgi_Eli' (check for typos like q vs g)
-    // 2. The user 'neodiqqi_eleni_user' is added to 'neodiqgi_Eli' with ALL PRIVILEGES
-    // 3. The password 'a1e2y3t4h5' is correct
-    $host = '127.0.0.1'; // Using 127.0.0.1 instead of localhost can sometimes bypass socket issues
+    $host = '127.0.0.1';
     $user = 'neodiqqi_eleni_user';
     $pass = 'a1e2y3t4h5';
     $db   = 'neodiqgi_Eli';
@@ -39,6 +44,10 @@ try {
         PDO::ATTR_EMULATE_PREPARES   => false,
     ]);
 } catch (\PDOException $e) {
+    // Log connection errors specifically
+    if (!$db_url) {
+        error_log("Database connection failed: " . $e->getMessage());
+    }
     die("Database connection failed: " . $e->getMessage());
 }
 
