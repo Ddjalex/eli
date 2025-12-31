@@ -54,37 +54,37 @@ if (!file_exists($file_path)) {
     </style>
 </head>
 <body class="bg-black text-white">
-    <div class="min-h-screen pdf-viewer p-8">
+    <div class="min-h-screen pdf-viewer p-4 sm:p-6 md:p-8">
         <div class="max-w-4xl mx-auto">
             <!-- Header -->
-            <div class="flex justify-between items-center mb-8 pb-8 border-b border-white/10">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6 sm:mb-8 pb-6 sm:pb-8 border-b border-white/10">
                 <div>
-                    <h1 class="text-3xl font-bold text-emerald-500 uppercase tracking-tighter"><?php echo htmlspecialchars($plan['title']); ?></h1>
-                    <p class="text-zinc-500 text-sm mt-2">View & Study Your Meal Plan</p>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-emerald-500 uppercase tracking-tighter"><?php echo htmlspecialchars($plan['title']); ?></h1>
+                    <p class="text-zinc-500 text-xs sm:text-sm mt-2">View & Study Your Meal Plan</p>
                 </div>
-                <a href="user/dashboard.php" class="bg-zinc-900 border border-white/10 px-6 py-3 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-white/5 transition-all">Back to Dashboard</a>
+                <a href="user/dashboard.php" class="bg-zinc-900 border border-white/10 px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-xs tracking-widest hover:bg-white/5 transition-all whitespace-nowrap">Back to Dashboard</a>
             </div>
 
             <!-- PDF Viewer Controls -->
-            <div class="bg-zinc-900/50 border border-white/10 p-6 rounded-2xl mb-8">
-                <div class="flex justify-between items-center gap-4">
-                    <div class="flex items-center gap-2">
-                        <button id="prev-btn" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold uppercase text-xs hover:bg-emerald-500 transition-all">← Previous</button>
-                        <span id="page-num" class="mx-4 text-sm">Page <span id="current-page">1</span> of <span id="total-pages">--</span></span>
-                        <button id="next-btn" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold uppercase text-xs hover:bg-emerald-500 transition-all">Next →</button>
+            <div class="bg-zinc-900/50 border border-white/10 p-4 sm:p-6 rounded-xl sm:rounded-2xl mb-6 sm:mb-8">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+                    <div class="flex items-center gap-1 sm:gap-2 overflow-auto w-full sm:w-auto">
+                        <button id="prev-btn" class="bg-emerald-600 text-white px-2 sm:px-4 py-1 sm:py-2 rounded text-[9px] sm:rounded-lg sm:font-bold sm:uppercase sm:text-xs hover:bg-emerald-500 transition-all flex-shrink-0">←</button>
+                        <span id="page-num" class="mx-2 sm:mx-4 text-xs sm:text-sm whitespace-nowrap flex-shrink-0">Page <span id="current-page">1</span> of <span id="total-pages">--</span></span>
+                        <button id="next-btn" class="bg-emerald-600 text-white px-2 sm:px-4 py-1 sm:py-2 rounded text-[9px] sm:rounded-lg sm:font-bold sm:uppercase sm:text-xs hover:bg-emerald-500 transition-all flex-shrink-0">→</button>
                     </div>
                 </div>
             </div>
 
             <!-- PDF Canvas -->
-            <div class="bg-zinc-900/30 border border-white/10 p-8 rounded-2xl flex justify-center">
-                <canvas id="pdf-canvas"></canvas>
+            <div class="bg-zinc-900/30 border border-white/10 p-4 sm:p-6 md:p-8 rounded-lg sm:rounded-2xl flex justify-center overflow-x-auto">
+                <canvas id="pdf-canvas" style="max-width: 100%; height: auto;"></canvas>
             </div>
 
             <!-- Page Navigation at Bottom -->
-            <div class="flex justify-center gap-4 mt-8">
-                <button id="prev-btn-bottom" class="bg-emerald-600 text-white px-6 py-3 rounded-lg font-bold uppercase text-sm hover:bg-emerald-500 transition-all">← Previous Page</button>
-                <button id="next-btn-bottom" class="bg-emerald-600 text-white px-6 py-3 rounded-lg font-bold uppercase text-sm hover:bg-emerald-500 transition-all">Next Page →</button>
+            <div class="flex flex-col sm:flex-row justify-center gap-2 sm:gap-4 mt-6 sm:mt-8">
+                <button id="prev-btn-bottom" class="bg-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-lg font-bold uppercase text-[9px] sm:text-sm hover:bg-emerald-500 transition-all">← Previous Page</button>
+                <button id="next-btn-bottom" class="bg-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-lg font-bold uppercase text-[9px] sm:text-sm hover:bg-emerald-500 transition-all">Next Page →</button>
             </div>
         </div>
     </div>
