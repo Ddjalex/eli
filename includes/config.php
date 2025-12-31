@@ -2,6 +2,10 @@
 // Database configuration using PostgreSQL (from Replit environment)
 $db_url = getenv('DATABASE_URL');
 
+if (!$db_url) {
+    die("Database connection failed: DATABASE_URL not set.");
+}
+
 // Robust parsing for DATABASE_URL
 if (preg_match('/^postgres(?:ql)?:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)$/', $db_url, $matches)) {
     $user = $matches[1];
@@ -10,8 +14,11 @@ if (preg_match('/^postgres(?:ql)?:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)$/', $d
     $port = $matches[4];
     $db   = $matches[5];
 } else {
-    // Fallback to parse_url if regex fails, but with better error handling
+    // Fallback to parse_url
     $db_opts = parse_url($db_url);
+    if (!$db_opts) {
+        die("Database connection failed: Malformed DATABASE_URL.");
+    }
     $host = $db_opts['host'] ?? 'localhost';
     $port = $db_opts['port'] ?? '5432';
     $db   = ltrim($db_opts['path'] ?? '', '/');
@@ -19,7 +26,7 @@ if (preg_match('/^postgres(?:ql)?:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)$/', $d
     $pass = $db_opts['pass'] ?? '';
 }
 
-$dsn = "pgsql:host=$host;port=$port;dbname=$db";
+$dsn = "pgsql:host=$host;port=$port;dbname=$db;sslmode=require";
 
 try {
     $pdo = new PDO($dsn, $user, $pass, [
