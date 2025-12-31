@@ -35,7 +35,7 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
     </style>
 </head>
 <body class="bg-black text-white selection:bg-emerald-500">
-    <nav class="fixed w-full z-50 p-6 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/10">
+    <nav id="main-nav" class="fixed w-full z-50 p-6 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/10 transition-transform duration-500">
         <div class="text-2xl font-bold tracking-tighter uppercase text-emerald-500">Eleni Mekuria</div>
         <div class="hidden md:flex space-x-8 uppercase text-[10px] tracking-widest font-bold">
             <a href="#home" class="hover:text-emerald-400">Home</a>
@@ -229,6 +229,19 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
         const lenis = new Lenis();
         function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
         requestAnimationFrame(raf);
+
+        // Smart Navbar Hide/Show
+        let lastScrollY = window.scrollY;
+        const nav = document.getElementById('main-nav');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > lastScrollY && window.scrollY > 100) {
+                nav.style.transform = 'translateY(-100%)';
+            } else {
+                nav.style.transform = 'translateY(0)';
+            }
+            lastScrollY = window.scrollY;
+        });
 
         gsap.registerPlugin(ScrollTrigger);
         document.querySelectorAll('.scroll-reveal').forEach((el) => {
