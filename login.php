@@ -25,27 +25,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Eleni Mekuria</title>
+    <title>Member Login | Eleni Mekuria</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .auth-bg {
+            background-image: linear-gradient(to left, rgba(0,0,0,0.9) 40%, rgba(0,0,0,0.4)), url('attached_assets/stock_images/modern_nutrition_hea_600ebd32.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
 </head>
-<body class="bg-black text-white flex items-center justify-center min-h-screen">
-    <div class="bg-zinc-900 p-8 rounded-xl border border-zinc-800 w-full max-w-md">
-        <h2 class="text-3xl font-bold mb-6">Client Login</h2>
+<body class="bg-black text-white min-h-screen auth-bg flex items-center justify-end p-6 md:p-24">
+    <div class="max-w-md w-full bg-zinc-900/80 backdrop-blur-xl p-12 rounded-3xl border border-white/10 shadow-2xl">
+        <div class="mb-10 text-center">
+            <h2 class="text-4xl font-black uppercase tracking-tighter mb-2">Welcome <span class="text-emerald-500">Back</span></h2>
+            <p class="text-zinc-400">Login to access your personalized meal plans.</p>
+        </div>
+        
         <?php if ($error): ?>
-            <p class="text-red-500 mb-4"><?php echo $error; ?></p>
+            <div class="bg-red-500/10 border border-red-500/50 p-4 rounded-xl mb-8 text-center">
+                <p class="text-red-500 text-sm font-bold uppercase tracking-widest"><?php echo $error; ?></p>
+            </div>
         <?php endif; ?>
-        <form method="POST">
-            <div class="mb-4">
-                <label class="block mb-2">Email</label>
-                <input type="email" name="email" class="w-full bg-black border border-zinc-800 p-3 rounded" required>
+
+        <form method="POST" class="space-y-6">
+            <div>
+                <label class="block text-xs uppercase tracking-widest font-bold text-zinc-500 mb-2">Email Address</label>
+                <input type="email" name="email" class="w-full bg-black/50 border border-white/10 p-5 rounded-xl focus:border-emerald-500 transition-all outline-none" placeholder="your@email.com" required>
             </div>
-            <div class="mb-6">
-                <label class="block mb-2">Password</label>
-                <input type="password" name="password" class="w-full bg-black border border-zinc-800 p-3 rounded" required>
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-xs uppercase tracking-widest font-bold text-zinc-500">Password</label>
+                    <a href="#" class="text-[10px] uppercase font-bold text-emerald-500 hover:text-emerald-400">Forgot?</a>
+                </div>
+                <input type="password" name="password" class="w-full bg-black/50 border border-white/10 p-5 rounded-xl focus:border-emerald-500 transition-all outline-none" required>
             </div>
-            <button type="submit" class="w-full bg-white text-black font-bold py-3 rounded hover:bg-gray-200">Login</button>
+            <button type="submit" class="w-full bg-emerald-600 text-white font-black uppercase tracking-[0.2em] py-5 rounded-xl hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-900/20">Login to Portal</button>
         </form>
-        <p class="mt-4 text-center text-zinc-500">Don't have an account? <a href="register.php" class="text-white">Register</a></p>
+        
+        <p class="mt-10 text-center text-zinc-500 text-sm">New to the program? <a href="register.php" class="text-white hover:text-emerald-400 font-bold">Sign up today</a></p>
     </div>
 </body>
 </html>
