@@ -1,5 +1,8 @@
 <?php
 require_once 'includes/config.php';
+$stmt = $pdo->prepare("SELECT value FROM site_settings WHERE key = ?");
+$stmt->execute(['register_bg_image']);
+$reg_bg = $stmt->fetchColumn() ?: 'attached_assets/stock_images/nutrition_fresh_frui_271f4a7c.jpg';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
@@ -29,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .auth-bg {
-            background-image: linear-gradient(to right, rgba(0,0,0,0.9) 40%, rgba(0,0,0,0.4)), url('attached_assets/stock_images/nutrition_fresh_frui_271f4a7c.jpg');
+            background-image: linear-gradient(to right, rgba(0,0,0,0.9) 40%, rgba(0,0,0,0.4)), url('<?php echo $reg_bg; ?>');
             background-size: cover;
             background-position: center;
         }

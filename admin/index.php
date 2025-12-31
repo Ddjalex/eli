@@ -25,7 +25,10 @@ $users = $stmt->fetchAll();
 </head>
 <body class="bg-black text-white p-8">
     <div class="max-w-6xl mx-auto">
-        <h1 class="text-3xl font-bold mb-8">Admin Dashboard</h1>
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+            <a href="manage_images.php" class="bg-emerald-600 text-white px-6 py-2 rounded-full font-bold hover:bg-emerald-500">Manage Images</a>
+        </div>
         <table class="w-full border-collapse">
             <thead>
                 <tr class="bg-zinc-900 border-b border-zinc-800 text-left">

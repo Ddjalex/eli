@@ -1,3 +1,12 @@
+<?php
+require_once 'includes/config.php';
+$stmt = $pdo->prepare("SELECT value FROM site_settings WHERE key = ?");
+$stmt->execute(['hero_bg_image']);
+$hero_bg = $stmt->fetchColumn() ?: 'attached_assets/stock_images/modern_nutrition_hea_7726d1af.jpg';
+
+$stmt->execute(['about_image']);
+$about_img = $stmt->fetchColumn() ?: 'attached_assets/stock_images/professional_dietiti_8bb8decd.jpg';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +28,7 @@
             position: absolute; 
             top: 0; left: 0; 
             width: 100%; height: 100%; 
-            background-image: url('attached_assets/stock_images/modern_nutrition_hea_7726d1af.jpg');
+            background-image: url('<?php echo $hero_bg; ?>');
             background-size: cover;
             background-position: center;
             filter: brightness(0.4);
@@ -77,7 +86,7 @@
             <div class="scroll-reveal relative group">
                 <div class="absolute -inset-4 bg-emerald-500/20 rounded-2xl blur-xl group-hover:bg-emerald-500/30 transition-all"></div>
                 <div class="aspect-[4/5] rounded-2xl overflow-hidden border border-white/10 relative">
-                    <img src="attached_assets/stock_images/professional_dietiti_8bb8decd.jpg" alt="Eleni Mekuria" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700">
+                    <img src="<?php echo $about_img; ?>" alt="Eleni Mekuria" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700">
                 </div>
                 <div class="absolute -bottom-6 -left-6 bg-emerald-600 p-8 rounded-xl shadow-2xl">
                     <span class="text-5xl font-black block">400+</span>
