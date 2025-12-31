@@ -74,20 +74,29 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
     <section id="services" class="py-32 bg-black px-6">
         <h2 class="text-5xl font-bold text-center mb-20 uppercase tracking-tighter">Premium <span class="text-emerald-500">Services</span></h2>
         <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div class="bg-zinc-900/50 p-10 rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all">
+            <div class="bg-zinc-900/50 p-10 rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all flex flex-col">
                 <div class="text-4xl mb-6">🤝</div>
                 <h3 class="text-xl font-bold mb-4 uppercase">1-on-1 Counseling</h3>
-                <p class="text-zinc-500 text-sm">Personalized Online & In-person sessions tailored to your unique biology.</p>
+                <p class="text-zinc-500 text-sm mb-8">Personalized Online & In-person sessions tailored to your unique biology.</p>
+                <div class="mt-auto">
+                    <a href="register.php" class="inline-block bg-white text-black px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Join Now</a>
+                </div>
             </div>
-            <div class="bg-zinc-900/50 p-10 rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all">
+            <div class="bg-zinc-900/50 p-10 rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all flex flex-col">
                 <div class="text-4xl mb-6">📋</div>
                 <h3 class="text-xl font-bold mb-4 uppercase">Custom Meal Planning</h3>
-                <p class="text-zinc-500 text-sm">Science-backed protocols for weight loss, muscle gain, or performance.</p>
+                <p class="text-zinc-500 text-sm mb-8">Science-backed protocols for weight loss, muscle gain, or performance.</p>
+                <div class="mt-auto">
+                    <a href="register.php" class="inline-block bg-white text-black px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Join Now</a>
+                </div>
             </div>
-            <div class="bg-zinc-900/50 p-10 rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all">
+            <div class="bg-zinc-900/50 p-10 rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all flex flex-col">
                 <div class="text-4xl mb-6">🏢</div>
                 <h3 class="text-xl font-bold mb-4 uppercase">Corporate Wellness</h3>
-                <p class="text-zinc-500 text-sm">Group coaching and wellness strategy for high-performance teams.</p>
+                <p class="text-zinc-500 text-sm mb-8">Group coaching and wellness strategy for high-performance teams.</p>
+                <div class="mt-auto">
+                    <a href="register.php" class="inline-block bg-white text-black px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Join Now</a>
+                </div>
             </div>
         </div>
     </section>
@@ -109,9 +118,9 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
     <footer id="contact" class="py-20 bg-black border-t border-white/10 px-6 text-center">
         <h2 class="text-4xl font-bold mb-10 uppercase tracking-tighter">Get In <span class="text-emerald-500">Touch</span></h2>
         <div class="flex justify-center gap-12 mb-12">
-            <a href="#" class="text-zinc-500 hover:text-white uppercase tracking-[0.2em] text-xs">Telehealth</a>
-            <a href="#" class="text-zinc-500 hover:text-white uppercase tracking-[0.2em] text-xs">Instagram</a>
-            <a href="#" class="text-zinc-500 hover:text-white uppercase tracking-[0.2em] text-xs">WhatsApp</a>
+            <a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_telehealth_link'")->fetchColumn() ?: '#'; ?>" class="text-zinc-500 hover:text-white uppercase tracking-[0.2em] text-xs">Telehealth</a>
+            <a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_social_ig'")->fetchColumn() ?: '#'; ?>" class="text-zinc-500 hover:text-white uppercase tracking-[0.2em] text-xs">Instagram</a>
+            <a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_whatsapp_link'")->fetchColumn() ?: '#'; ?>" class="text-zinc-500 hover:text-white uppercase tracking-[0.2em] text-xs">WhatsApp</a>
         </div>
         <p class="text-zinc-600 text-[10px] uppercase tracking-widest">&copy; 2025 Eleni Mekuria. All Rights Reserved.</p>
     </footer>
