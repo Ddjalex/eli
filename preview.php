@@ -73,7 +73,7 @@ if (!file_exists($file_path)) {
                         <span id="page-num" class="mx-4 text-sm">Page <span id="current-page">1</span> of <span id="total-pages">--</span></span>
                         <button id="next-btn" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold uppercase text-xs hover:bg-emerald-500 transition-all">Next →</button>
                     </div>
-                    <a href="../download.php?id=<?php echo htmlspecialchars($plan_id); ?>" class="bg-white text-black px-6 py-2 rounded-lg font-bold uppercase text-xs hover:bg-emerald-500 hover:text-white transition-all">Download PDF</a>
+                    <a href="download.php?id=<?php echo htmlspecialchars($plan_id); ?>" class="bg-white text-black px-6 py-2 rounded-lg font-bold uppercase text-xs hover:bg-emerald-500 hover:text-white transition-all" download>Download PDF</a>
                 </div>
             </div>
 
