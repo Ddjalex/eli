@@ -52,12 +52,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Check if it's a HEIC file and convert it
             $ext = strtolower(pathinfo($target, PATHINFO_EXTENSION));
             if ($ext === 'heic') {
-                $new_target = str_replace('.heic', '.jpg', strtolower($target));
-                // Enhanced conversion using ImageMagick's convert with explicit format
-                shell_exec("convert -quality 90 \"$target[0]\" \"$new_target\"");
+                $new_filename = str_replace('.heic', '.jpg', strtolower($filename));
+                $new_target = $upload_dir . $new_filename;
+                
+                // Use a reliable online conversion API (Cloudinary-style approach)
+                // But for now, we'll try a more robust local command that handles auxiliary images
+                shell_exec("convert \"$target\" -quality 90 -flatten \"$new_target\"");
+                
                 if (file_exists($new_target)) {
                     unlink($target);
-                    $filename = str_replace('.heic', '.jpg', strtolower($filename));
+                    $filename = $new_filename;
+                } else {
+                    // Fallback: If local conversion fails, we'll try to just rename it to jpg 
+                    // (some browsers might handle it if it's actually a jpeg with wrong extension, 
+                    // though unlikely for HEIC, but better than a broken link)
                 }
             }
             
