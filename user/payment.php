@@ -46,17 +46,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
         <div class="mb-10 p-6 bg-white/5 border border-white/5 rounded-2xl">
             <h3 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-4">Official Bank Details</h3>
             <div class="space-y-3">
+                <?php
+                $bank_name = $pdo->query("SELECT value FROM site_settings WHERE key = 'bank_name'")->fetchColumn() ?: 'CBE (Commercial Bank)';
+                $bank_account = $pdo->query("SELECT value FROM site_settings WHERE key = 'bank_account'")->fetchColumn() ?: '1000425432348';
+                $bank_holder = $pdo->query("SELECT value FROM site_settings WHERE key = 'bank_holder'")->fetchColumn() ?: 'Eleni Mekuria';
+                ?>
                 <div class="flex justify-between">
                     <span class="text-zinc-500 text-xs uppercase tracking-widest">Bank</span>
-                    <span class="font-bold text-sm">CBE (Commercial Bank)</span>
+                    <span class="font-bold text-sm"><?php echo htmlspecialchars($bank_name); ?></span>
                 </div>
                 <div class="flex justify-between border-t border-white/5 pt-3">
                     <span class="text-zinc-500 text-xs uppercase tracking-widest">Account</span>
-                    <span class="font-black text-emerald-500 text-sm">1000425432348</span>
+                    <span class="font-black text-emerald-500 text-sm"><?php echo htmlspecialchars($bank_account); ?></span>
                 </div>
                 <div class="flex justify-between border-t border-white/5 pt-3">
                     <span class="text-zinc-500 text-xs uppercase tracking-widest">Name</span>
-                    <span class="font-bold text-sm">Eleni Mekuria</span>
+                    <span class="font-bold text-sm"><?php echo htmlspecialchars($bank_holder); ?></span>
                 </div>
             </div>
         </div>

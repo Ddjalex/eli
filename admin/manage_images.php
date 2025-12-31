@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$settings = $pdo->query("SELECT * FROM site_settings WHERE key NOT LIKE 'contact_%' AND key NOT LIKE 'footer_%' ORDER BY key ASC")->fetchAll();
+$settings = $pdo->query("SELECT * FROM site_settings WHERE key NOT LIKE 'contact_%' AND key NOT LIKE 'footer_%' AND key NOT LIKE 'bank_%' ORDER BY key ASC")->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -91,10 +91,10 @@ $settings = $pdo->query("SELECT * FROM site_settings WHERE key NOT LIKE 'contact
             <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <input type="hidden" name="update_links" value="1">
                 <?php 
-                $links = $pdo->query("SELECT * FROM site_settings WHERE key LIKE 'contact_%' OR key LIKE 'footer_%' ORDER BY key ASC")->fetchAll();
+                $links = $pdo->query("SELECT * FROM site_settings WHERE key LIKE 'contact_%' OR key LIKE 'footer_%' OR key LIKE 'bank_%' ORDER BY key ASC")->fetchAll();
                 foreach ($links as $link): ?>
                     <div class="flex flex-col gap-1">
-                        <label class="text-[10px] uppercase text-zinc-500 font-bold tracking-widest"><?php echo str_replace(['contact_', 'footer_'], '', $link['key']); ?></label>
+                        <label class="text-[10px] uppercase text-zinc-500 font-bold tracking-widest"><?php echo str_replace(['contact_', 'footer_', 'bank_'], '', $link['key']); ?></label>
                         <input type="text" name="link_<?php echo $link['key']; ?>" value="<?php echo htmlspecialchars($link['value']); ?>" class="bg-black border border-white/10 p-4 rounded-xl text-sm focus:border-emerald-500 outline-none transition-all">
                     </div>
                 <?php endforeach; ?>

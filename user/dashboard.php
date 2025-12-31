@@ -84,10 +84,10 @@ $available_plans = $stmt->fetchAll();
                     <div class="flex justify-between items-start mb-6">
                         <div class="text-4xl">📄</div>
                         <div class="flex gap-2">
-                            <?php if ($plan['preview_image']): ?>
+                            <?php if (!empty($plan['preview_image'])): ?>
                                 <button onclick="alert('Look Inside Feature Coming Soon!')" class="text-[10px] bg-white/10 text-white px-3 py-1 rounded-full font-bold uppercase border border-white/10">Look Inside</button>
                             <?php endif; ?>
-                            <?php if ($user['status'] === 'approved' && $plan['file_url']): ?>
+                            <?php if ($user['status'] === 'approved' && !empty($plan['file_url'])): ?>
                                 <span class="text-[10px] bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full font-bold uppercase border border-emerald-500/20">Unlocked</span>
                             <?php else: ?>
                                 <span class="text-[10px] bg-zinc-800 text-zinc-500 px-3 py-1 rounded-full font-bold uppercase border border-white/5">Locked</span>
