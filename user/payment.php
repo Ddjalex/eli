@@ -7,6 +7,11 @@ if (isset($_GET['reason']) && $_GET['reason'] === 'unauthorized') {
     $message = "Your access is currently locked. Please upload your receipt for manual verification.";
 }
 
+$success_message = '';
+if (isset($_GET['success'])) {
+    $success_message = "Payment submitted successfully! Waiting for admin approval to unlock your meal plans.";
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
     $upload_dir = '../uploads/receipts/';
     if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
@@ -22,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
             $_POST['trx_number'] ?? null,
             $_POST['payment_method'] ?? null
         ]);
-        header("Location: dashboard.php?uploaded=1");
+        header("Location: payment.php?success=1");
         exit;
     }
 }
@@ -42,7 +47,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
             <p class="text-zinc-400 text-sm">To unlock your premium meal plans, please complete the bank transfer and upload your receipt below.</p>
         </div>
 
-        <?php if ($message): ?>
+        <?php if ($success_message): ?>
+            <div class="bg-emerald-500/10 border border-emerald-500/50 p-6 rounded-xl mb-8">
+                <div class="flex items-start gap-4">
+                    <div class="flex-shrink-0">
+                        <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-emerald-500 text-sm font-bold uppercase tracking-widest mb-2">Payment Submitted Successfully!</h3>
+                        <p class="text-emerald-400/80 text-xs leading-relaxed">Your receipt has been received. Admin will verify your payment within 24 hours. Once approved, all your meal plans will be instantly unlocked.</p>
+                    </div>
+                </div>
+                <a href="dashboard.php" class="block text-center mt-6 bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-emerald-500 transition-all">Go to Dashboard</a>
+            </div>
+        <?php elseif ($message): ?>
             <div class="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl mb-8 text-emerald-500 text-xs font-bold uppercase tracking-widest text-center">
                 <?php echo $message; ?>
             </div>

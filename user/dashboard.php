@@ -9,6 +9,11 @@ $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
+// Check if user has submitted payment
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM payments WHERE user_id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$has_payment = $stmt->fetchColumn() > 0;
+
 // Handle package change
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_package'])) {
     $new_package = $_POST['new_package'];
@@ -48,13 +53,30 @@ $available_plans = $stmt->fetchAll();
             <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-3xl"></div>
             <h2 class="text-sm font-bold text-zinc-500 uppercase tracking-[0.3em] mb-2">Account Status</h2>
             <div class="flex items-center gap-3">
-                <div class="w-3 h-3 rounded-full <?php echo $user['status'] === 'approved' ? 'bg-emerald-500 animate-pulse' : 'bg-yellow-500'; ?>"></div>
+                <div class="w-3 h-3 rounded-full <?php echo $user['status'] === 'approved' ? 'bg-emerald-500 animate-pulse' : ($has_payment ? 'bg-blue-500 animate-pulse' : 'bg-yellow-500'); ?>"></div>
                 <span class="text-2xl font-black uppercase tracking-tighter">
-                    <?php echo $user['status'] === 'approved' ? 'Fully Unlocked' : 'Verification Pending'; ?>
+                    <?php 
+                    if ($user['status'] === 'approved') {
+                        echo '✓ Fully Unlocked';
+                    } elseif ($has_payment) {
+                        echo '⏳ Waiting for Approval';
+                    } else {
+                        echo '🔒 Verification Pending';
+                    }
+                    ?>
                 </span>
             </div>
             
-            <?php if ($user['status'] === 'pending'): ?>
+            <?php if ($user['status'] === 'approved'): ?>
+                <div class="mt-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl">
+                    <p class="text-emerald-400 text-sm font-semibold">✓ Your account has been approved! All meal plans are now unlocked and ready to view.</p>
+                </div>
+            <?php elseif ($has_payment): ?>
+                <div class="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-2xl">
+                    <p class="text-blue-400 text-sm mb-3">Your payment receipt is under verification. Admin typically approves within 24 hours.</p>
+                    <p class="text-blue-300 text-xs text-opacity-70">Once approved, you'll receive instant access to all meal plans in this dashboard.</p>
+                </div>
+            <?php else: ?>
                 <div class="mt-6 p-4 bg-white/5 border border-white/10 rounded-2xl">
                     <p class="text-zinc-400 text-sm mb-4">Your personalized meal plans are currently in the secure vault. Complete your verification to gain full access.</p>
                     <a href="payment.php" class="inline-block bg-white text-black px-8 py-3 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Submit Receipt</a>
