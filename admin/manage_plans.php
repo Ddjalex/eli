@@ -30,8 +30,8 @@ function convertHEIC($target, $upload_dir, $filename) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add_plan'])) {
-        $stmt = $pdo->prepare("INSERT INTO meal_plans (title, package_type) VALUES (?, ?)");
-        $stmt->execute([$_POST['title'], $_POST['package_type']]);
+        $stmt = $pdo->prepare("INSERT INTO meal_plans (title, package_type, price) VALUES (?, ?, ?)");
+        $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0]);
         $message = "New package added successfully!";
     } elseif (isset($_POST['delete_plan'])) {
         $stmt = $pdo->prepare("DELETE FROM meal_plans WHERE id = ?");
@@ -40,9 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (isset($_POST['update_plan'])) {
         $plan_id = $_POST['plan_id'];
         
-        // Update basic info
-        $stmt = $pdo->prepare("UPDATE meal_plans SET title = ?, package_type = ? WHERE id = ?");
-        $stmt->execute([$_POST['title'], $_POST['package_type'], $plan_id]);
+        // Update basic info including price
+        $stmt = $pdo->prepare("UPDATE meal_plans SET title = ?, package_type = ?, price = ? WHERE id = ?");
+        $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0, $plan_id]);
         
         // Handle PDF
         if (isset($_FILES['pdf_file']) && $_FILES['pdf_file']['size'] > 0) {
@@ -105,7 +105,7 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
                 <span class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-xs">+</span>
                 Create New Package
             </h2>
-            <form method="POST" class="grid md:grid-cols-3 gap-6">
+            <form method="POST" class="grid md:grid-cols-4 gap-6">
                 <input type="hidden" name="add_plan" value="1">
                 <div class="md:col-span-1">
                     <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Package Name</label>
@@ -114,6 +114,10 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
                 <div class="md:col-span-1">
                     <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Package Type (Slug)</label>
                     <input type="text" name="package_type" required placeholder="e.g. keto_plan" class="w-full bg-black border border-white/10 p-4 rounded-xl focus:border-emerald-500 outline-none">
+                </div>
+                <div class="md:col-span-1">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Payment Amount</label>
+                    <input type="number" step="0.01" name="price" required placeholder="e.g. 50.00" class="w-full bg-black border border-white/10 p-4 rounded-xl focus:border-emerald-500 outline-none">
                 </div>
                 <div class="md:col-span-1 flex items-end">
                     <button type="submit" class="w-full bg-emerald-600 py-4 rounded-xl font-black uppercase tracking-widest hover:bg-emerald-500 transition-all">Create Package</button>
@@ -144,7 +148,7 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
                             </div>
 
                             <div class="flex-1 space-y-6">
-                                <div class="grid grid-cols-2 gap-6">
+                                <div class="grid grid-cols-3 gap-6">
                                     <div>
                                         <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Display Title</label>
                                         <input type="text" name="title" value="<?php echo htmlspecialchars($p['title']); ?>" class="w-full bg-black/50 border border-white/5 p-4 rounded-xl text-sm focus:border-emerald-500 outline-none">
@@ -152,6 +156,10 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
                                     <div>
                                         <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Package ID</label>
                                         <input type="text" name="package_type" value="<?php echo htmlspecialchars($p['package_type']); ?>" class="w-full bg-black/50 border border-white/5 p-4 rounded-xl text-sm focus:border-emerald-500 outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Payment Amount</label>
+                                        <input type="number" step="0.01" name="price" value="<?php echo $p['price'] ?? 0; ?>" class="w-full bg-black/50 border border-white/5 p-4 rounded-xl text-sm focus:border-emerald-500 outline-none">
                                     </div>
                                 </div>
 

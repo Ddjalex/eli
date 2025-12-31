@@ -115,6 +115,9 @@ $available_plans = $stmt->fetchAll();
                         </div>
                     </div>
                     <h3 class="text-xl font-bold mb-2 uppercase tracking-tight"><?php echo htmlspecialchars($plan['title']); ?></h3>
+                    <?php if ($plan['price'] > 0): ?>
+                        <p class="text-emerald-500 font-bold text-lg mb-4">Birr <?php echo number_format($plan['price'], 2); ?></p>
+                    <?php endif; ?>
                     
                     <?php if ($user['status'] === 'approved'): ?>
                         <a href="../download.php?id=<?php echo $plan['id']; ?>" class="mt-4 block text-center bg-emerald-600 text-white px-6 py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-emerald-500 transition-all">Secure Download</a>
