@@ -94,18 +94,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
         // Fallback if column doesnt exist yet or query fails
     }
     
-    // Also check if the user is approved overall (for their primary package)
-    if ($user['status'] === 'approved' || $user['status'] === 'active') {
-        $paid_packages[] = $user['package'];
+    // Check if the user is approved for their initial package
+    $stmt = $pdo->prepare("SELECT package FROM users WHERE id = ? AND status IN ('approved', 'active')");
+    $stmt->execute([$user_id]);
+    $initial_package = $stmt->fetchColumn();
+    if ($initial_package) {
+        $paid_packages[] = $initial_package;
     }
+    $paid_packages = array_unique($paid_packages);
 
 
     // Handle package update request
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user_package'])) {
         $new_package = $_POST['new_package'];
-        $stmt = $pdo->prepare("UPDATE users SET package = ?, status = 'pending' WHERE id = ?");
-        $stmt->execute([$new_package, $user_id]);
-        header("Location: dashboard.php?package_updated=1");
+        
+        // Check if user already has access to this package
+        if (in_array($new_package, $paid_packages)) {
+            // User already paid for this! Just switch the active package
+            $stmt = $pdo->prepare("UPDATE users SET package = ?, status = 'active' WHERE id = ?");
+            $stmt->execute([$new_package, $user_id]);
+            header("Location: dashboard.php?package_switched=1");
+        } else {
+            // New package, needs approval
+            $stmt = $pdo->prepare("UPDATE users SET package = ?, status = 'pending' WHERE id = ?");
+            $stmt->execute([$new_package, $user_id]);
+            header("Location: dashboard.php?package_updated=1");
+        }
         exit;
     }
 ?>
@@ -237,6 +251,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
                     <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">Change Plan</h4>
                     <?php if (isset($_GET['package_updated'])): ?>
                         <p class="text-[10px] text-emerald-500 font-bold uppercase mb-4">Request sent! Awaiting approval.</p>
+                    <?php elseif (isset($_GET['package_switched'])): ?>
+                        <p class="text-[10px] text-emerald-500 font-bold uppercase mb-4">Plan switched! Welcome back.</p>
                     <?php endif; ?>
                     <form method="POST" class="space-y-4">
                         <input type="hidden" name="update_user_package" value="1">
