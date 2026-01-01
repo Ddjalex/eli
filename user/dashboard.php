@@ -52,6 +52,8 @@ $latest_stats = $analytics[0] ?? [
     'steps' => 0
 ];
 
+$has_any_pending = ($user['status'] === 'pending');
+
 // Available meal plans based on user package
 $available_plans = [];
 if ($user['status'] === 'approved') {

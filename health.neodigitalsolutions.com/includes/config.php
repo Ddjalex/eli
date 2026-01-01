@@ -2,12 +2,12 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// CPANEL ENVIRONMENT (MySQL)
-$host = 'localhost';
-$db   = 'neodigqi_Eli';         
-$user = 'neodigqi_eleni_user2'; 
-$pass = 'a1e2y3t4h5';           
-$dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
+$host = getenv('PGHOST');
+$db   = getenv('PGDATABASE');         
+$user = getenv('PGUSER'); 
+$pass = getenv('PGPASSWORD');
+$port = getenv('PGPORT');           
+$dsn = "pgsql:host=$host;port=$port;dbname=$db";
 
 try {
     $options = [
@@ -17,7 +17,6 @@ try {
     ];
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (PDOException $e) {
-    // Silent fail or custom error for production
     die("Connection failed: " . $e->getMessage());
 }
 
