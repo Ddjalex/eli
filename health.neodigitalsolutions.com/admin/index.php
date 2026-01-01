@@ -244,7 +244,7 @@ $stats = [
                                             Stats
                                         </a>
                                         <?php if ($u['status'] === 'pending' || (isset($u['payment_status']) && $u['payment_status'] !== 'approved')): ?>
-                                            <a href="?approve=<?php echo $u['id']; ?>" class="emerald-gradient text-white px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all inline-block">
+                                            <a href="index.php?approve=<?php echo $u['id']; ?>" class="emerald-gradient text-white px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all inline-block">
                                                 Approve
                                             </a>
                                         <?php else: ?>
