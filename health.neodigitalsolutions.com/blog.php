@@ -7,7 +7,13 @@ $blogs = $pdo->query("SELECT * FROM blogs ORDER BY created_at DESC")->fetchAll()
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog | Eleni Mekuria</title>
+    <title>Fitness & Nutrition Blog Ethiopia | Eleni Mekuria</title>
+    <meta name="description" content="Discover the best fitness and nutrition tips in Ethiopia. Learn about the Ethiopian diet, Eskista fitness, and weight loss with Eleni Mekuria.">
+    <meta name="keywords" content="Fitness Ethiopia, Nutrition Addis Ababa, Ethiopian Diet, Weight Loss Ethiopia, Eskista Fitness, Eleni Mekuria">
+    <meta property="og:title" content="Fitness & Nutrition Blog Ethiopia | Eleni Mekuria">
+    <meta property="og:description" content="Transform your body with science-backed nutrition and culturally relevant fitness tips in Ethiopia.">
+    <meta property="og:image" content="attached_assets/stock_images/professional_fitness_249142df.jpg">
+    <meta property="og:type" content="website">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-black text-white">
