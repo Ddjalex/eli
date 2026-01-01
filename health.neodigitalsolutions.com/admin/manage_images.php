@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if (move_uploaded_file($_FILES[$key]["tmp_name"], $target_file)) {
                 $db_path = "uploads/site/" . $filename;
-                $stmt = $pdo->prepare("INSERT INTO site_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value");
+                $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)");
                 $stmt->execute([$key, $db_path]);
                 $message = "Settings updated successfully!";
             }

@@ -11,7 +11,7 @@ $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
 
-$stmt = $pdo->prepare("SELECT value FROM site_settings WHERE key = 'user_dashboard_bg'");
+$stmt = $pdo->prepare("SELECT `value` FROM site_settings WHERE `key` = 'user_dashboard_bg'");
 $stmt->execute();
 $dashboard_bg = $stmt->fetchColumn() ?: 'attached_assets/stock_images/healthy_lifestyle_c_09890184.jpg';
 
@@ -30,8 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
             $stmt = $pdo->prepare("
                 INSERT INTO user_analytics (user_id, date, photo_path)
                 VALUES (?, CURRENT_DATE, ?)
-                ON CONFLICT (user_id, date) 
-                DO UPDATE SET photo_path = EXCLUDED.photo_path
+                ON DUPLICATE KEY UPDATE photo_path = VALUES(photo_path)
             ");
             $stmt->execute([$_SESSION['user_id'], $photo_relative_path]);
             $photo_msg = "Photo uploaded successfully!";

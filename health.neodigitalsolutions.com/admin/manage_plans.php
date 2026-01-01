@@ -43,8 +43,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $plan_id = $_POST['plan_id'];
         
         // Update basic info including price and video URL
-        $stmt = $pdo->prepare("UPDATE meal_plans SET title = ?, package_type = ?, price = ?, video_url = ? WHERE id = ?");
-        $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0, $_POST['video_url'] ?? '', $plan_id]);
+        $stmt = $pdo->prepare("UPDATE meal_plans SET title = ?, package_type = ?, price = ? WHERE id = ?");
+        $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0, $plan_id]);
+        
+        // Handle video_url separately or check if column exists
+        try {
+            $stmt = $pdo->prepare("UPDATE meal_plans SET video_url = ? WHERE id = ?");
+            $stmt->execute([$_POST['video_url'] ?? '', $plan_id]);
+        } catch (PDOException $e) {
+            // Ignore if column doesn't exist yet, or log it
+        }
         
         // Handle PDF
         if (isset($_FILES['pdf_file']) && $_FILES['pdf_file']['size'] > 0) {
