@@ -33,7 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
             
             // Also create a record in user_plan_access with pending status
             if ($plan_id) {
-                $pdo->prepare("INSERT INTO user_plan_access (user_id, meal_plan_id, status) VALUES (?, ?, 'pending') ON DUPLICATE KEY UPDATE status = 'pending', updated_at = CURRENT_TIMESTAMP")->execute([$_SESSION['user_id'], $plan_id]);
+                try {
+                    $pdo->prepare("INSERT INTO user_plan_access (user_id, meal_plan_id, status) VALUES (?, ?, 'pending') ON DUPLICATE KEY UPDATE status = 'pending', updated_at = CURRENT_TIMESTAMP")->execute([$_SESSION['user_id'], $plan_id]);
+                } catch (PDOException $e) {
+                    // Fallback if the access table check fails
+                }
             }
         } catch (PDOException $e) {
             // Fallback for older schema
