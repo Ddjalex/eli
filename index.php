@@ -1,22 +1,20 @@
 <?php
-ob_start();
-error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
 require_once 'includes/config.php';
 
-// Helper for settings with DB fallback
-function getSetting($pdo, $key, $default) {
-    try {
-        $stmt = $pdo->prepare("SELECT value FROM site_settings WHERE key = ?");
-        $stmt->execute([$key]);
-        return $stmt->fetchColumn() ?: $default;
-    } catch (PDOException $e) {
-        return $default;
-    }
-}
+// 'key' በሚለው ቃል ዙሪያ ጋሻ (backticks) መጨመሩን እርግጠኛ ሁኚ
+$stmt = $pdo->prepare("SELECT value FROM site_settings WHERE `key` = ?");
 
-$hero_bg = getSetting($pdo, 'hero_bg_image', 'attached_assets/stock_images/modern_nutrition_hea_7726d1af.jpg');
-$about_img = getSetting($pdo, 'about_image', 'attached_assets/stock_images/professional_dietiti_8bb8decd.jpg');
-$about_bio = getSetting($pdo, 'about_detailed_bio', 'MSc from Addis Ababa University, Afrihealth TV host, and founder of EDPA.');
+$stmt->execute(['hero_bg_image']);
+$hero_bg = $stmt->fetchColumn() ?: 'attached_assets/stock_images/modern_nutrition_hea_7726d1af.jpg';
+
+$stmt->execute(['about_image']);
+$about_img = $stmt->fetchColumn() ?: 'attached_assets/stock_images/professional_dietiti_8bb8decd.jpg';
+
+$stmt->execute(['about_philosophy']);
+$about_philosophy = $stmt->fetchColumn() ?: 'Science & Empathy';
+
+$stmt->execute(['about_detailed_bio']);
+$about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealth TV host, and founder of EDPA.';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,16 +33,20 @@ $about_bio = getSetting($pdo, 'about_detailed_bio', 'MSc from Addis Ababa Univer
         .hero-bg-image { 
             position: absolute; inset: 0;
             background-size: cover; background-position: center; filter: brightness(0.4);
+            width: 100%; height: 100%; object-fit: cover;
         }
         .scroll-reveal { opacity: 0; transform: scale(0.95); }
+        #main-nav { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
 <body class="bg-black text-white selection:bg-emerald-500">
-    <nav id="main-nav" class="fixed w-full z-50 p-3 sm:p-4 md:p-6 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/10 transition-transform duration-500">
+    <nav id="main-nav" class="fixed w-full z-50 p-3 sm:p-4 md:p-6 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/10">
         <div class="text-lg sm:text-xl md:text-2xl font-bold tracking-tighter uppercase text-emerald-500">Eleni</div>
         <div class="hidden md:flex space-x-4 lg:space-x-8 uppercase text-[9px] lg:text-[10px] tracking-widest font-bold">
             <a href="#home" class="hover:text-emerald-400">Home</a>
             <a href="#about" class="hover:text-emerald-400">About</a>
+            <a href="portfolio.php" class="hover:text-emerald-400">Portfolio</a>
+            <a href="blog.php" class="hover:text-emerald-400">Blog</a>
             <a href="#services" class="hover:text-emerald-400">Services</a>
             <a href="#testimonials" class="hover:text-emerald-400">Stories</a>
             <a href="#contact" class="hover:text-emerald-400">Contact</a>
@@ -55,14 +57,16 @@ $about_bio = getSetting($pdo, 'about_detailed_bio', 'MSc from Addis Ababa Univer
 
     <div id="home" class="relative h-screen flex items-center justify-center overflow-hidden">
         <?php
-        $slides = [];
+        // hero_slides ዳታ ካለ ማምጣት
         try {
             $slides = $pdo->query("SELECT * FROM hero_slides ORDER BY display_order ASC, id DESC")->fetchAll();
-        } catch (PDOException $e) {}
+        } catch (Exception $e) {
+            $slides = [];
+        }
 
         if (empty($slides)) {
             $slides = [[
-                'image_url' => $hero_bg,
+                'image_url' => 'attached_assets/stock_images/modern_nutrition_hea_7726d1af.jpg',
                 'title_main' => 'FUEL YOUR',
                 'title_accent' => 'POTENTIAL',
                 'subtitle' => 'SCIENCE & EMPATHY'
@@ -94,8 +98,20 @@ $about_bio = getSetting($pdo, 'about_detailed_bio', 'MSc from Addis Ababa Univer
                     "My approach blends rigorous nutritional science with deep clinical empathy."
                 </div>
             </div>
-            <div class="aspect-[4/5] rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 scroll-reveal order-1 md:order-2">
-                <img src="<?php echo htmlspecialchars($about_img); ?>" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700">
+            <div class="aspect-[4/5] rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 scroll-reveal order-1 md:order-2 relative" id="about-image-container">
+                <?php
+                try {
+                    $about_slides = $pdo->query("SELECT * FROM about_slides ORDER BY id DESC")->fetchAll();
+                } catch (Exception $e) { $about_slides = []; }
+
+                if (empty($about_slides)) {
+                    $about_slides = [['image_url' => $about_img]];
+                }
+
+                foreach ($about_slides as $index => $slide): ?>
+                    <img src="<?php echo htmlspecialchars($slide['image_url']); ?>" 
+                         class="about-slide absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-opacity duration-1000 <?php echo $index === 0 ? 'opacity-100' : 'opacity-0'; ?>">
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
@@ -116,20 +132,29 @@ $about_bio = getSetting($pdo, 'about_detailed_bio', 'MSc from Addis Ababa Univer
              <?php
              $market_plans = [];
              try {
-                 $market_plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
-             } catch (PDOException $e) {}
+                 // Fetch all 3 plans from the database
+                 $stmt_plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC");
+                 $market_plans = $stmt_plans->fetchAll();
+             } catch (PDOException $e) {
+                 // Fallback if table doesn't exist
+                 $market_plans = [];
+             }
              
-             foreach ($market_plans as $plan): ?>
-             <div class="bg-zinc-900/50 p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all flex flex-col">
-                 <div class="text-3xl sm:text-4xl mb-4 md:mb-6">🥗</div>
-                 <h3 class="text-base sm:text-lg md:text-xl font-bold mb-3 md:mb-4 uppercase"><?php echo htmlspecialchars($plan['title']); ?></h3>
-                 <p class="text-zinc-500 text-xs sm:text-sm mb-6 md:mb-8">Professional nutritional guide for <?php echo htmlspecialchars(str_replace('_', ' ', $plan['package_type'] ?: 'Health')); ?>.</p>
-                 <div class="mt-auto flex gap-2 sm:gap-4 flex-col sm:flex-row">
-                     <a href="preview.php?id=<?php echo $plan['id']; ?>" class="inline-block text-center border border-white/10 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-white hover:text-black transition-all">Preview</a>
-                     <a href="register.php" class="inline-block text-center bg-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-emerald-500 transition-all">Buy Plan</a>
+             if (empty($market_plans)) {
+                 echo '<p class="text-zinc-500 text-center col-span-full">No meal plans available at the moment.</p>';
+             } else {
+                 foreach ($market_plans as $plan): ?>
+                 <div class="bg-zinc-900/50 p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all flex flex-col group">
+                     <div class="text-3xl sm:text-4xl mb-4 md:mb-6 group-hover:scale-110 transition-transform">🥗</div>
+                     <h3 class="text-base sm:text-lg md:text-xl font-bold mb-3 md:mb-4 uppercase"><?php echo htmlspecialchars($plan['title']); ?></h3>
+                     <p class="text-zinc-500 text-xs sm:text-sm mb-6 md:mb-8">Professional nutritional guide for <?php echo htmlspecialchars(str_replace('_', ' ', $plan['package_type'] ?: 'Health')); ?>.</p>
+                     <div class="mt-auto flex gap-2 sm:gap-4 flex-col sm:flex-row">
+                         <a href="service-detail.php?id=<?php echo $plan['id']; ?>" class="inline-block text-center border border-white/10 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-white hover:text-black transition-all">Details</a>
+                         <a href="register.php" class="inline-block text-center bg-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-emerald-500 transition-all">Join Now</a>
+                     </div>
                  </div>
-             </div>
-             <?php endforeach; ?>
+                 <?php endforeach; 
+             } ?>
          </div>
     </section>
 
@@ -140,6 +165,29 @@ $about_bio = getSetting($pdo, 'about_detailed_bio', 'MSc from Addis Ababa Univer
         function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
         requestAnimationFrame(raf);
 
+        // Navbar Scroll Behavior
+        let lastScroll = 0;
+        const nav = document.getElementById('main-nav');
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll <= 0) {
+                nav.style.transform = 'translateY(0)';
+                return;
+            }
+            
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                // Scrolling down
+                nav.style.transform = 'translateY(-100%)';
+            } else {
+                // Scrolling up
+                nav.style.transform = 'translateY(0)';
+            }
+            lastScroll = currentScroll;
+        });
+
+        // Slider Script
         const slides = document.querySelectorAll('.hero-slide');
         if (slides.length > 1) {
             let currentSlide = 0;
@@ -150,6 +198,18 @@ $about_bio = getSetting($pdo, 'about_detailed_bio', 'MSc from Addis Ababa Univer
             }, 5000);
         }
 
+        // About Slider Script
+        const aboutSlides = document.querySelectorAll('.about-slide');
+        if (aboutSlides.length > 1) {
+            let currentAboutSlide = 0;
+            setInterval(() => {
+                aboutSlides.forEach(slide => slide.style.opacity = '0');
+                currentAboutSlide = (currentAboutSlide + 1) % aboutSlides.length;
+                aboutSlides[currentAboutSlide].style.opacity = '1';
+            }, 3000);
+        }
+
+        // GSAP Scroll
         gsap.registerPlugin(ScrollTrigger);
         document.querySelectorAll('.scroll-reveal').forEach((el) => {
             gsap.to(el, {

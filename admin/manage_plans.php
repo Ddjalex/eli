@@ -35,6 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("INSERT INTO meal_plans (title, package_type, price) VALUES (?, ?, ?)");
         $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0]);
         $message = "New package added successfully!";
+        
+        $plan_id = $pdo->lastInsertId();
+        try {
+            $stmt = $pdo->prepare("UPDATE meal_plans SET video_url = '' WHERE id = ?");
+            $stmt->execute([$plan_id]);
+        } catch (PDOException $e) {}
     } elseif (isset($_POST['delete_plan'])) {
         $stmt = $pdo->prepare("DELETE FROM meal_plans WHERE id = ?");
         $stmt->execute([$_POST['plan_id']]);
@@ -42,9 +48,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (isset($_POST['update_plan'])) {
         $plan_id = $_POST['plan_id'];
         
-        // Update basic info including price and video URL
-        $stmt = $pdo->prepare("UPDATE meal_plans SET title = ?, package_type = ?, price = ?, video_url = ? WHERE id = ?");
-        $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0, $_POST['video_url'] ?? '', $plan_id]);
+        // Update basic info including price, video URL, and description
+        $stmt = $pdo->prepare("UPDATE meal_plans SET title = ?, package_type = ?, price = ?, description = ? WHERE id = ?");
+        $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0, $_POST['description'] ?? '', $plan_id]);
+        
+        // Handle video_url separately or check if column exists
+        try {
+            $stmt = $pdo->prepare("UPDATE meal_plans SET video_url = ? WHERE id = ?");
+            $stmt->execute([$_POST['video_url'] ?? '', $plan_id]);
+        } catch (PDOException $e) {
+            // Ignore if column doesn't exist yet, or log it
+        }
         
         // Handle PDF
         if (isset($_FILES['pdf_file']) && $_FILES['pdf_file']['size'] > 0) {
@@ -90,15 +104,31 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
         .glass { background: rgba(24, 24, 27, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
-<body class="bg-[#09090b] text-white p-8">
-    <div class="max-w-6xl mx-auto">
-        <div class="flex justify-between items-center mb-12">
-            <div>
-                <h1 class="text-4xl font-black uppercase tracking-tighter text-emerald-500">Meal Packages</h1>
-                <p class="text-zinc-500 text-sm mt-1">Manage your subscription packages and secure meal plan files.</p>
-            </div>
-            <a href="index.php" class="glass px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-white/5 transition-all">Back to Dashboard</a>
-        </div>
+<body class="bg-[#09090b] text-white">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 border-r border-white/5 bg-[#09090b] p-6 hidden lg:block">
+            <div class="text-xl font-bold text-emerald-500 mb-10 tracking-tighter uppercase">Admin Panel</div>
+            <nav class="space-y-2">
+                <a href="index.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Dashboard</a>
+                <a href="manage_users.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Manage Users</a>
+                <a href="manage_hero.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Hero Slider</a>
+                <a href="manage_plans.php" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-medium">Meal Plans</a>
+                <a href="manage_payments.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Payment Methods</a>
+                <a href="manage_images.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Site Settings</a>
+                <a href="change_password.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Change Password</a>
+                <a href="../logout.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 transition-all text-zinc-500 hover:text-red-500">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-8 lg:p-12">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex justify-between items-center mb-12">
+                    <div>
+                        <h1 class="text-4xl font-black uppercase tracking-tighter text-emerald-500">Meal Packages</h1>
+                        <p class="text-zinc-500 text-sm mt-1">Manage your subscription packages and secure meal plan files.</p>
+                    </div>
+                </div>
         
         <?php if ($message): ?>
             <div class="bg-emerald-500/10 border border-emerald-500/50 p-4 rounded-xl mb-8 text-emerald-500 font-bold text-sm uppercase tracking-widest text-center"><?php echo $message; ?></div>
@@ -170,6 +200,10 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
                                         <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Instructional Video URL (YouTube/Vimeo Embed)</label>
                                         <input type="text" name="video_url" value="<?php echo htmlspecialchars($p['video_url'] ?? ''); ?>" placeholder="https://www.youtube.com/embed/..." class="w-full bg-black/50 border border-white/5 p-4 rounded-xl text-sm focus:border-emerald-500 outline-none">
                                     </div>
+                                    <div class="col-span-2">
+                                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Short Description (Appears in User Dashboard)</label>
+                                        <textarea name="description" rows="3" class="w-full bg-black/50 border border-white/5 p-4 rounded-xl text-sm focus:border-emerald-500 outline-none placeholder-zinc-700" placeholder="Describe the benefits of this plan..."><?php echo htmlspecialchars($p['description'] ?? ''); ?></textarea>
+                                    </div>
                                 </div>
 
                                 <div class="bg-black/40 p-6 rounded-2xl border border-white/5">
@@ -195,7 +229,7 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
                     </form>
                 </div>
             <?php endforeach; ?>
-        </div>
+        </main>
     </div>
 </body>
 </html>

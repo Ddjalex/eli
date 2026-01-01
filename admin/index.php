@@ -20,7 +20,19 @@ $stats = [
     'plans' => $pdo->query("SELECT COUNT(*) FROM meal_plans")->fetchColumn(),
 ];
 
-$stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number FROM users u LEFT JOIN payments p ON u.id = p.user_id WHERE u.role = 'user' ORDER BY u.created_at DESC");
+$stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number 
+    FROM users u 
+    LEFT JOIN (
+        SELECT p1.*
+        FROM payments p1
+        INNER JOIN (
+            SELECT user_id, MAX(created_at) as max_created
+            FROM payments
+            GROUP BY user_id
+        ) p2 ON p1.user_id = p2.user_id AND p1.created_at = p2.max_created
+    ) p ON u.id = p.user_id 
+    WHERE u.role = 'user' 
+    ORDER BY u.created_at DESC");
 $users = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
@@ -46,6 +58,10 @@ $users = $stmt->fetchAll();
                 <a href="index.php" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-medium">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                     Dashboard
+                </a>
+                <a href="manage_users.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    Manage Users
                 </a>
                 <a href="manage_hero.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
