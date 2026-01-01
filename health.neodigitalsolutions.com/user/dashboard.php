@@ -84,12 +84,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
 
     // Check if user has paid for other plans
     $stmt = $pdo->prepare("SELECT DISTINCT mp.package_type FROM payments p JOIN meal_plans mp ON p.meal_plan_id = mp.id WHERE p.user_id = ? AND p.status = 'approved'");
+    $paid_packages = [];
     try {
         $stmt->execute([$user_id]);
-        $paid_packages = $stmt->fetchAll(PDO_FETCH_COLUMN);
-    } catch (PDOException $e) {
-        // Fallback if column doesnt exist yet
-        $paid_packages = [];
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $paid_packages[] = $row['package_type'];
+        }
+    } catch (Exception $e) {
+        // Fallback if column doesnt exist yet or query fails
     }
     $paid_packages[] = $user['package']; // User's registered package is always "available" if approved
 
