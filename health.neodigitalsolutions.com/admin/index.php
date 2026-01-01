@@ -15,25 +15,21 @@ if (isset($_GET['approve'])) {
     
     if ($last_payment && $last_payment['meal_plan_id']) {
         // Approve specific plan
-        $stmt = $pdo->prepare("UPDATE payments SET status = 'approved' WHERE user_id = ? AND meal_plan_id = ?");
-        $stmt->execute([$user_id, $last_payment['meal_plan_id']]);
+        $pdo->prepare("UPDATE payments SET status = 'approved' WHERE user_id = ? AND meal_plan_id = ?")->execute([$user_id, $last_payment['meal_plan_id']]);
         
-        // Also update user package and status
-        $stmt = $pdo->prepare("SELECT package_type FROM meal_plans WHERE id = ?");
-        $stmt->execute([$last_payment['meal_plan_id']]);
-        $package_type = $stmt->fetchColumn();
+        // Fetch package type
+        $stmt_pkg = $pdo->prepare("SELECT package_type FROM meal_plans WHERE id = ?");
+        $stmt_pkg->execute([$last_payment['meal_plan_id']]);
+        $package_type = $stmt_pkg->fetchColumn();
         
         if ($package_type) {
-            $stmt = $pdo->prepare("UPDATE users SET package = ?, status = 'active' WHERE id = ?");
-            $stmt->execute([$package_type, $user_id]);
+            $pdo->prepare("UPDATE users SET package = ?, status = 'active' WHERE id = ?")->execute([$package_type, $user_id]);
         } else {
-            $stmt = $pdo->prepare("UPDATE users SET status = 'approved' WHERE id = ?");
-            $stmt->execute([$user_id]);
+            $pdo->prepare("UPDATE users SET status = 'active' WHERE id = ?")->execute([$user_id]);
         }
     } else {
-        // Global approval for main package
-        $stmt = $pdo->prepare("UPDATE users SET status = 'approved' WHERE id = ?");
-        $stmt->execute([$user_id]);
+        // Global approval
+        $pdo->prepare("UPDATE users SET status = 'approved' WHERE id = ?")->execute([$user_id]);
     }
     
     header("Location: index.php");
