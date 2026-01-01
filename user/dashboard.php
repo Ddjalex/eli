@@ -52,11 +52,54 @@ $latest_stats = $analytics[0] ?? [
     'steps' => 0
 ];
 
-$has_any_pending = ($user['status'] === 'pending');
+// Fetch all active packages for update
+$all_plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
+
+// Check for approved plans using the new dedicated table
+$stmt = $pdo->prepare("
+    SELECT mp.id as plan_id, mp.package_type 
+    FROM user_plan_access upa 
+    JOIN meal_plans mp ON upa.meal_plan_id = mp.id 
+    WHERE upa.user_id = ? AND upa.status = 'approved'
+");
+$paid_plan_ids = [];
+try {
+    $stmt->execute([$user_id]);
+    while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $paid_plan_ids[] = (int)$row['plan_id'];
+    }
+} catch (Exception $e) {}
+
+// Check for pending plans
+$stmt = $pdo->prepare("
+    SELECT mp.id as plan_id 
+    FROM user_plan_access upa 
+    JOIN meal_plans mp ON upa.meal_plan_id = mp.id 
+    WHERE upa.user_id = ? AND upa.status = 'pending'
+");
+$pending_plan_ids = [];
+try {
+    $stmt->execute([$user_id]);
+    while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $pending_plan_ids[] = (int)$row['plan_id'];
+    }
+} catch (Exception $e) {}
+
+// CRITICAL: Ensure the user's primary package is treated as "paid" if they are approved/active
+if (($user['status'] === 'approved' || $user['status'] === 'active') && !empty($user['package'])) {
+    $stmt = $pdo->prepare("SELECT id FROM meal_plans WHERE package_type = ?");
+    $stmt->execute([$user['package']]);
+    $primary_id = $stmt->fetchColumn();
+    if ($primary_id) $paid_plan_ids[] = (int)$primary_id;
+}
+
+$paid_plan_ids = array_unique($paid_plan_ids);
+$pending_plan_ids = array_unique($pending_plan_ids);
+$has_any_pending = !empty($pending_plan_ids) || ($user['status'] === 'pending');
 
 // Available meal plans based on user package
 $available_plans = [];
-if ($user['status'] === 'approved') {
+if ($user['status'] === 'approved' || $user['status'] === 'active') {
     $stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE package_type = ? OR package_type IS NULL ORDER BY id ASC");
     $stmt->execute([$user['package']]);
     $available_plans = $stmt->fetchAll();
@@ -203,10 +246,29 @@ if ($user['status'] === 'approved') {
                     
                     <h2 class="text-3xl font-black uppercase tracking-tighter mb-8">My Custom <span class="text-emerald-500">Meal Plan</span></h2>
 
-                    <?php if ($user['status'] === 'approved'): ?>
+                    <?php 
+                    $is_approved = ($user['status'] === 'approved' || $user['status'] === 'active');
+                    if ($is_approved): ?>
                         <div class="grid sm:grid-cols-2 gap-6">
-                            <?php foreach ($available_plans as $plan): ?>
-                                <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex flex-col group hover:bg-white/[0.07] transition-all duration-500 shadow-xl">
+                            <?php 
+                            foreach ($all_plans as $plan): 
+                                $has_access = in_array((int)$plan['id'], $paid_plan_ids, true);
+                                $is_pending = in_array((int)$plan['id'], $pending_plan_ids, true);
+                            ?>
+                                <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex flex-col group hover:bg-white/[0.07] transition-all duration-500 shadow-xl relative">
+                                    <?php if (!$has_access): ?>
+                                        <div class="absolute inset-0 z-20 bg-black/60 backdrop-blur-[2px] rounded-[2rem] flex flex-col items-center justify-center p-6 text-center">
+                                            <span class="text-3xl mb-3"><?php echo $is_pending ? '⏳' : '🔒'; ?></span>
+                                            <p class="text-[10px] font-bold uppercase tracking-widest text-white mb-4">
+                                                <?php echo $is_pending ? 'Awaiting Approval' : 'Payment Required'; ?>
+                                            </p>
+                                            <?php if (!$is_pending): ?>
+                                                <a href="payment.php?plan_id=<?php echo $plan['id']; ?>" class="bg-emerald-600 text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all">Unlock Plan</a>
+                                            <?php else: ?>
+                                                <span class="px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/10 border border-emerald-500/20">Pending Verification</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
                                     <div class="px-2">
                                         <h3 class="text-xl font-black uppercase tracking-tighter mb-4 text-white group-hover:text-emerald-400 transition-colors"><?php echo htmlspecialchars($plan['title']); ?></h3>
                                         
@@ -224,24 +286,24 @@ if ($user['status'] === 'approved') {
                                         </a>
                                     </div>
                                 </div>
-                                
-                                <?php if (!empty($plan['video_url'])): ?>
-                                    <div class="mt-6 rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black ring-1 ring-white/5 w-full aspect-video">
-                                        <iframe class="w-full h-full" src="<?php echo htmlspecialchars($plan['video_url']); ?>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                                    </div>
-                                <?php endif; ?>
                             <?php endforeach; ?>
                         </div>
                     <?php else: ?>
                         <div class="text-center py-24 bg-black/40 rounded-[2.5rem] border border-white/5 backdrop-blur-3xl relative group">
                             <div class="mb-8">
-                                <span class="text-6xl filter grayscale group-hover:grayscale-0 transition-all duration-700">🔒</span>
+                                <span class="text-6xl <?php echo $has_any_pending ? '' : 'filter grayscale group-hover:grayscale-0'; ?> transition-all duration-700"><?php echo $has_any_pending ? '⏳' : '🔒'; ?></span>
                             </div>
-                            <h3 class="text-xl font-bold uppercase tracking-widest text-white mb-3">Content Locked</h3>
-                            <p class="max-w-md mx-auto text-zinc-500 text-sm leading-relaxed mb-10">Complete your payment and upload your receipt to unlock your premium nutritional guide.</p>
-                            <div class="flex justify-center">
-                                <a href="payment.php" class="bg-emerald-600 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-900/40">Unlock Now</a>
-                            </div>
+                            <h3 class="text-xl font-bold uppercase tracking-widest text-white mb-3">
+                                <?php echo $has_any_pending ? 'Verification in Progress' : 'Content Locked'; ?>
+                            </h3>
+                            <p class="max-w-md mx-auto text-zinc-500 text-sm leading-relaxed mb-10">
+                                <?php echo $has_any_pending ? 'Your receipt is being reviewed. You will have full access once Eleni approves your payment.' : 'Complete your payment and upload your receipt to unlock your premium nutritional guide.'; ?>
+                            </p>
+                            <?php if (!$has_any_pending): ?>
+                                <div class="flex justify-center">
+                                    <a href="payment.php" class="bg-emerald-600 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-900/40">Unlock Now</a>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
                 </div>
