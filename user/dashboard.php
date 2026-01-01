@@ -142,21 +142,21 @@ $available_plans = $stmt->fetchAll();
                                         </div>
 
                                         <?php if ($user['status'] === 'approved'): ?>
-                                            <a href="../preview.php?id=<?php echo $plan['id']; ?>" class="inline-flex w-full items-center justify-center gap-3 bg-emerald-600 text-white py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-emerald-500 hover:shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all active:scale-95 mb-6">
+                                            <a href="../preview.php?id=<?php echo $plan['id']; ?>" class="inline-flex w-full items-center justify-center gap-3 bg-emerald-600 text-white py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-emerald-500 hover:shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all active:scale-95">
                                                 <span>View Full Plan</span>
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                             </a>
                                         <?php else: ?>
-                                            <div class="text-center py-5 bg-white/5 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-zinc-600 border border-dashed border-white/10 mb-6">Awaiting Approval...</div>
-                                        <?php endif; ?>
-
-                                        <?php if (!empty($plan['video_url'])): ?>
-                                            <div class="rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black ring-1 ring-white/5 w-full aspect-video">
-                                                <iframe class="w-full h-full" src="<?php echo htmlspecialchars($plan['video_url']); ?>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                                            </div>
+                                            <div class="text-center py-5 bg-white/5 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-zinc-600 border border-dashed border-white/10">Awaiting Approval...</div>
                                         <?php endif; ?>
                                     </div>
                                 </div>
+                                
+                                <?php if (!empty($plan['video_url'])): ?>
+                                    <div class="mt-6 rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black ring-1 ring-white/5 w-full aspect-video">
+                                        <iframe class="w-full h-full" src="<?php echo htmlspecialchars($plan['video_url']); ?>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         </div>
                     <?php else: ?>
