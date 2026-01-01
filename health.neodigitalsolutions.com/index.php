@@ -200,7 +200,7 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
         if (aboutSlides.length > 1) {
             let currentAboutSlide = 0;
             setInterval(() => {
-                aboutSlides[currentAboutSlide].style.opacity = '0';
+                aboutSlides.forEach(slide => slide.style.opacity = '0');
                 currentAboutSlide = (currentAboutSlide + 1) % aboutSlides.length;
                 aboutSlides[currentAboutSlide].style.opacity = '1';
             }, 3000);

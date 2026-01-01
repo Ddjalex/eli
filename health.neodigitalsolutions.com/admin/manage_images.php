@@ -26,20 +26,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($key === 'about_image') {
                     $stmt_slide = $pdo->prepare("INSERT INTO about_slides (image_url) VALUES (?)");
                     $stmt_slide->execute([$db_path]);
-                }
-
-                // Get driver name to determine syntax
-                $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-                
-                if ($driver === 'pgsql') {
-                    // PostgreSQL syntax
-                    $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
                 } else {
-                    // MariaDB/MySQL syntax
-                    $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
+                    // Get driver name to determine syntax
+                    $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+                    
+                    if ($driver === 'pgsql') {
+                        // PostgreSQL syntax
+                        $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
+                    } else {
+                        // MariaDB/MySQL syntax
+                        $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
+                    }
+                    
+                    $stmt->execute([$key, $db_path]);
                 }
-                
-                $stmt->execute([$key, $db_path]);
                 $message = "Settings updated successfully!";
             }
         }
