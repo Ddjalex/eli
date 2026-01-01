@@ -84,48 +84,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
 
     // Check for approved plans using the new dedicated table
     $stmt = $pdo->prepare("
-        SELECT mp.package_type 
+        SELECT mp.id as plan_id, mp.package_type 
         FROM user_plan_access upa 
         JOIN meal_plans mp ON upa.meal_plan_id = mp.id 
         WHERE upa.user_id = ? AND upa.status = 'approved'
-        UNION
-        SELECT package as package_type FROM users WHERE id = ? AND status IN ('approved', 'active')
     ");
     $paid_packages = [];
+    $paid_plan_ids = [];
     try {
-        $stmt->execute([$user_id, $user_id]);
+        $stmt->execute([$user_id]);
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $paid_packages[] = $row['package_type'];
+            $paid_plan_ids[] = $row['plan_id'];
         }
     } catch (Exception $e) {}
     
     // Check for pending plans using the new dedicated table
     $stmt = $pdo->prepare("
-        SELECT mp.package_type 
+        SELECT mp.id as plan_id, mp.package_type 
         FROM user_plan_access upa 
         JOIN meal_plans mp ON upa.meal_plan_id = mp.id 
         WHERE upa.user_id = ? AND upa.status = 'pending'
-        UNION
-        SELECT package as package_type FROM users WHERE id = ? AND status = 'pending'
     ");
     $pending_packages = [];
+    $pending_plan_ids = [];
     try {
-        $stmt->execute([$user_id, $user_id]);
+        $stmt->execute([$user_id]);
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $pending_packages[] = $row['package_type'];
+            $pending_plan_ids[] = $row['plan_id'];
         }
     } catch (Exception $e) {}
 
-    // CRITICAL: Ensure the user's current package is treated as "paid" if they are approved/active
+    // CRITICAL: Ensure the user's primary package is treated as "paid" if they are approved/active
     if (($user['status'] === 'approved' || $user['status'] === 'active') && !empty($user['package'])) {
-        if (!in_array($user['package'], $paid_packages)) {
-            $paid_packages[] = $user['package'];
-        }
+        $paid_packages[] = $user['package'];
+        // Also find the ID for the primary package to unlock it by ID
+        $stmt = $pdo->prepare("SELECT id FROM meal_plans WHERE package_type = ?");
+        $stmt->execute([$user['package']]);
+        $primary_id = $stmt->fetchColumn();
+        if ($primary_id) $paid_plan_ids[] = $primary_id;
     }
 
-    // Check if user has ANY pending plan access
-    $has_any_pending = count($pending_packages) > 0;
     $paid_packages = array_unique($paid_packages);
+    $paid_plan_ids = array_unique($paid_plan_ids);
+    $pending_plan_ids = array_unique($pending_plan_ids);
 
 
     // Handle package update request
@@ -327,8 +330,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
                             <?php 
                             // Show all plans, but lock those not paid for
                             foreach ($all_plans as $plan): 
-                                $has_access = in_array($plan['package_type'], $paid_packages);
-                                $is_pending = in_array($plan['package_type'], $pending_packages);
+                                $has_access = in_array($plan['id'], $paid_plan_ids);
+                                $is_pending = in_array($plan['id'], $pending_plan_ids);
                             ?>
                                 <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex flex-col group hover:bg-white/[0.07] transition-all duration-500 shadow-xl relative">
                                     <?php if (!$has_access): ?>
