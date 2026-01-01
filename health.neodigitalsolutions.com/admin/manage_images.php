@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if (move_uploaded_file($_FILES[$key]["tmp_name"], $target_file)) {
                 $db_path = "uploads/site/" . $filename;
-                $stmt = $pdo->prepare("INSERT INTO site_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value");
+                $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
                 $stmt->execute([$key, $db_path]);
                 $message = "Settings updated successfully!";
             }
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['about_text'])) {
         $key = 'about_text';
         $val = $_POST['about_text'];
-        $stmt = $pdo->prepare("INSERT INTO site_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value");
+        $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
         $stmt->execute([$key, $val]);
         $message = "Settings updated successfully!";
     }
