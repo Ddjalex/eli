@@ -78,7 +78,7 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
         <a href="#contact" class="mobile-link hover:text-emerald-500 transition-colors">Contact</a>
     </div>
 
-    <div id="home" class="relative h-[100dvh] flex items-center justify-center overflow-hidden">
+    <div id="home" class="relative h-[70dvh] sm:h-[85dvh] lg:h-screen flex items-center justify-center overflow-hidden">
         <?php
         // hero_slides ዳታ ካለ ማምጣት
         try {
@@ -100,13 +100,13 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
             <div class="hero-slide <?php echo $index === 0 ? 'active' : ''; ?>">
                 <div class="absolute inset-0 hero-bg-image" style="background-image: url('<?php echo $slide['image_url']; ?>');"></div>
                 <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 sm:px-12">
-                    <h1 class="text-2xl sm:text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter mb-4 sm:mb-6 leading-[0.9] drop-shadow-2xl">
+                    <h1 class="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter mb-2 sm:mb-4 leading-[0.9] drop-shadow-2xl">
                         <?php echo htmlspecialchars($slide['title_main']); ?> <br><span class="text-emerald-500"><?php echo htmlspecialchars($slide['title_accent']); ?></span>
                     </h1>
-                    <p class="text-[9px] sm:text-sm md:text-lg lg:text-xl tracking-[0.2em] sm:tracking-[0.4em] uppercase text-zinc-300 font-bold mb-8 sm:mb-12 max-w-2xl px-6 leading-relaxed">
+                    <p class="text-[8px] sm:text-sm md:text-lg lg:text-xl tracking-[0.2em] sm:tracking-[0.4em] uppercase text-zinc-300 font-bold mb-6 sm:mb-10 max-w-2xl px-6 leading-tight">
                         <?php echo htmlspecialchars($slide['subtitle']); ?>
                     </p>
-                    <a href="register.php" class="bg-white text-black px-6 sm:px-12 py-3 sm:py-5 rounded-full font-black uppercase tracking-widest text-[10px] sm:text-sm hover:bg-emerald-500 hover:text-white transition-all transform hover:scale-105 shadow-2xl shadow-black/50">Start Your Journey</a>
+                    <a href="register.php" class="bg-white text-black px-6 sm:px-12 py-3 sm:py-5 rounded-full font-black uppercase tracking-widest text-[9px] sm:text-sm hover:bg-emerald-500 hover:text-white transition-all transform hover:scale-105 shadow-2xl shadow-black/50">Start Your Journey</a>
                 </div>
             </div>
         <?php endforeach; ?>
