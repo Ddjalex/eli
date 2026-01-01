@@ -1,40 +1,24 @@
 <?php
-// Replit Managed PostgreSQL Database Configuration
-$db_url = getenv('DATABASE_URL');
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-if (!$db_url) {
-    die("Database configuration error: DATABASE_URL not set.");
-}
-
-// Robust parsing for DATABASE_URL
-if (preg_match('/^postgres(?:ql)?:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)$/', $db_url, $matches)) {
-    $user = $matches[1];
-    $pass = $matches[2];
-    $host = $matches[3];
-    $port = $matches[4];
-    $db   = $matches[5];
-} else {
-    $db_opts = parse_url($db_url);
-    if (!$db_opts) {
-        die("Database configuration error: Malformed DATABASE_URL.");
-    }
-    $host = $db_opts['host'] ?? 'localhost';
-    $port = $db_opts['port'] ?? '5432';
-    $db   = ltrim($db_opts['path'] ?? '', '/');
-    $user = $db_opts['user'] ?? '';
-    $pass = $db_opts['pass'] ?? '';
-}
-
-$dsn = "pgsql:host=$host;port=$port;dbname=$db";
+// CPANEL ENVIRONMENT (MySQL)
+$host = 'localhost';
+$db   = 'neodigqi_Eli';         
+$user = 'neodigqi_eleni_user2'; 
+$pass = 'a1e2y3t4h5';           
+$dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
 
 try {
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES   => false,
-    ]);
-} catch (\PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ];
+    $pdo = new PDO($dsn, $user, $pass, $options);
+} catch (PDOException $e) {
+    // Silent fail or custom error for production
+    die("Connection failed: " . $e->getMessage());
 }
 
 if (session_status() === PHP_SESSION_NONE) {
