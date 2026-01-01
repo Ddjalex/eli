@@ -1,20 +1,22 @@
 <?php
+ob_start();
+error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
 require_once 'includes/config.php';
 
-// 'key' በሚለው ቃል ዙሪያ ጋሻ (backticks) መጨመሩን እርግጠኛ ሁኚ
-$stmt = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = ?");
+// Helper for settings with DB fallback
+function getSetting($pdo, $key, $default) {
+    try {
+        $stmt = $pdo->prepare("SELECT value FROM site_settings WHERE key = ?");
+        $stmt->execute([$key]);
+        return $stmt->fetchColumn() ?: $default;
+    } catch (PDOException $e) {
+        return $default;
+    }
+}
 
-$stmt->execute(['hero_bg_image']);
-$hero_bg = $stmt->fetchColumn() ?: 'attached_assets/stock_images/modern_nutrition_hea_7726d1af.jpg';
-
-$stmt->execute(['about_image']);
-$about_img = $stmt->fetchColumn() ?: 'attached_assets/stock_images/professional_dietiti_8bb8decd.jpg';
-
-$stmt->execute(['about_philosophy']);
-$about_philosophy = $stmt->fetchColumn() ?: 'Science & Empathy';
-
-$stmt->execute(['about_detailed_bio']);
-$about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealth TV host, and founder of EDPA.';
+$hero_bg = getSetting($pdo, 'hero_bg_image', 'attached_assets/stock_images/modern_nutrition_hea_7726d1af.jpg');
+$about_img = getSetting($pdo, 'about_image', 'attached_assets/stock_images/professional_dietiti_8bb8decd.jpg');
+$about_bio = getSetting($pdo, 'about_detailed_bio', 'MSc from Addis Ababa University, Afrihealth TV host, and founder of EDPA.');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -53,16 +55,14 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
 
     <div id="home" class="relative h-screen flex items-center justify-center overflow-hidden">
         <?php
-        // hero_slides ዳታ ካለ ማምጣት
+        $slides = [];
         try {
             $slides = $pdo->query("SELECT * FROM hero_slides ORDER BY display_order ASC, id DESC")->fetchAll();
-        } catch (Exception $e) {
-            $slides = [];
-        }
+        } catch (PDOException $e) {}
 
         if (empty($slides)) {
             $slides = [[
-                'image_url' => 'attached_assets/stock_images/modern_nutrition_hea_7726d1af.jpg',
+                'image_url' => $hero_bg,
                 'title_main' => 'FUEL YOUR',
                 'title_accent' => 'POTENTIAL',
                 'subtitle' => 'SCIENCE & EMPATHY'
@@ -112,7 +112,7 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                      <a href="register.php" class="inline-block text-center bg-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-emerald-500 transition-all">Join Now</a>
                  </div>
              </div>
-             </div>
+         </div>
     </section>
 
     <?php include 'includes/footer.php'; ?>
@@ -122,7 +122,6 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
         function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
         requestAnimationFrame(raf);
 
-        // Slider Script
         const slides = document.querySelectorAll('.hero-slide');
         if (slides.length > 1) {
             let currentSlide = 0;
@@ -133,7 +132,6 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
             }, 5000);
         }
 
-        // GSAP Scroll
         gsap.registerPlugin(ScrollTrigger);
         document.querySelectorAll('.scroll-reveal').forEach((el) => {
             gsap.to(el, {

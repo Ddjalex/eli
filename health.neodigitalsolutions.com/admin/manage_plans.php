@@ -35,6 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("INSERT INTO meal_plans (title, package_type, price) VALUES (?, ?, ?)");
         $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0]);
         $message = "New package added successfully!";
+        
+        $plan_id = $pdo->lastInsertId();
+        try {
+            $stmt = $pdo->prepare("UPDATE meal_plans SET video_url = '' WHERE id = ?");
+            $stmt->execute([$plan_id]);
+        } catch (PDOException $e) {}
     } elseif (isset($_POST['delete_plan'])) {
         $stmt = $pdo->prepare("DELETE FROM meal_plans WHERE id = ?");
         $stmt->execute([$_POST['plan_id']]);
