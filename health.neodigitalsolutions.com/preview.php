@@ -34,8 +34,14 @@ if (!$plan || !$plan['file_url']) {
 
 $file_path = $plan['file_url'];
 
+// Fix: Adjust path for subdirectory structure
 if (!file_exists($file_path)) {
-    die("File error: The requested document could not be found on the server.");
+    $alt_path = "../" . $file_path;
+    if (file_exists($alt_path)) {
+        $file_path = $alt_path;
+    } else {
+        die("File error: The requested document could not be found on the server. Path: " . $file_path);
+    }
 }
 ?>
 <!DOCTYPE html>
