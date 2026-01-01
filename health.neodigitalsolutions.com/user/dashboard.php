@@ -58,28 +58,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
     }
 }
 
-// Fetch latest analytics
-$stmt = $pdo->prepare("SELECT * FROM user_analytics WHERE user_id = ? ORDER BY date DESC LIMIT 7");
-$stmt->execute([$user_id]);
-$analytics = $stmt->fetchAll();
-$latest_stats = $analytics[0] ?? [
-    'weight' => $user['weight'],
-    'calories_burned' => 0,
-    'water_intake' => 0,
-    'steps' => 0
-];
+    // Fetch latest analytics
+    $stmt = $pdo->prepare("SELECT * FROM user_analytics WHERE user_id = ? ORDER BY date DESC LIMIT 7");
+    $stmt->execute([$user_id]);
+    $analytics = $stmt->fetchAll();
+    $latest_stats = $analytics[0] ?? [
+        'weight' => $user['weight'],
+        'calories_burned' => 0,
+        'water_intake' => 0,
+        'steps' => 0
+    ];
 
-// Fetch all active packages for update
-$all_plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
+    // Fetch all active packages for update
+    $all_plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
 
-// Handle package update request
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user_package'])) {
-    $new_package = $_POST['new_package'];
-    $stmt = $pdo->prepare("UPDATE users SET package = ?, status = 'pending' WHERE id = ?");
-    $stmt->execute([$new_package, $user_id]);
-    header("Location: dashboard.php?package_updated=1");
-    exit;
-}
+    // Fetch the current plan details
+    $stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE package_type = ?");
+    $stmt->execute([$user['package']]);
+    $current_plan = $stmt->fetch();
+
+    // Fetch available plans for approved users (matching their package)
+    $stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE package_type = ?");
+    $stmt->execute([$user['package']]);
+    $available_plans = $stmt->fetchAll();
+
+    // Handle package update request
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user_package'])) {
+        $new_package = $_POST['new_package'];
+        $stmt = $pdo->prepare("UPDATE users SET package = ?, status = 'pending' WHERE id = ?");
+        $stmt->execute([$new_package, $user_id]);
+        header("Location: dashboard.php?package_updated=1");
+        exit;
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -276,7 +286,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user_package']
                                 <span class="text-6xl filter grayscale group-hover:grayscale-0 transition-all duration-700">🔒</span>
                             </div>
                             <h3 class="text-xl font-bold uppercase tracking-widest text-white mb-3">Content Locked</h3>
-                            <p class="max-w-md mx-auto text-zinc-500 text-sm leading-relaxed mb-10">Complete your payment and upload your receipt to unlock your premium nutritional guide.</p>
+                            <p class="max-w-md mx-auto text-zinc-500 text-sm leading-relaxed mb-4">Complete your payment and upload your receipt to unlock your premium nutritional guide.</p>
+                            
+                            <?php if ($current_plan): ?>
+                                <div class="bg-emerald-500/10 border border-emerald-500/20 p-6 rounded-2xl mb-8 max-w-xs mx-auto">
+                                    <p class="text-[10px] font-bold uppercase tracking-widest text-emerald-500 mb-1">Required Investment</p>
+                                    <p class="text-3xl font-black text-white"><?php echo number_format($current_plan['price'], 2); ?> <span class="text-xs font-bold text-emerald-500">ETB</span></p>
+                                    <p class="text-[9px] text-zinc-500 mt-2 uppercase font-bold"><?php echo htmlspecialchars($current_plan['title']); ?></p>
+                                </div>
+                            <?php endif; ?>
+
                             <div class="flex justify-center">
                                 <a href="payment.php" class="bg-emerald-600 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-900/40">Unlock Now</a>
                             </div>
