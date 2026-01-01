@@ -21,14 +21,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
 
     if (move_uploaded_file($_FILES['receipt']['tmp_name'], $target)) {
         $plan_id = $_POST['plan_id'] ?? null;
-        $stmt = $pdo->prepare("INSERT INTO payments (user_id, meal_plan_id, receipt_path, trx_number, payment_method_id) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([
-            $_SESSION['user_id'], 
-            $plan_id,
-            $target, 
-            $_POST['trx_number'] ?? null,
-            $_POST['payment_method'] ?? null
-        ]);
+        try {
+            $stmt = $pdo->prepare("INSERT INTO payments (user_id, meal_plan_id, receipt_path, trx_number, payment_method_id) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $_SESSION['user_id'], 
+                $plan_id,
+                $target, 
+                $_POST['trx_number'] ?? null,
+                $_POST['payment_method'] ?? null
+            ]);
+        } catch (PDOException $e) {
+            // Fallback for older schema
+            $stmt = $pdo->prepare("INSERT INTO payments (user_id, receipt_path, trx_number, payment_method_id) VALUES (?, ?, ?, ?)");
+            $stmt->execute([
+                $_SESSION['user_id'], 
+                $target, 
+                $_POST['trx_number'] ?? null,
+                $_POST['payment_method'] ?? null
+            ]);
+        }
         header("Location: payment.php?success=1");
         exit;
     }
