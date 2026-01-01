@@ -138,6 +138,13 @@ $available_plans = $stmt->fetchAll();
                                         <?php endif; ?>
                                     </div>
                                     <h3 class="text-lg font-bold uppercase tracking-tight mb-2"><?php echo htmlspecialchars($plan['title']); ?></h3>
+                                    
+                                    <?php if (!empty($plan['video_url'])): ?>
+                                        <div class="mb-4 aspect-video rounded-xl overflow-hidden border border-white/5">
+                                            <iframe class="w-full h-full" src="<?php echo htmlspecialchars($plan['video_url']); ?>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                        </div>
+                                    <?php endif; ?>
+
                                     <?php if (!empty($plan['file_url'])): ?>
                                         <a href="../<?php echo $plan['file_url']; ?>" download class="mt-auto inline-flex items-center justify-center gap-2 bg-emerald-600 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all">
                                             <span>Download PDF</span>

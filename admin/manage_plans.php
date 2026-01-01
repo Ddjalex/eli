@@ -42,9 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (isset($_POST['update_plan'])) {
         $plan_id = $_POST['plan_id'];
         
-        // Update basic info including price
-        $stmt = $pdo->prepare("UPDATE meal_plans SET title = ?, package_type = ?, price = ? WHERE id = ?");
-        $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0, $plan_id]);
+        // Update basic info including price and video URL
+        $stmt = $pdo->prepare("UPDATE meal_plans SET title = ?, package_type = ?, price = ?, video_url = ? WHERE id = ?");
+        $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0, $_POST['video_url'] ?? '', $plan_id]);
         
         // Handle PDF
         if (isset($_FILES['pdf_file']) && $_FILES['pdf_file']['size'] > 0) {
@@ -153,7 +153,7 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
                             </div>
 
                             <div class="flex-1 space-y-6">
-                                <div class="grid grid-cols-3 gap-6">
+                                <div class="grid grid-cols-2 gap-6">
                                     <div>
                                         <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Display Title</label>
                                         <input type="text" name="title" value="<?php echo htmlspecialchars($p['title']); ?>" class="w-full bg-black/50 border border-white/5 p-4 rounded-xl text-sm focus:border-emerald-500 outline-none">
@@ -165,6 +165,10 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
                                     <div>
                                         <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Payment Amount</label>
                                         <input type="number" step="0.01" name="price" value="<?php echo $p['price'] ?? 0; ?>" class="w-full bg-black/50 border border-white/5 p-4 rounded-xl text-sm focus:border-emerald-500 outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Instructional Video URL (YouTube/Vimeo Embed)</label>
+                                        <input type="text" name="video_url" value="<?php echo htmlspecialchars($p['video_url'] ?? ''); ?>" placeholder="https://www.youtube.com/embed/..." class="w-full bg-black/50 border border-white/5 p-4 rounded-xl text-sm focus:border-emerald-500 outline-none">
                                     </div>
                                 </div>
 
