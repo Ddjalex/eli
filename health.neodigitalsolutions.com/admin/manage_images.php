@@ -26,7 +26,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($key === 'about_image') {
                     $stmt_slide = $pdo->prepare("INSERT INTO about_slides (image_url) VALUES (?)");
                     $stmt_slide->execute([$db_path]);
+                    // Also update the site_settings for the single fallback
+                    $update_settings_flag = true;
                 } else {
+                    $update_settings_flag = true;
+                }
+
+                if (isset($update_settings_flag)) {
                     // Get driver name to determine syntax
                     $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
                     
@@ -39,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     
                     $stmt->execute([$key, $db_path]);
+                    unset($update_settings_flag);
                 }
                 $message = "Settings updated successfully!";
             }
@@ -65,8 +72,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
         }
         
-        $stmt->execute([$key, $val]);
-        $message = "Settings updated successfully!";
+        if ($stmt->execute([$key, $val])) {
+            $message = "Settings updated successfully!";
+        } else {
+            $message = "Error saving text setting.";
+        }
     }
 }
 
