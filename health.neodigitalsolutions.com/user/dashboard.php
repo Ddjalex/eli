@@ -10,6 +10,11 @@ $user_id = $_SESSION['user_id'];
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
+if (!$user) {
+    session_destroy();
+    header("Location: ../login.php");
+    exit;
+}
 
 $stmt = $pdo->prepare("SELECT `value` FROM site_settings WHERE `key` = 'user_dashboard_bg'");
 $stmt->execute();
