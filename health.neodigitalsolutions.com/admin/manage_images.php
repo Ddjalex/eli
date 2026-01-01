@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mkdir($target_dir, 0777, true);
     }
 
-    foreach (['hero_bg_image', 'about_image', 'login_bg_image', 'register_bg_image', 'user_dashboard_bg'] as $key) {
+    foreach (['hero_bg_image', 'about_image', 'login_bg_image', 'register_bg_image', 'user_dashboard_bg', 'certificate_image'] as $key) {
         if (isset($_FILES[$key]) && $_FILES[$key]['error'] == 0) {
             $file_extension = pathinfo($_FILES[$key]["name"], PATHINFO_EXTENSION);
             $filename = $key . "_" . time() . "." . $file_extension;
@@ -32,6 +32,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      $message = "Settings updated successfully!";
                 }
             }
+        }
+    }
+
+    if (isset($_POST['about_text'])) {
+        $key = 'about_text';
+        $val = $_POST['about_text'];
+        $stmt = $pdo->prepare("INSERT INTO site_settings (key, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
+        try {
+            $stmt->execute([$key, $val]);
+            $message = "Settings updated successfully!";
+        } catch (PDOException $e) {
+             $stmt = $pdo->prepare("INSERT INTO site_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value");
+             $stmt->execute([$key, $val]);
+             $message = "Settings updated successfully!";
         }
     }
 }
@@ -126,6 +140,21 @@ try {
                             <img src="../<?php echo $settings['about_image']; ?>" class="w-full h-48 object-cover rounded-xl mb-4 border border-white/5">
                         <?php endif; ?>
                         <input type="file" name="about_image" class="w-full bg-black/50 border border-white/10 p-3 rounded-xl text-sm">
+                    </div>
+
+                    <!-- About Text -->
+                    <div class="glass p-8 rounded-3xl md:col-span-2">
+                        <label class="block text-sm font-bold uppercase tracking-widest text-zinc-500 mb-4">About Section Text</label>
+                        <textarea name="about_text" rows="6" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl text-sm text-white focus:border-emerald-500 outline-none"><?php echo htmlspecialchars($settings['about_text'] ?? ''); ?></textarea>
+                    </div>
+
+                    <!-- Certificate Image -->
+                    <div class="glass p-8 rounded-3xl">
+                        <label class="block text-sm font-bold uppercase tracking-widest text-zinc-500 mb-4">Certificate Image</label>
+                        <?php if (isset($settings['certificate_image'])): ?>
+                            <img src="../<?php echo $settings['certificate_image']; ?>" class="w-full h-48 object-cover rounded-xl mb-4 border border-white/5">
+                        <?php endif; ?>
+                        <input type="file" name="certificate_image" class="w-full bg-black/50 border border-white/10 p-3 rounded-xl text-sm">
                     </div>
                 </div>
 
