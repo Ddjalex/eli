@@ -222,13 +222,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
                     <?php endif; ?>
                     <form method="POST" class="space-y-4">
                         <input type="hidden" name="update_user_package" value="1">
-                        <select name="new_package" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl text-[10px] font-bold uppercase text-white outline-none focus:border-emerald-500">
+                        <select name="new_package" id="packageSelect" onchange="updatePlanDescription()" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl text-[10px] font-bold uppercase text-white outline-none focus:border-emerald-500">
                             <?php foreach ($all_plans as $p): ?>
-                                <option value="<?php echo htmlspecialchars($p['package_type']); ?>" <?php echo $user['package'] === $p['package_type'] ? 'selected' : ''; ?>>
+                                <option value="<?php echo htmlspecialchars($p['package_type']); ?>" 
+                                        data-description="<?php echo htmlspecialchars($p['description'] ?? ''); ?>"
+                                        <?php echo $user['package'] === $p['package_type'] ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($p['title']); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                        <div id="planDescriptionBox" class="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-xl hidden">
+                            <p id="planDescriptionText" class="text-[9px] text-zinc-400 leading-relaxed italic"></p>
+                        </div>
                         <button type="submit" class="w-full bg-zinc-800 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all">Update Plan</button>
                     </form>
                 </div>
@@ -312,6 +317,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
     <?php include '../includes/footer.php'; ?>
 
     <script>
+        function updatePlanDescription() {
+            const select = document.getElementById('packageSelect');
+            const box = document.getElementById('planDescriptionBox');
+            const text = document.getElementById('planDescriptionText');
+            const selected = select.options[select.selectedIndex];
+            const description = selected.getAttribute('data-description');
+            
+            if (description && description.trim() !== '') {
+                text.textContent = description;
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', updatePlanDescription);
+
         const analyticsData = <?php echo json_encode(array_reverse($analytics)); ?>;
         const labels = analyticsData.map(d => d.date);
         const weightData = analyticsData.map(d => d.weight);
