@@ -23,9 +23,13 @@ $stats = [
 $stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number 
     FROM users u 
     LEFT JOIN (
-        SELECT DISTINCT ON (user_id) * 
-        FROM payments 
-        ORDER BY user_id, created_at DESC
+        SELECT p1.*
+        FROM payments p1
+        INNER JOIN (
+            SELECT user_id, MAX(created_at) as max_created
+            FROM payments
+            GROUP BY user_id
+        ) p2 ON p1.user_id = p2.user_id AND p1.created_at = p2.max_created
     ) p ON u.id = p.user_id 
     WHERE u.role = 'user' 
     ORDER BY u.created_at DESC");
