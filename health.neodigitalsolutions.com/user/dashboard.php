@@ -82,56 +82,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
     $stmt->execute([$user['package']]);
     $available_plans = $stmt->fetchAll();
 
-    // Check for approved plans using the new dedicated table
-    $stmt = $pdo->prepare("
-        SELECT mp.id as plan_id, mp.package_type 
-        FROM user_plan_access upa 
-        JOIN meal_plans mp ON upa.meal_plan_id = mp.id 
-        WHERE upa.user_id = ? AND upa.status = 'approved'
-    ");
-    $paid_packages = [];
-    $paid_plan_ids = [];
-    try {
-        $stmt->execute([$user_id]);
-        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $paid_packages[] = $row['package_type'];
-            $paid_plan_ids[] = (int)$row['plan_id'];
-        }
-    } catch (Exception $e) {}
-    
-    // Check for pending plans using the new dedicated table
-    $stmt = $pdo->prepare("
-        SELECT mp.id as plan_id, mp.package_type 
-        FROM user_plan_access upa 
-        JOIN meal_plans mp ON upa.meal_plan_id = mp.id 
-        WHERE upa.user_id = ? AND upa.status = 'pending'
-    ");
-    $pending_packages = [];
-    $pending_plan_ids = [];
-    try {
-        $stmt->execute([$user_id]);
-        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $pending_packages[] = $row['package_type'];
-            $pending_plan_ids[] = (int)$row['plan_id'];
-        }
-    } catch (Exception $e) {}
+// Fetch all active packages for update
+$all_plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
 
-    // CRITICAL: Ensure the user's primary package is treated as "paid" if they are approved/active
-    if (($user['status'] === 'approved' || $user['status'] === 'active') && !empty($user['package'])) {
-        $paid_packages[] = $user['package'];
-        // Also find the ID for the primary package to unlock it by ID
-        $stmt = $pdo->prepare("SELECT id FROM meal_plans WHERE package_type = ?");
-        $stmt->execute([$user['package']]);
-        $primary_id = $stmt->fetchColumn();
-        if ($primary_id) $paid_plan_ids[] = (int)$primary_id;
+// Check for approved plans using the new dedicated table
+$stmt = $pdo->prepare("
+    SELECT mp.id as plan_id, mp.package_type 
+    FROM user_plan_access upa 
+    JOIN meal_plans mp ON upa.meal_plan_id = mp.id 
+    WHERE upa.user_id = ? AND upa.status = 'approved'
+");
+$paid_plan_ids = [];
+try {
+    $stmt->execute([$user_id]);
+    while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $paid_plan_ids[] = (int)$row['plan_id'];
     }
+} catch (Exception $e) {}
 
-    $paid_packages = array_unique($paid_packages);
-    $paid_plan_ids = array_unique($paid_plan_ids);
-    $pending_plan_ids = array_unique($pending_plan_ids);
-    
-    // Explicitly define this to prevent warnings
-    $has_any_pending = !empty($pending_plan_ids) || ($user['status'] ?? '') === 'pending';
+// Check for pending plans
+$stmt = $pdo->prepare("
+    SELECT mp.id as plan_id 
+    FROM user_plan_access upa 
+    JOIN meal_plans mp ON upa.meal_plan_id = mp.id 
+    WHERE upa.user_id = ? AND upa.status = 'pending'
+");
+$pending_plan_ids = [];
+try {
+    $stmt->execute([$user_id]);
+    while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $pending_plan_ids[] = (int)$row['plan_id'];
+    }
+} catch (Exception $e) {}
+
+// CRITICAL: Ensure the user's primary package is treated as "paid" if they are approved/active
+if (($user['status'] === 'approved' || $user['status'] === 'active') && !empty($user['package'])) {
+    $stmt = $pdo->prepare("SELECT id FROM meal_plans WHERE package_type = ?");
+    $stmt->execute([$user['package']]);
+    $primary_id = $stmt->fetchColumn();
+    if ($primary_id) $paid_plan_ids[] = (int)$primary_id;
+}
+
+$paid_plan_ids = array_unique($paid_plan_ids);
+$pending_plan_ids = array_unique($pending_plan_ids);
+$has_any_pending = !empty($pending_plan_ids) || ($user['status'] === 'pending');
     
     // Fallback for dashboard background if not set
     if (!isset($dashboard_bg)) {
