@@ -1,0 +1,49 @@
+high-end, luxury-style Portfolio & Meal Planning Platform for Eleni Mekuria (Dietitian/Nutritionist).
+
+Core Technology: Pure PHP (CPanel ready) for the backend, MySQL (PDO) for the database.
+
+Design Style: Strictly inspired by https://www.mydigimenu.com.
+
+Visuals: Must use smooth scrolling (GSAP/Lenis) and immersive full-screen sections.
+
+2. Brand Identity (Use data from the provided PDF):
+
+Hero Section: Create a "MyDigiMenu" style video background placeholder where a video of Eleni's Afrihealth TV show will loop.
+
+About Section: Professional bio featuring her MSc from AAU, BSc from AASTU, and clinical experience at St. Paul’s and Black Lion Hospital.
+
+Credibility: Dedicated sections for "Certificates" and "Media/PR" (Ethiopian Dietetics Professionals Association).
+
+Social Proof: Highlight that she has helped 400+ clients achieve their goals. Use a high-end slider for "Client Testimonials."
+
+3. Business Logic & Access Control:
+
+User Registration: Collect Name, Age, Weight, Height, Fitness Goal, and chosen Package.
+
+The Meal-Plan Route: Logged-in users can browse all "Meal Plan Packages."
+
+The "Lock" System: * The "Download" and "View Details" buttons on meal plans must be LOCKED by default.
+
+If a user clicks a locked plan, redirect them to a Payment Page.
+
+Payment Page: Show Admin's Bank details and an Image Upload field for the user to submit their bank receipt screenshot.
+
+Approval: Content only unlocks after the Admin manually approves the transaction in the Admin Panel.
+
+4. Admin Panel Features:
+
+Secure Admin Login.
+
+User Management: View registered users' health data and their uploaded receipts.
+
+Manual Approval: A button to switch user status from 'Pending' to 'Approved' to unlock their meal plans.
+
+Portfolio Management: Update testimonials and certificates easily.
+
+5. Technical Specifics:
+
+Separated Logic: Use a clean folder structure (/assets, /includes, /admin, /user).
+
+Database: Use a single config.php for MySQL credentials using process.env for security.
+
+Frontend: Use Tailwind CSS for layout and GSAP for the "amazing scroll" effect.
