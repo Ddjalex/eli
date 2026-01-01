@@ -71,8 +71,8 @@ $latest_stats = $analytics[0] ?? [
 
 // Available meal plans based on user package
 $available_plans = [];
-if ($user['status'] === 'approved') {
-    $stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE package_type = ? OR package_type IS NULL ORDER BY id ASC");
+if ($user['status'] === 'approved' || $user['status'] === 'active') {
+    $stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE (package_type = ? OR package_type IS NULL OR package_type = '') ORDER BY id ASC");
     $stmt->execute([$user['package']]);
     $available_plans = $stmt->fetchAll();
 }
@@ -194,9 +194,9 @@ if ($user['status'] === 'approved') {
                 <!-- Account Status -->
                 <div class="glass p-8 rounded-[2.5rem] shadow-2xl">
                     <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">Subscription Status</h4>
-                    <div class="flex items-center justify-between p-4 rounded-2xl <?php echo $user['status'] === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-amber-500/10 border-amber-500/20'; ?> border">
-                        <span class="text-xs font-bold uppercase tracking-widest"><?php echo $user['status'] === 'approved' ? 'Active' : 'Pending Approval'; ?></span>
-                        <span class="w-3 h-3 rounded-full <?php echo $user['status'] === 'approved' ? 'bg-emerald-500' : 'bg-amber-500'; ?> animate-pulse"></span>
+                    <div class="flex items-center justify-between p-4 rounded-2xl <?php echo ($user['status'] === 'approved' || $user['status'] === 'active') ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-amber-500/10 border-amber-500/20'; ?> border">
+                        <span class="text-xs font-bold uppercase tracking-widest"><?php echo ($user['status'] === 'approved' || $user['status'] === 'active') ? 'Active' : 'Pending Approval'; ?></span>
+                        <span class="w-3 h-3 rounded-full <?php echo ($user['status'] === 'approved' || $user['status'] === 'active') ? 'bg-emerald-500' : 'bg-amber-500'; ?> animate-pulse"></span>
                     </div>
                 </div>
             </div>
@@ -218,7 +218,7 @@ if ($user['status'] === 'approved') {
                     
                     <h2 class="text-3xl font-black uppercase tracking-tighter mb-8">My Custom <span class="text-emerald-500">Meal Plan</span></h2>
 
-                    <?php if ($user['status'] === 'approved'): ?>
+                    <?php if ($user['status'] === 'approved' || $user['status'] === 'active'): ?>
                         <div class="grid sm:grid-cols-2 gap-6">
                             <?php foreach ($available_plans as $plan): ?>
                                 <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex flex-col group hover:bg-white/[0.07] transition-all duration-500 shadow-xl">
