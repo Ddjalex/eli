@@ -38,10 +38,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
             $stmt = $pdo->prepare("
                 INSERT INTO user_analytics (user_id, date, photo_path)
                 VALUES (?, CURRENT_DATE, ?)
-                ON CONFLICT (user_id, date) 
-                DO UPDATE SET photo_path = EXCLUDED.photo_path
+                ON DUPLICATE KEY UPDATE photo_path = VALUES(photo_path)
             ");
-            $stmt->execute([$_SESSION['user_id'], $photo_relative_path]);
+            try {
+                $stmt->execute([$_SESSION['user_id'], $photo_relative_path]);
+            } catch (PDOException $e) {
+                $stmt = $pdo->prepare("
+                    INSERT INTO user_analytics (user_id, date, photo_path)
+                    VALUES (?, CURRENT_DATE, ?)
+                    ON CONFLICT (user_id, date) 
+                    DO UPDATE SET photo_path = EXCLUDED.photo_path
+                ");
+                $stmt->execute([$_SESSION['user_id'], $photo_relative_path]);
+            }
             $photo_msg = "Photo uploaded successfully!";
         } else {
             $photo_msg = "Error moving uploaded file.";
@@ -121,7 +130,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
     $paid_plan_ids = array_unique($paid_plan_ids);
     $pending_plan_ids = array_unique($pending_plan_ids);
     
-    $has_any_pending = !empty($pending_plan_ids) || $user['status'] === 'pending';
+    // Explicitly define this to prevent warnings
+    $has_any_pending = !empty($pending_plan_ids) || ($user['status'] ?? '') === 'pending';
 
     // Final debug/verification: Ensure IDs are checked correctly
     // (int) casting ensures in_array works with numeric IDs
