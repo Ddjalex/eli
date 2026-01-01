@@ -10,7 +10,7 @@ $user_id = $_GET['id'] ?? 0;
 $date = $_POST['date'] ?? date('Y-m-d');
 
 // Fetch user info
-$stmt = $pdo->prepare("SELECT full_name FROM users WHERE id = ?");
+$stmt = $pdo->prepare("SELECT name as full_name FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
 
