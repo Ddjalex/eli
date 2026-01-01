@@ -111,6 +111,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
         }
     } catch (Exception $e) {}
 
+    // Check for ANY pending payment for the user to set global pending status
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM payments WHERE user_id = ? AND status = 'pending'");
+    $stmt->execute([$user_id]);
+    $has_any_pending = $stmt->fetchColumn() > 0;
+
     $paid_packages = array_unique($paid_packages);
 
 
@@ -250,9 +255,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
                 <!-- Account Status -->
                 <div class="glass p-8 rounded-[2.5rem] shadow-2xl">
                     <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">Subscription Status</h4>
-                    <div class="flex items-center justify-between p-4 rounded-2xl <?php echo ($user['status'] === 'approved' || $user['status'] === 'active') ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-amber-500/10 border-amber-500/20'; ?> border">
-                        <span class="text-xs font-bold uppercase tracking-widest"><?php echo ($user['status'] === 'approved' || $user['status'] === 'active') ? 'Active' : 'Pending Approval'; ?></span>
-                        <span class="w-3 h-3 rounded-full <?php echo ($user['status'] === 'approved' || $user['status'] === 'active') ? 'bg-emerald-500' : 'bg-amber-500'; ?> animate-pulse"></span>
+                    <?php 
+                    $is_active = ($user['status'] === 'approved' || $user['status'] === 'active');
+                    $display_status = $is_active ? 'Active' : ($has_any_pending ? 'Pending Approval' : 'Payment Required');
+                    $status_color = $is_active ? 'bg-emerald-500' : 'bg-amber-500';
+                    $bg_color = $is_active ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-amber-500/10 border-amber-500/20';
+                    ?>
+                    <div class="flex items-center justify-between p-4 rounded-2xl <?php echo $bg_color; ?> border">
+                        <span class="text-xs font-bold uppercase tracking-widest"><?php echo $display_status; ?></span>
+                        <span class="w-3 h-3 rounded-full <?php echo $status_color; ?> animate-pulse"></span>
                     </div>
                 </div>
 
@@ -346,10 +357,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
                     <?php else: ?>
                         <div class="text-center py-24 bg-black/40 rounded-[2.5rem] border border-white/5 backdrop-blur-3xl relative group">
                             <div class="mb-8">
-                                <span class="text-6xl filter grayscale group-hover:grayscale-0 transition-all duration-700">🔒</span>
+                                <span class="text-6xl <?php echo $has_any_pending ? '' : 'filter grayscale group-hover:grayscale-0'; ?> transition-all duration-700"><?php echo $has_any_pending ? '⏳' : '🔒'; ?></span>
                             </div>
-                            <h3 class="text-xl font-bold uppercase tracking-widest text-white mb-3">Content Locked</h3>
-                            <p class="max-w-md mx-auto text-zinc-500 text-sm leading-relaxed mb-4">Complete your payment and upload your receipt to unlock your premium nutritional guide.</p>
+                            <h3 class="text-xl font-bold uppercase tracking-widest text-white mb-3">
+                                <?php echo $has_any_pending ? 'Verification in Progress' : 'Content Locked'; ?>
+                            </h3>
+                            <p class="max-w-md mx-auto text-zinc-500 text-sm leading-relaxed mb-4">
+                                <?php echo $has_any_pending ? 'Your receipt is being reviewed. You will have full access once Eleni approves your payment.' : 'Complete your payment and upload your receipt to unlock your premium nutritional guide.'; ?>
+                            </p>
                             
                             <?php if ($current_plan): ?>
                                 <div class="bg-emerald-500/10 border border-emerald-500/20 p-6 rounded-2xl mb-8 max-w-xs mx-auto">
@@ -363,7 +378,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
                             <?php endif; ?>
 
                             <div class="flex justify-center">
-                                <a href="payment.php" class="bg-emerald-600 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-900/40">Unlock Now</a>
+                                <?php if ($has_any_pending): ?>
+                                    <span class="bg-amber-500/20 text-amber-500 border border-amber-500/30 px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest">Awaiting Verification</span>
+                                <?php else: ?>
+                                    <a href="payment.php" class="bg-emerald-600 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-900/40">Unlock Now</a>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endif; ?>
