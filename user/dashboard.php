@@ -1,5 +1,6 @@
 <?php
 require_once '../includes/config.php';
+
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {
     header("Location: ../login.php");
     exit;
@@ -14,23 +15,24 @@ $stmt = $pdo->prepare("SELECT value FROM site_settings WHERE key = 'user_dashboa
 $stmt->execute();
 $dashboard_bg = $stmt->fetchColumn() ?: 'attached_assets/stock_images/healthy_lifestyle_c_09890184.jpg';
 
-// Check if user has submitted payment
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM payments WHERE user_id = ?");
+// Fetch latest analytics
+$stmt = $pdo->prepare("SELECT * FROM user_analytics WHERE user_id = ? ORDER BY date DESC LIMIT 7");
 $stmt->execute([$user_id]);
-$has_payment = $stmt->fetchColumn() > 0;
+$analytics = $stmt->fetchAll();
+$latest_stats = $analytics[0] ?? [
+    'weight' => $user['weight'],
+    'calories_burned' => 0,
+    'water_intake' => 0,
+    'steps' => 0
+];
 
-// Handle package change
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_package'])) {
-    $new_package = $_POST['new_package'];
-    $stmt = $pdo->prepare("UPDATE users SET package = ? WHERE id = ?");
-    $stmt->execute([$new_package, $user_id]);
-    $user['package'] = $new_package;
+// Available meal plans based on user package
+$available_plans = [];
+if ($user['status'] === 'approved') {
+    $stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE package_type = ? OR package_type IS NULL ORDER BY id ASC");
+    $stmt->execute([$user['package']]);
+    $available_plans = $stmt->fetchAll();
 }
-
-// Fetch meal plans from database
-$stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE package_type = ? OR package_type IS NULL ORDER BY id ASC");
-$stmt->execute([$user['package']]);
-$available_plans = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -39,6 +41,7 @@ $available_plans = $stmt->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard | Eleni Mekuria</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -62,9 +65,9 @@ $available_plans = $stmt->fetchAll();
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Left: User Profile & Status -->
-            <div class="space-y-8">
+            <div class="lg:col-span-4 space-y-8">
                 <div class="glass p-8 rounded-[2.5rem] shadow-2xl">
                     <div class="flex items-center gap-6 mb-8">
                         <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-emerald-500/20 flex items-center justify-center text-3xl sm:text-4xl border border-emerald-500/30">
@@ -80,12 +83,49 @@ $available_plans = $stmt->fetchAll();
                     
                     <div class="grid grid-cols-2 gap-4">
                         <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                            <p class="text-[9px] uppercase tracking-[0.2em] text-zinc-500 font-bold mb-1">Weight</p>
-                            <p class="text-xl font-black text-white"><?php echo htmlspecialchars($user['weight'] ?? '-'); ?> <span class="text-[10px] font-medium text-zinc-500">kg</span></p>
+                            <p class="text-[9px] uppercase tracking-[0.2em] text-zinc-500 font-bold mb-1">Current Weight</p>
+                            <p class="text-xl font-black text-white"><?php echo number_format($latest_stats['weight'], 1); ?> <span class="text-[10px] font-medium text-zinc-500">kg</span></p>
                         </div>
                         <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
                             <p class="text-[9px] uppercase tracking-[0.2em] text-zinc-500 font-bold mb-1">Goal</p>
                             <p class="text-sm font-bold text-emerald-400 uppercase tracking-tight"><?php echo htmlspecialchars($user['goal'] ?? 'Maintain'); ?></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Activity -->
+                <div class="glass p-8 rounded-[2.5rem] shadow-2xl">
+                    <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">Daily Activity</h4>
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xl">🔥</span>
+                                <div>
+                                    <p class="text-[9px] uppercase font-bold text-zinc-500">Calories</p>
+                                    <p class="text-sm font-black text-white"><?php echo $latest_stats['calories_burned']; ?> kcal</p>
+                                </div>
+                            </div>
+                            <div class="text-[9px] font-bold text-emerald-500">Goal: 500</div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xl">💧</span>
+                                <div>
+                                    <p class="text-[9px] uppercase font-bold text-zinc-500">Water</p>
+                                    <p class="text-sm font-black text-white"><?php echo $latest_stats['water_intake']; ?> L</p>
+                                </div>
+                            </div>
+                            <div class="text-[9px] font-bold text-emerald-500">Goal: 3.0</div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xl">👣</span>
+                                <div>
+                                    <p class="text-[9px] uppercase font-bold text-zinc-500">Steps</p>
+                                    <p class="text-sm font-black text-white"><?php echo number_format($latest_stats['steps']); ?></p>
+                                </div>
+                            </div>
+                            <div class="text-[9px] font-bold text-emerald-500">Goal: 10k</div>
                         </div>
                     </div>
                 </div>
@@ -97,28 +137,19 @@ $available_plans = $stmt->fetchAll();
                         <span class="text-xs font-bold uppercase tracking-widest"><?php echo $user['status'] === 'approved' ? 'Active' : 'Pending Approval'; ?></span>
                         <span class="w-3 h-3 rounded-full <?php echo $user['status'] === 'approved' ? 'bg-emerald-500' : 'bg-amber-500'; ?> animate-pulse"></span>
                     </div>
-                    <?php if ($user['status'] !== 'approved'): ?>
-                        <p class="mt-4 text-[11px] text-zinc-400 italic">Your meal plan will be unlocked once your payment is verified by our team.</p>
-                        <a href="payment.php" class="mt-6 block w-full text-center bg-white text-black py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Upload Payment Receipt</a>
-                    <?php endif; ?>
-                </div>
-
-                <!-- Change Package -->
-                <div class="glass p-8 rounded-[2.5rem] shadow-2xl">
-                    <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">Change Package</h4>
-                    <form method="POST" class="space-y-4">
-                        <select name="new_package" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl text-[10px] font-bold uppercase tracking-widest focus:border-emerald-500 outline-none">
-                            <option value="weight_loss" <?php echo $user['package'] === 'weight_loss' ? 'selected' : ''; ?>>Weight Loss</option>
-                            <option value="muscle_gain" <?php echo $user['package'] === 'muscle_gain' ? 'selected' : ''; ?>>Muscle Gain</option>
-                            <option value="sports_performance" <?php echo $user['package'] === 'sports_performance' ? 'selected' : ''; ?>>Sports Performance</option>
-                        </select>
-                        <button type="submit" name="change_package" value="1" class="w-full bg-emerald-600 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all">Update Plan</button>
-                    </form>
                 </div>
             </div>
 
-            <!-- Middle/Right: Meal Plans Content -->
-            <div class="lg:col-span-2 space-y-8">
+            <!-- Middle/Right: Charts & Meal Plans -->
+            <div class="lg:col-span-8 space-y-8">
+                <!-- Weight Progress Chart -->
+                <div class="glass p-8 rounded-[3rem] shadow-2xl">
+                    <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">Weight Progress (Last 7 Days)</h4>
+                    <div class="h-[250px]">
+                        <canvas id="weightChart"></canvas>
+                    </div>
+                </div>
+
                 <div class="glass p-10 rounded-[3rem] shadow-2xl relative overflow-hidden">
                     <div class="absolute top-0 right-0 p-8">
                         <span class="text-6xl opacity-10">🥗</span>
@@ -141,14 +172,10 @@ $available_plans = $stmt->fetchAll();
                                             <?php endif; ?>
                                         </div>
 
-                                        <?php if ($user['status'] === 'approved'): ?>
-                                            <a href="../preview.php?id=<?php echo $plan['id']; ?>" class="inline-flex w-full items-center justify-center gap-3 bg-emerald-600 text-white py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-emerald-500 hover:shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all active:scale-95">
-                                                <span>View Full Plan</span>
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                            </a>
-                                        <?php else: ?>
-                                            <div class="text-center py-5 bg-white/5 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-zinc-600 border border-dashed border-white/10">Awaiting Approval...</div>
-                                        <?php endif; ?>
+                                        <a href="../preview.php?id=<?php echo $plan['id']; ?>" class="inline-flex w-full items-center justify-center gap-3 bg-emerald-600 text-white py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-emerald-500 hover:shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all active:scale-95">
+                                            <span>View Full Plan</span>
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        </a>
                                     </div>
                                 </div>
                                 
@@ -172,19 +199,42 @@ $available_plans = $stmt->fetchAll();
                         </div>
                     <?php endif; ?>
                 </div>
-
-                <!-- Daily Tip -->
-                <div class="glass p-8 rounded-[2.5rem] shadow-2xl bg-gradient-to-br from-emerald-500/10 to-transparent">
-                    <div class="flex items-start gap-6">
-                        <span class="text-3xl">💡</span>
-                        <div>
-                            <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-emerald-500 mb-2">Nutrition Tip of the Day</h4>
-                            <p class="text-zinc-300 text-sm italic leading-relaxed">"Consistency is the key to cellular transformation. Your body responds to the patterns you create over time, not just the efforts of a single day."</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
+
+    <script>
+        const analyticsData = <?php echo json_encode(array_reverse($analytics)); ?>;
+        const labels = analyticsData.map(d => d.date);
+        const weightData = analyticsData.map(d => d.weight);
+
+        const ctx = document.getElementById('weightChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Weight (kg)',
+                    data: weightData,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#10b981',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#71717a' } },
+                    x: { grid: { display: false }, ticks: { color: '#71717a' } }
+                }
+            }
+        });
+    </script>
 </body>
 </html>

@@ -184,7 +184,10 @@ $users = $stmt->fetchAll();
                                             </span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="px-8 py-6 text-right">
+                                    <td class="px-8 py-6 text-right flex justify-end gap-2">
+                                        <a href="user_analytics.php?id=<?php echo $u['id']; ?>" class="bg-blue-600/10 text-blue-400 border border-blue-500/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
+                                            Stats
+                                        </a>
                                         <?php if ($u['status'] === 'pending'): ?>
                                             <a href="?approve=<?php echo $u['id']; ?>" class="emerald-gradient text-white px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all inline-block">
                                                 Approve
