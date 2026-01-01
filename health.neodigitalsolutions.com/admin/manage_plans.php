@@ -43,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $plan_id = $_POST['plan_id'];
         
         // Update basic info including price, video URL, and description
+        // Standardize column name to video_url
         $stmt = $pdo->prepare("UPDATE meal_plans SET title = ?, package_type = ?, price = ?, description = ?, video_url = ? WHERE id = ?");
         $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0, $_POST['description'] ?? '', $_POST['video_url'] ?? '', $plan_id]);
         
