@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $update_settings_flag = true;
                 }
 
-                if (isset($update_settings_flag)) {
+                if ($update_settings_flag) {
                     // Get driver name to determine syntax
                     $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
                     
@@ -45,9 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     
                     $stmt->execute([$key, $db_path]);
-                    unset($update_settings_flag);
                 }
                 $message = "Settings updated successfully!";
+            } else {
+                $message = "Failed to upload file. Check folder permissions.";
             }
         }
     }
@@ -80,9 +81,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$settings = [];
+// Always reload settings for the form display
 try {
     $stmt = $pdo->query("SELECT * FROM site_settings");
+    $settings = [];
     while ($row = $stmt->fetch()) {
         $settings[$row['key']] = $row['value'];
     }
