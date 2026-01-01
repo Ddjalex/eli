@@ -92,7 +92,9 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
         <div class="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
             <div class="scroll-reveal order-2 md:order-1">
                 <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 md:mb-8 uppercase tracking-tighter">About <span class="text-emerald-500">Eleni</span></h2>
-                <p class="text-sm sm:text-base md:text-lg lg:text-xl text-zinc-400 leading-relaxed mb-4 md:mb-6"><?php echo $about_bio; ?></p>
+                <div class="text-sm sm:text-base md:text-lg lg:text-xl text-zinc-400 leading-relaxed mb-4 md:mb-6 space-y-4">
+                    <?php echo nl2br(htmlspecialchars($about_bio)); ?>
+                </div>
                 <div class="border-l-4 border-emerald-500 pl-4 sm:pl-6 italic text-sm sm:text-base md:text-lg mb-6 md:mb-8">
                     "My approach blends rigorous nutritional science with deep clinical empathy."
                 </div>
