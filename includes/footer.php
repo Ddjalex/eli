@@ -9,7 +9,7 @@
                     <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed">
                         <?php 
                         try {
-                            $stmt = $pdo->query("SELECT value FROM site_settings WHERE key = 'footer_address'");
+                            $stmt = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'footer_address'");
                             echo $stmt ? ($stmt->fetchColumn() ?: 'Addis Ababa, Ethiopia') : 'Addis Ababa, Ethiopia';
                         } catch (PDOException $e) {
                             echo 'Addis Ababa, Ethiopia';
@@ -22,7 +22,7 @@
                     <p class="text-zinc-400 text-xs sm:text-sm font-bold">
                         <?php 
                         try {
-                            $stmt = $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_phone'");
+                            $stmt = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'contact_phone'");
                             echo $stmt ? ($stmt->fetchColumn() ?: '+251 911 000 000') : '+251 911 000 000';
                         } catch (PDOException $e) {
                             echo '+251 911 000 000';
@@ -35,7 +35,7 @@
                     <p class="text-zinc-400 text-xs sm:text-sm">
                         <?php 
                         try {
-                            $stmt = $pdo->query("SELECT value FROM site_settings WHERE key = 'footer_email'");
+                            $stmt = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'footer_email'");
                             echo $stmt ? ($stmt->fetchColumn() ?: 'info@elenimekuria.com') : 'info@elenimekuria.com';
                         } catch (PDOException $e) {
                             echo 'info@elenimekuria.com';
@@ -63,7 +63,7 @@
             <ul class="space-y-2 sm:space-y-4 text-sm">
                 <li><a href="<?php 
                     try {
-                        $stmt = $pdo->query("SELECT value FROM site_settings WHERE key = 'footer_tiktok'");
+                        $stmt = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'footer_tiktok'");
                         echo $stmt ? ($stmt->fetchColumn() ?: '#') : '#';
                     } catch (PDOException $e) {
                         echo '#';
@@ -73,7 +73,7 @@
                 </a></li>
                 <li><a href="<?php 
                     try {
-                        $stmt = $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_social_ig'");
+                        $stmt = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'contact_social_ig'");
                         echo $stmt ? ($stmt->fetchColumn() ?: '#') : '#';
                     } catch (PDOException $e) {
                         echo '#';
@@ -83,7 +83,7 @@
                 </a></li>
                 <li><a href="<?php 
                     try {
-                        $stmt = $pdo->query("SELECT value FROM site_settings WHERE key = 'contact_whatsapp_link'");
+                        $stmt = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'contact_whatsapp_link'");
                         echo $stmt ? ($stmt->fetchColumn() ?: '#') : '#';
                     } catch (PDOException $e) {
                         echo '#';
@@ -93,7 +93,7 @@
                 </a></li>
                 <li><a href="<?php 
                     try {
-                        $stmt = $pdo->query("SELECT value FROM site_settings WHERE key = 'footer_telegram'");
+                        $stmt = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'footer_telegram'");
                         echo $stmt ? ($stmt->fetchColumn() ?: '#') : '#';
                     } catch (PDOException $e) {
                         echo '#';
