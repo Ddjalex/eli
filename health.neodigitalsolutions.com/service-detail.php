@@ -97,11 +97,6 @@ if (!$plan) {
                     <a href="<?php echo $plan['button_link']; ?>" class="bg-emerald-600 text-white px-10 py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-emerald-500 transition-all transform hover:scale-105 shadow-xl shadow-emerald-900/20">
                         <?php echo htmlspecialchars($plan['button_text']); ?>
                     </a>
-                    <?php if (isset($plan['preview_link'])): ?>
-                        <a href="<?php echo $plan['preview_link']; ?>" class="bg-white/5 text-white border border-white/10 px-10 py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-white/10 transition-all">
-                            Preview Content
-                        </a>
-                    <?php endif; ?>
                 </div>
             </div>
 
