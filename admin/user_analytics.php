@@ -93,6 +93,15 @@ $current_stats = $stmt->fetch();
                     </div>
                 </div>
 
+                <?php if (!empty($current_stats['photo_path'])): ?>
+                    <div class="mt-6">
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Progress Photo</label>
+                        <div class="rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+                            <img src="../<?php echo $current_stats['photo_path']; ?>" class="w-full h-auto">
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <button type="submit" name="save_analytics" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-[0.2em] py-4 rounded-xl transition-all shadow-lg shadow-emerald-900/20">
                     Save Daily Progress
                 </button>

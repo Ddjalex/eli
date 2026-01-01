@@ -15,6 +15,32 @@ $stmt = $pdo->prepare("SELECT value FROM site_settings WHERE key = 'user_dashboa
 $stmt->execute();
 $dashboard_bg = $stmt->fetchColumn() ?: 'attached_assets/stock_images/healthy_lifestyle_c_09890184.jpg';
 
+// Handle progress photo upload
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
+    if (isset($_FILES['progress_photo']) && $_FILES['progress_photo']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = '../uploads/progress/';
+        if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+        
+        $file_ext = pathinfo($_FILES['progress_photo']['name'], PATHINFO_EXTENSION);
+        $file_name = 'progress_' . $_SESSION['user_id'] . '_' . time() . '.' . $file_ext;
+        $target_path = $upload_dir . $file_name;
+        
+        if (move_uploaded_file($_FILES['progress_photo']['tmp_name'], $target_path)) {
+            $photo_relative_path = 'uploads/progress/' . $file_name;
+            $stmt = $pdo->prepare("
+                INSERT INTO user_analytics (user_id, date, photo_path)
+                VALUES (?, CURRENT_DATE, ?)
+                ON CONFLICT (user_id, date) 
+                DO UPDATE SET photo_path = EXCLUDED.photo_path
+            ");
+            $stmt->execute([$_SESSION['user_id'], $photo_relative_path]);
+            $photo_msg = "Photo uploaded successfully!";
+        } else {
+            $photo_msg = "Error moving uploaded file.";
+        }
+    }
+}
+
 // Fetch latest analytics
 $stmt = $pdo->prepare("SELECT * FROM user_analytics WHERE user_id = ? ORDER BY date DESC LIMIT 7");
 $stmt->execute([$user_id]);
@@ -68,6 +94,24 @@ if ($user['status'] === 'approved') {
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Left: User Profile & Status -->
             <div class="lg:col-span-4 space-y-8">
+                <!-- Progress Photo Upload -->
+                <div class="glass p-8 rounded-[2.5rem] shadow-2xl">
+                    <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">Daily Progress Photo</h4>
+                    <form method="POST" enctype="multipart/form-data" class="space-y-4">
+                        <div class="relative group">
+                            <input type="file" name="progress_photo" accept="image/*" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                            <div class="bg-black/40 border border-white/5 p-8 rounded-2xl border-dashed group-hover:border-emerald-500/50 transition-all text-center">
+                                <span class="text-3xl block mb-2">📸</span>
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Click to upload photo</p>
+                            </div>
+                        </div>
+                        <button type="submit" name="upload_photo" class="w-full bg-emerald-600 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all">Submit Photo</button>
+                    </form>
+                    <?php if (isset($photo_msg)): ?>
+                        <p class="mt-4 text-[10px] font-bold uppercase text-emerald-500 text-center"><?php echo $photo_msg; ?></p>
+                    <?php endif; ?>
+                </div>
+
                 <div class="glass p-8 rounded-[2.5rem] shadow-2xl">
                     <div class="flex items-center gap-6 mb-8">
                         <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-emerald-500/20 flex items-center justify-center text-3xl sm:text-4xl border border-emerald-500/30">
