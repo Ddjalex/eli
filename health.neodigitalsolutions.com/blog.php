@@ -31,6 +31,13 @@ $blogs = $pdo->query("SELECT * FROM blogs ORDER BY created_at DESC")->fetchAll()
                     <?php endif; ?>
                     <h2 class="text-2xl font-bold mb-4"><?php echo htmlspecialchars($b['title']); ?></h2>
                     <p class="text-zinc-400 leading-relaxed mb-6"><?php echo nl2br(htmlspecialchars(substr($b['content'], 0, 300))); ?>...</p>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-[10px]">E</div>
+                        <div>
+                            <div class="font-bold uppercase tracking-widest text-[8px]">Eleni Mekuria</div>
+                            <div class="text-zinc-500 text-[8px]"><?php echo date('M d, Y', strtotime($b['created_at'])); ?></div>
+                        </div>
+                    </div>
                     <a href="blog-detail.php?id=<?php echo $b['id']; ?>" class="text-emerald-500 text-sm font-bold uppercase tracking-widest">Read More</a>
                 </article>
             <?php endforeach; ?>

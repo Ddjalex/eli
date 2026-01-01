@@ -52,7 +52,12 @@ if (!$blog) {
         </h1>
 
         <div class="flex items-center gap-4 mb-12 pb-12 border-b border-white/10">
-            <div class="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center font-bold">E</div>
+            <?php
+            $stmt_img = $pdo->prepare("SELECT value FROM site_settings WHERE `key` = 'about_image'");
+            $stmt_img->execute();
+            $admin_img = $stmt_img->fetchColumn() ?: 'attached_assets/stock_images/professional_dietiti_8bb8decd.jpg';
+            ?>
+            <img src="<?php echo htmlspecialchars($admin_img); ?>" class="w-12 h-12 rounded-full object-cover border border-emerald-500/30">
             <div>
                 <div class="font-bold uppercase tracking-widest text-xs">Eleni Mekuria</div>
                 <div class="text-zinc-500 text-xs"><?php echo date('M d, Y', strtotime($blog['created_at'])); ?></div>
