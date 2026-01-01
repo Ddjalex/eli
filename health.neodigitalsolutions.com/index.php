@@ -113,7 +113,25 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                      <a href="register.php" class="inline-block text-center bg-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-emerald-500 transition-all">Join Now</a>
                  </div>
              </div>
+
+             <?php
+             $market_plans = [];
+             try {
+                 $market_plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
+             } catch (PDOException $e) {}
+             
+             foreach ($market_plans as $plan): ?>
+             <div class="bg-zinc-900/50 p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all flex flex-col">
+                 <div class="text-3xl sm:text-4xl mb-4 md:mb-6">🥗</div>
+                 <h3 class="text-base sm:text-lg md:text-xl font-bold mb-3 md:mb-4 uppercase"><?php echo htmlspecialchars($plan['title']); ?></h3>
+                 <p class="text-zinc-500 text-xs sm:text-sm mb-6 md:mb-8">Professional nutritional guide for <?php echo htmlspecialchars(str_replace('_', ' ', $plan['package_type'] ?: 'Health')); ?>.</p>
+                 <div class="mt-auto flex gap-2 sm:gap-4 flex-col sm:flex-row">
+                     <a href="preview.php?id=<?php echo $plan['id']; ?>" class="inline-block text-center border border-white/10 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-white hover:text-black transition-all">Preview</a>
+                     <a href="register.php" class="inline-block text-center bg-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-emerald-500 transition-all">Buy Plan</a>
+                 </div>
              </div>
+             <?php endforeach; ?>
+         </div>
     </section>
 
     <?php include 'includes/footer.php'; ?>
