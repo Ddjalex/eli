@@ -51,6 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!is_dir($protected_dir)) mkdir($protected_dir, 0777, true);
             $filename = 'plan_' . $plan_id . '_' . time() . '.pdf';
             $target = $protected_dir . $filename;
+            
+            // Optimization: Use stream for moving file if possible, or just standard move
             if (move_uploaded_file($_FILES['pdf_file']['tmp_name'], $target)) {
                 $db_path = 'protected_files/' . $filename;
                 $stmt = $pdo->prepare("UPDATE meal_plans SET file_url = ? WHERE id = ?");
