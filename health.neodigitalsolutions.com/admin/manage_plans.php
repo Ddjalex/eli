@@ -32,15 +32,9 @@ function convertHEIC($target, $upload_dir, $filename) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add_plan'])) {
-        $stmt = $pdo->prepare("INSERT INTO meal_plans (title, package_type, price) VALUES (?, ?, ?)");
-        $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0]);
+        $stmt = $pdo->prepare("INSERT INTO meal_plans (title, package_type, price, video_url) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0, $_POST['video_url'] ?? '']);
         $message = "New package added successfully!";
-        
-        $plan_id = $pdo->lastInsertId();
-        try {
-            $stmt = $pdo->prepare("UPDATE meal_plans SET video_url = '' WHERE id = ?");
-            $stmt->execute([$plan_id]);
-        } catch (PDOException $e) {}
     } elseif (isset($_POST['delete_plan'])) {
         $stmt = $pdo->prepare("DELETE FROM meal_plans WHERE id = ?");
         $stmt->execute([$_POST['plan_id']]);
@@ -49,16 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $plan_id = $_POST['plan_id'];
         
         // Update basic info including price, video URL, and description
-        $stmt = $pdo->prepare("UPDATE meal_plans SET title = ?, package_type = ?, price = ?, description = ? WHERE id = ?");
-        $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0, $_POST['description'] ?? '', $plan_id]);
-        
-        // Handle video_url separately or check if column exists
-        try {
-            $stmt = $pdo->prepare("UPDATE meal_plans SET video_url = ? WHERE id = ?");
-            $stmt->execute([$_POST['video_url'] ?? '', $plan_id]);
-        } catch (PDOException $e) {
-            // Ignore if column doesn't exist yet, or log it
-        }
+        $stmt = $pdo->prepare("UPDATE meal_plans SET title = ?, package_type = ?, price = ?, description = ?, video_url = ? WHERE id = ?");
+        $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0, $_POST['description'] ?? '', $_POST['video_url'] ?? '', $plan_id]);
         
         // Handle PDF
         if (isset($_FILES['pdf_file']) && $_FILES['pdf_file']['size'] > 0) {
