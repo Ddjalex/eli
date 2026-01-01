@@ -116,9 +116,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
         }
     } catch (Exception $e) {}
 
+    // CRITICAL: Ensure the user's current package is treated as "paid" if they are approved/active
+    if (($user['status'] === 'approved' || $user['status'] === 'active') && !empty($user['package'])) {
+        if (!in_array($user['package'], $paid_packages)) {
+            $paid_packages[] = $user['package'];
+        }
+    }
+
     // Check if user has ANY pending plan access
     $has_any_pending = count($pending_packages) > 0;
-
     $paid_packages = array_unique($paid_packages);
 
 
