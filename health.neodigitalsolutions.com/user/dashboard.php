@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
     $available_plans = $stmt->fetchAll();
 
     // Check if user has paid for other plans
-    $stmt = $pdo->prepare("SELECT DISTINCT mp.package_type FROM payments p JOIN meal_plans mp ON p.meal_plan_id = mp.id WHERE p.user_id = ? AND p.status = 'approved'");
+    $stmt = $pdo->prepare("SELECT mp.package_type FROM payments p JOIN meal_plans mp ON p.meal_plan_id = mp.id WHERE p.user_id = ? AND p.status = 'approved'");
     $paid_packages = [];
     try {
         $stmt->execute([$user_id]);
@@ -93,7 +93,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
     } catch (Exception $e) {
         // Fallback if column doesnt exist yet or query fails
     }
-    $paid_packages[] = $user['package']; // User's registered package is always "available" if approved
+    
+    // Also check if the user is approved overall (for their primary package)
+    if ($user['status'] === 'approved' || $user['status'] === 'active') {
+        $paid_packages[] = $user['package'];
+    }
 
 
     // Handle package update request

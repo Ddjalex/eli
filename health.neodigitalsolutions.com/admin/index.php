@@ -7,8 +7,26 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 if (isset($_GET['approve'])) {
     $user_id = $_GET['approve'];
-    $stmt = $pdo->prepare("UPDATE users SET status = 'approved' WHERE id = ?");
+    
+    // Check if it is a plan-specific approval
+    $stmt = $pdo->prepare("SELECT meal_plan_id FROM payments WHERE user_id = ? ORDER BY created_at DESC LIMIT 1");
     $stmt->execute([$user_id]);
+    $last_payment = $stmt->fetch();
+    
+    if ($last_payment && $last_payment['meal_plan_id']) {
+        // Approve specific plan
+        $stmt = $pdo->prepare("UPDATE payments SET status = 'approved' WHERE user_id = ? AND meal_plan_id = ?");
+        $stmt->execute([$user_id, $last_payment['meal_plan_id']]);
+        
+        // Also update user status to active if they were pending
+        $stmt = $pdo->prepare("UPDATE users SET status = 'active' WHERE id = ?");
+        $stmt->execute([$user_id]);
+    } else {
+        // Global approval for main package
+        $stmt = $pdo->prepare("UPDATE users SET status = 'approved' WHERE id = ?");
+        $stmt->execute([$user_id]);
+    }
+    
     header("Location: index.php");
     exit;
 }
@@ -20,7 +38,7 @@ $stats = [
     'plans' => $pdo->query("SELECT COUNT(*) FROM meal_plans")->fetchColumn(),
 ];
 
-$stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number 
+$stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number, p.meal_plan_id, mp.title as plan_title 
     FROM users u 
     LEFT JOIN (
         SELECT p1.*
@@ -31,6 +49,7 @@ $stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number
             GROUP BY user_id
         ) p2 ON p1.user_id = p2.user_id AND p1.created_at = p2.max_created
     ) p ON u.id = p.user_id 
+    LEFT JOIN meal_plans mp ON p.meal_plan_id = mp.id
     WHERE u.role = 'user' 
     ORDER BY u.created_at DESC");
 $users = $stmt->fetchAll();
@@ -171,6 +190,9 @@ $users = $stmt->fetchAll();
                                             <div>
                                                 <div class="font-bold text-white group-hover:text-emerald-400 transition-colors"><?php echo htmlspecialchars($u['name']); ?></div>
                                                 <div class="text-sm text-zinc-500"><?php echo htmlspecialchars($u['email']); ?></div>
+                                                <?php if (isset($u['plan_title']) && $u['plan_title']): ?>
+                                                    <div class="text-[10px] text-emerald-500 font-bold uppercase mt-1">Paying for: <?php echo htmlspecialchars($u['plan_title']); ?></div>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </td>
