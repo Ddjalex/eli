@@ -2,12 +2,24 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// CPANEL ENVIRONMENT (MySQL)
-$host = 'localhost';
-$db   = 'neodigqi_Eli';         
-$user = 'neodigqi_eleni_user2'; 
-$pass = 'a1e2y3t4h5';           
-$dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
+// REPLIT ENVIRONMENT (PostgreSQL)
+// use the DATABASE_URL environment variable
+$db_url = getenv('DATABASE_URL');
+
+if ($db_url) {
+    // Parse the DATABASE_URL
+    $url = parse_url($db_url);
+    $host = $url['host'];
+    $port = $url['port'] ?? 5432;
+    $db   = ltrim($url['path'], '/');
+    $user = $url['user'];
+    $pass = $url['pass'];
+
+    $dsn = "pgsql:host=$host;port=$port;dbname=$db";
+} else {
+    // Fallback or development
+    die("DATABASE_URL not found.");
+}
 
 try {
     $options = [
@@ -17,7 +29,6 @@ try {
     ];
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (PDOException $e) {
-    // Silent fail or custom error for production
     die("Connection failed: " . $e->getMessage());
 }
 

@@ -1,6 +1,6 @@
 <?php
 require_once 'includes/config.php';
-$stmt = $pdo->prepare("SELECT value FROM site_settings WHERE `key` = ?");
+$stmt = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = ?");
 $stmt->execute(['register_bg_image']);
 $reg_bg = $stmt->fetchColumn() ?: 'attached_assets/stock_images/nutrition_fresh_frui_271f4a7c.jpg';
 
