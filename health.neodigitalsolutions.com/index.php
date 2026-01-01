@@ -134,7 +134,7 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                      <h3 class="text-base sm:text-lg md:text-xl font-bold mb-3 md:mb-4 uppercase"><?php echo htmlspecialchars($plan['title']); ?></h3>
                      <p class="text-zinc-500 text-xs sm:text-sm mb-6 md:mb-8">Professional nutritional guide for <?php echo htmlspecialchars(str_replace('_', ' ', $plan['package_type'] ?: 'Health')); ?>.</p>
                      <div class="mt-auto flex gap-2 sm:gap-4 flex-col sm:flex-row">
-                         <a href="preview.php?id=<?php echo $plan['id']; ?>" class="inline-block text-center border border-white/10 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-white hover:text-black transition-all">Preview</a>
+                         <a href="service-detail.php?id=<?php echo $plan['id']; ?>" class="inline-block text-center border border-white/10 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-white hover:text-black transition-all">Details</a>
                          <a href="register.php" class="inline-block text-center bg-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-emerald-500 transition-all">Buy Plan</a>
                      </div>
                  </div>
