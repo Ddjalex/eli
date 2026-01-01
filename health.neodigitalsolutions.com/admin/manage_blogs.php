@@ -58,7 +58,18 @@ if ($blog) {
 <body class="bg-[#09090b] text-zinc-200 p-8">
     <div class="max-w-4xl mx-auto">
         <div class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-bold">Manage Blogs</h1>
+            <div class="flex items-center gap-4">
+                <?php
+                $stmt_top = $pdo->prepare("SELECT value FROM site_settings WHERE `key` = 'about_image'");
+                $stmt_top->execute();
+                $top_img = $stmt_top->fetchColumn() ?: 'attached_assets/stock_images/professional_dietiti_8bb8decd.jpg';
+                ?>
+                <img src="../<?php echo htmlspecialchars($top_img); ?>" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-500">
+                <div>
+                    <h1 class="text-3xl font-bold">Manage Blogs</h1>
+                    <p class="text-emerald-500 text-xs font-bold uppercase tracking-widest">Post as Eleni Mekuria</p>
+                </div>
+            </div>
             <a href="index.php" class="text-zinc-400 hover:text-white">Back to Dashboard</a>
         </div>
 
