@@ -22,6 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (move_uploaded_file($_FILES[$key]["tmp_name"], $target_file)) {
                 $db_path = "uploads/site/" . $filename;
                 
+                // If it's an about image, also add to about_slides
+                if ($key === 'about_image') {
+                    $stmt_slide = $pdo->prepare("INSERT INTO about_slides (image_url) VALUES (?)");
+                    $stmt_slide->execute([$db_path]);
+                }
+
                 // Get driver name to determine syntax
                 $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
                 
@@ -37,6 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = "Settings updated successfully!";
             }
         }
+    }
+
+    if (isset($_POST['delete_about_slide'])) {
+        $stmt = $pdo->prepare("DELETE FROM about_slides WHERE id = ?");
+        $stmt->execute([$_POST['slide_id']]);
+        $message = "Slide deleted successfully!";
     }
 
     if (isset($_POST['about_text'])) {
@@ -143,11 +155,24 @@ try {
                     </div>
 
                     <div class="glass p-8 rounded-3xl">
-                        <label class="block text-sm font-bold uppercase tracking-widest text-zinc-500 mb-4">About Section Image</label>
-                        <?php if (isset($settings['about_image'])): ?>
-                            <img src="../<?php echo $settings['about_image']; ?>" class="w-full h-48 object-cover rounded-xl mb-4 border border-white/5">
-                        <?php endif; ?>
+                        <label class="block text-sm font-bold uppercase tracking-widest text-zinc-500 mb-4">About Section Images (Slider)</label>
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                            <?php
+                            $about_slides = $pdo->query("SELECT * FROM about_slides ORDER BY id DESC")->fetchAll();
+                            foreach ($about_slides as $slide): ?>
+                                <div class="relative group">
+                                    <img src="../<?php echo $slide['image_url']; ?>" class="w-full h-24 object-cover rounded-lg border border-white/5">
+                                    <form method="POST" class="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                                        <input type="hidden" name="slide_id" value="<?php echo $slide['id']; ?>">
+                                        <button type="submit" name="delete_about_slide" value="1" class="text-red-500 hover:text-red-400">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
                         <input type="file" name="about_image" class="w-full bg-black/50 border border-white/10 p-3 rounded-xl text-sm">
+                        <p class="text-[10px] text-zinc-500 mt-2 uppercase tracking-widest">Upload to add new slide</p>
                     </div>
 
                     <!-- About Text -->

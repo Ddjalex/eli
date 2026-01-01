@@ -95,8 +95,20 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                     "My approach blends rigorous nutritional science with deep clinical empathy."
                 </div>
             </div>
-            <div class="aspect-[4/5] rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 scroll-reveal order-1 md:order-2">
-                <img src="<?php echo htmlspecialchars($about_img); ?>" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700">
+            <div class="aspect-[4/5] rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 scroll-reveal order-1 md:order-2 relative" id="about-image-container">
+                <?php
+                try {
+                    $about_slides = $pdo->query("SELECT * FROM about_slides ORDER BY id DESC")->fetchAll();
+                } catch (Exception $e) { $about_slides = []; }
+
+                if (empty($about_slides)) {
+                    $about_slides = [['image_url' => $about_img]];
+                }
+
+                foreach ($about_slides as $index => $slide): ?>
+                    <img src="<?php echo htmlspecialchars($slide['image_url']); ?>" 
+                         class="about-slide absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-opacity duration-1000 <?php echo $index === 0 ? 'opacity-100' : 'opacity-0'; ?>">
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
@@ -181,6 +193,17 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                 currentSlide = (currentSlide + 1) % slides.length;
                 slides[currentSlide].classList.add('active');
             }, 5000);
+        }
+
+        // About Slider Script
+        const aboutSlides = document.querySelectorAll('.about-slide');
+        if (aboutSlides.length > 1) {
+            let currentAboutSlide = 0;
+            setInterval(() => {
+                aboutSlides[currentAboutSlide].style.opacity = '0';
+                currentAboutSlide = (currentAboutSlide + 1) % aboutSlides.length;
+                aboutSlides[currentAboutSlide].style.opacity = '1';
+            }, 3000);
         }
 
         // GSAP Scroll
