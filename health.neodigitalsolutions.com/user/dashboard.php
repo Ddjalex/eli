@@ -82,27 +82,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
     $stmt->execute([$user['package']]);
     $available_plans = $stmt->fetchAll();
 
-    // Check if user has paid for other plans
-    $stmt = $pdo->prepare("SELECT mp.package_type FROM payments p JOIN meal_plans mp ON p.meal_plan_id = mp.id WHERE p.user_id = ? AND p.status = 'approved'");
+    // Check for approved plans using the new dedicated table
+    $stmt = $pdo->prepare("SELECT mp.package_type FROM user_plan_access upa JOIN meal_plans mp ON upa.meal_plan_id = mp.id WHERE upa.user_id = ? AND upa.status = 'approved'");
     $paid_packages = [];
     try {
         $stmt->execute([$user_id]);
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $paid_packages[] = $row['package_type'];
         }
-    } catch (Exception $e) {
-        // Fallback if column doesnt exist yet or query fails
-    }
+    } catch (Exception $e) {}
     
-    // Check if the user is approved for their initial package
-    $stmt = $pdo->prepare("SELECT package FROM users WHERE id = ? AND status IN ('approved', 'active')");
-    $stmt->execute([$user_id]);
-    $initial_package = $stmt->fetchColumn();
-    if ($initial_package) {
-        $paid_packages[] = $initial_package;
-    }
-    // Check for pending payments to prevent re-payment prompts
-    $stmt = $pdo->prepare("SELECT mp.package_type FROM payments p JOIN meal_plans mp ON p.meal_plan_id = mp.id WHERE p.user_id = ? AND p.status = 'pending'");
+    // Check for pending plans using the new dedicated table
+    $stmt = $pdo->prepare("SELECT mp.package_type FROM user_plan_access upa JOIN meal_plans mp ON upa.meal_plan_id = mp.id WHERE upa.user_id = ? AND upa.status = 'pending'");
     $pending_packages = [];
     try {
         $stmt->execute([$user_id]);
@@ -111,10 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
         }
     } catch (Exception $e) {}
 
-    // Check for ANY pending payment for the user to set global pending status
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM payments WHERE user_id = ? AND status = 'pending'");
-    $stmt->execute([$user_id]);
-    $has_any_pending = $stmt->fetchColumn() > 0;
+    // Check if user has ANY pending plan access
+    $has_any_pending = count($pending_packages) > 0;
 
     $paid_packages = array_unique($paid_packages);
 

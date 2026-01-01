@@ -30,6 +30,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
                 $_POST['trx_number'] ?? null,
                 $_POST['payment_method'] ?? null
             ]);
+            
+            // Also create a record in user_plan_access with pending status
+            if ($plan_id) {
+                $pdo->prepare("INSERT INTO user_plan_access (user_id, meal_plan_id, status) VALUES (?, ?, 'pending') ON CONFLICT (user_id, meal_plan_id) DO UPDATE SET status = 'pending', updated_at = CURRENT_TIMESTAMP")->execute([$_SESSION['user_id'], $plan_id]);
+            }
         } catch (PDOException $e) {
             // Fallback for older schema
             $stmt = $pdo->prepare("INSERT INTO payments (user_id, receipt_path, trx_number, payment_method_id) VALUES (?, ?, ?, ?)");

@@ -14,8 +14,11 @@ if (isset($_GET['approve'])) {
     $last_payment = $stmt->fetch();
     
     if ($last_payment && $last_payment['meal_plan_id']) {
-        // Approve specific plan
+        // Approve specific plan in payments
         $pdo->prepare("UPDATE payments SET status = 'approved' WHERE user_id = ? AND meal_plan_id = ?")->execute([$user_id, $last_payment['meal_plan_id']]);
+        
+        // Update user_plan_access table
+        $pdo->prepare("INSERT INTO user_plan_access (user_id, meal_plan_id, status) VALUES (?, ?, 'approved') ON CONFLICT (user_id, meal_plan_id) DO UPDATE SET status = 'approved', updated_at = CURRENT_TIMESTAMP")->execute([$user_id, $last_payment['meal_plan_id']]);
         
         // Fetch package type
         $stmt_pkg = $pdo->prepare("SELECT package_type FROM meal_plans WHERE id = ?");
@@ -30,6 +33,19 @@ if (isset($_GET['approve'])) {
     } else {
         // Global approval
         $pdo->prepare("UPDATE users SET status = 'approved' WHERE id = ?")->execute([$user_id]);
+        
+        // If there's an initial package assigned, grant access
+        $stmt_user = $pdo->prepare("SELECT package FROM users WHERE id = ?");
+        $stmt_user->execute([$user_id]);
+        $upkg = $stmt_user->fetchColumn();
+        if ($upkg) {
+            $stmt_mp = $pdo->prepare("SELECT id FROM meal_plans WHERE package_type = ? LIMIT 1");
+            $stmt_mp->execute([$upkg]);
+            $mpid = $stmt_mp->fetchColumn();
+            if ($mpid) {
+                $pdo->prepare("INSERT INTO user_plan_access (user_id, meal_plan_id, status) VALUES (?, ?, 'approved') ON CONFLICT (user_id, meal_plan_id) DO UPDATE SET status = 'approved'")->execute([$user_id, $mpid]);
+            }
+        }
     }
     
     header("Location: index.php");
