@@ -38,5 +38,5 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "php -d upload_max_filesize=128M -d post_max_size=128M -d memory_limit=256M -S 0.0.0.0:5000"
+args = "php -S 0.0.0.0:5000"
 waitForPort = 5000
