@@ -1,5 +1,6 @@
 <?php
 require_once 'includes/config.php';
+$blogs = $pdo->query("SELECT * FROM blogs ORDER BY created_at DESC")->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,11 +18,16 @@ require_once 'includes/config.php';
     <main class="py-20 px-6 max-w-4xl mx-auto">
         <h1 class="text-5xl font-bold mb-12 uppercase tracking-tighter">Health & Nutrition <span class="text-emerald-500">Blog</span></h1>
         <div class="grid gap-12">
-            <article class="border-b border-white/10 pb-12">
-                <h2 class="text-2xl font-bold mb-4">The Importance of Balanced Nutrition</h2>
-                <p class="text-zinc-400 leading-relaxed mb-6">Coming soon... We are working on bringing you the best nutritional advice.</p>
-                <span class="text-emerald-500 text-sm font-bold uppercase tracking-widest">Read More</span>
-            </article>
+            <?php foreach ($blogs as $b): ?>
+                <article class="border-b border-white/10 pb-12">
+                    <?php if ($b['image_url']): ?>
+                        <img src="<?php echo htmlspecialchars($b['image_url']); ?>" class="w-full aspect-video object-cover rounded-2xl mb-6 grayscale hover:grayscale-0 transition-all">
+                    <?php endif; ?>
+                    <h2 class="text-2xl font-bold mb-4"><?php echo htmlspecialchars($b['title']); ?></h2>
+                    <p class="text-zinc-400 leading-relaxed mb-6"><?php echo nl2br(htmlspecialchars(substr($b['content'], 0, 300))); ?>...</p>
+                    <a href="#" class="text-emerald-500 text-sm font-bold uppercase tracking-widest">Read More</a>
+                </article>
+            <?php endforeach; ?>
         </div>
     </main>
     <?php include 'includes/footer.php'; ?>
