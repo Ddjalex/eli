@@ -1,6 +1,19 @@
 <?php
 require_once '../includes/config.php';
-if (!isset($_SESSION['user_id'])) exit;
+$user_id = $_SESSION['user_id'];
+
+// Check if user already has access to this plan
+if (isset($_GET['plan_id'])) {
+    $check_plan_id = (int)$_GET['plan_id'];
+    $stmt = $pdo->prepare("SELECT status FROM user_plan_access WHERE user_id = ? AND meal_plan_id = ?");
+    $stmt->execute([$user_id, $check_plan_id]);
+    $access_status = $stmt->fetchColumn();
+    
+    if ($access_status === 'approved') {
+        header("Location: dashboard.php");
+        exit;
+    }
+}
 
 $message = '';
 if (isset($_GET['reason']) && $_GET['reason'] === 'unauthorized') {
