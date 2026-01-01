@@ -48,9 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (isset($_POST['update_plan'])) {
         $plan_id = $_POST['plan_id'];
         
-        // Update basic info including price and video URL
-        $stmt = $pdo->prepare("UPDATE meal_plans SET title = ?, package_type = ?, price = ? WHERE id = ?");
-        $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0, $plan_id]);
+        // Update basic info including price, video URL, and description
+        $stmt = $pdo->prepare("UPDATE meal_plans SET title = ?, package_type = ?, price = ?, description = ? WHERE id = ?");
+        $stmt->execute([$_POST['title'], $_POST['package_type'], $_POST['price'] ?? 0, $_POST['description'] ?? '', $plan_id]);
         
         // Handle video_url separately or check if column exists
         try {
@@ -199,6 +199,10 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
                                     <div>
                                         <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Instructional Video URL (YouTube/Vimeo Embed)</label>
                                         <input type="text" name="video_url" value="<?php echo htmlspecialchars($p['video_url'] ?? ''); ?>" placeholder="https://www.youtube.com/embed/..." class="w-full bg-black/50 border border-white/5 p-4 rounded-xl text-sm focus:border-emerald-500 outline-none">
+                                    </div>
+                                    <div class="col-span-2">
+                                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Short Description (Appears in User Dashboard)</label>
+                                        <textarea name="description" rows="3" class="w-full bg-black/50 border border-white/5 p-4 rounded-xl text-sm focus:border-emerald-500 outline-none placeholder-zinc-700" placeholder="Describe the benefits of this plan..."><?php echo htmlspecialchars($p['description'] ?? ''); ?></textarea>
                                     </div>
                                 </div>
 

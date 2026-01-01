@@ -293,6 +293,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
                                     <p class="text-[10px] font-bold uppercase tracking-widest text-emerald-500 mb-1">Required Investment</p>
                                     <p class="text-3xl font-black text-white"><?php echo number_format($current_plan['price'], 2); ?> <span class="text-xs font-bold text-emerald-500">ETB</span></p>
                                     <p class="text-[9px] text-zinc-500 mt-2 uppercase font-bold"><?php echo htmlspecialchars($current_plan['title']); ?></p>
+                                    <?php if (!empty($current_plan['description'])): ?>
+                                        <p class="text-[10px] text-zinc-400 mt-4 leading-relaxed italic border-t border-white/5 pt-4"><?php echo htmlspecialchars($current_plan['description']); ?></p>
+                                    <?php endif; ?>
                                 </div>
                             <?php endif; ?>
 
