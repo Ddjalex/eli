@@ -33,6 +33,7 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
         .hero-bg-image { 
             position: absolute; inset: 0;
             background-size: cover; background-position: center; filter: brightness(0.4);
+            width: 100%; height: 100%; object-fit: cover;
         }
         .scroll-reveal { opacity: 0; transform: scale(0.95); }
         #main-nav { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -44,6 +45,8 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
         <div class="hidden md:flex space-x-4 lg:space-x-8 uppercase text-[9px] lg:text-[10px] tracking-widest font-bold">
             <a href="#home" class="hover:text-emerald-400">Home</a>
             <a href="#about" class="hover:text-emerald-400">About</a>
+            <a href="portfolio.php" class="hover:text-emerald-400">Portfolio</a>
+            <a href="blog.php" class="hover:text-emerald-400">Blog</a>
             <a href="#services" class="hover:text-emerald-400">Services</a>
             <a href="#testimonials" class="hover:text-emerald-400">Stories</a>
             <a href="#contact" class="hover:text-emerald-400">Contact</a>

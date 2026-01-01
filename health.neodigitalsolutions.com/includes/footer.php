@@ -29,10 +29,11 @@
         <div>
             <h3 class="text-[9px] sm:text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-4 sm:mb-8">Quick Links</h3>
             <ul class="space-y-2 sm:space-y-4 text-sm">
-                <li><a href="../#home" class="text-zinc-400 hover:text-emerald-500 transition-all uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">Home</a></li>
-                <li><a href="../#about" class="text-zinc-400 hover:text-emerald-500 transition-all uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">About Us</a></li>
-                <li><a href="../#services" class="text-zinc-400 hover:text-emerald-500 transition-all uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">Our Services</a></li>
-                <li><a href="../#testimonials" class="text-zinc-400 hover:text-emerald-500 transition-all uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">Success Stories</a></li>
+                <li><a href="index.php" class="text-zinc-400 hover:text-emerald-500 transition-all uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">Home</a></li>
+                <li><a href="portfolio.php" class="text-zinc-400 hover:text-emerald-500 transition-all uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">Portfolio</a></li>
+                <li><a href="blog.php" class="text-zinc-400 hover:text-emerald-500 transition-all uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">Blog</a></li>
+                <li><a href="index.php#about" class="text-zinc-400 hover:text-emerald-500 transition-all uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">About Us</a></li>
+                <li><a href="index.php#services" class="text-zinc-400 hover:text-emerald-500 transition-all uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">Our Services</a></li>
             </ul>
         </div>
 
