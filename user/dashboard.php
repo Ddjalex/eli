@@ -130,17 +130,6 @@ $available_plans = $stmt->fetchAll();
                         <div class="grid sm:grid-cols-2 gap-6">
                             <?php foreach ($available_plans as $plan): ?>
                                 <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex flex-col group hover:bg-white/[0.07] transition-all duration-500 shadow-xl">
-                                    <div class="aspect-square rounded-2xl overflow-hidden border border-white/10 mb-6 shadow-inner relative">
-                                        <?php if (!empty($plan['preview_image'])): ?>
-                                            <img src="../<?php echo $plan['preview_image']; ?>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4">
-                                                <span class="text-[10px] font-black uppercase tracking-[0.2em]">View Details</span>
-                                            </div>
-                                        <?php else: ?>
-                                            <div class="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-700 font-bold uppercase tracking-widest text-[10px]">No Preview</div>
-                                        <?php endif; ?>
-                                    </div>
-                                    
                                     <div class="px-2">
                                         <h3 class="text-xl font-black uppercase tracking-tighter mb-4 text-white group-hover:text-emerald-400 transition-colors"><?php echo htmlspecialchars($plan['title']); ?></h3>
                                         
@@ -150,13 +139,21 @@ $available_plans = $stmt->fetchAll();
                                             </div>
                                         <?php endif; ?>
 
-                                        <?php if (!empty($plan['file_url'])): ?>
-                                            <a href="../<?php echo $plan['file_url']; ?>" download class="mt-4 inline-flex w-full items-center justify-center gap-3 bg-emerald-600 text-white py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-emerald-500 hover:shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all active:scale-95">
-                                                <span>Download PDF</span>
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                        <div class="aspect-square rounded-2xl overflow-hidden border border-white/10 mb-6 shadow-inner relative">
+                                            <?php if (!empty($plan['preview_image'])): ?>
+                                                <img src="../<?php echo $plan['preview_image']; ?>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                            <?php else: ?>
+                                                <div class="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-700 font-bold uppercase tracking-widest text-[10px]">No Preview Available</div>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <?php if ($user['status'] === 'approved'): ?>
+                                            <a href="../preview.php?id=<?php echo $plan['id']; ?>" class="mt-4 inline-flex w-full items-center justify-center gap-3 bg-emerald-600 text-white py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-emerald-500 hover:shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all active:scale-95">
+                                                <span>View Full Plan</span>
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                             </a>
                                         <?php else: ?>
-                                            <div class="mt-4 text-center py-5 bg-white/5 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-zinc-600 border border-dashed border-white/10">Awaiting Final Document...</div>
+                                            <div class="mt-4 text-center py-5 bg-white/5 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-zinc-600 border border-dashed border-white/10">Awaiting Approval...</div>
                                         <?php endif; ?>
                                     </div>
                                 </div>
