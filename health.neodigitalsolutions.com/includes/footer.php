@@ -1,5 +1,5 @@
-<footer id="contact" class="py-12 sm:py-16 md:py-24 bg-black border-t border-white/10 px-4 sm:px-6 mt-20 relative z-10">
-    <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-12 text-left">
+<footer id="contact" class="py-12 sm:py-16 md:py-24 bg-black border-t border-white/10 px-6 sm:px-8 mt-20 relative z-10">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 sm:gap-12 text-left">
         <!-- Address List -->
         <div>
             <h3 class="text-[9px] sm:text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-4 sm:mb-8">Address List</h3>
