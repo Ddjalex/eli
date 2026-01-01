@@ -104,15 +104,31 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
         .glass { background: rgba(24, 24, 27, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
-<body class="bg-[#09090b] text-white p-8">
-    <div class="max-w-6xl mx-auto">
-        <div class="flex justify-between items-center mb-12">
-            <div>
-                <h1 class="text-4xl font-black uppercase tracking-tighter text-emerald-500">Meal Packages</h1>
-                <p class="text-zinc-500 text-sm mt-1">Manage your subscription packages and secure meal plan files.</p>
-            </div>
-            <a href="index.php" class="glass px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-white/5 transition-all">Back to Dashboard</a>
-        </div>
+<body class="bg-[#09090b] text-white">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 border-r border-white/5 bg-[#09090b] p-6 hidden lg:block">
+            <div class="text-xl font-bold text-emerald-500 mb-10 tracking-tighter uppercase">Admin Panel</div>
+            <nav class="space-y-2">
+                <a href="index.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Dashboard</a>
+                <a href="manage_users.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Manage Users</a>
+                <a href="manage_hero.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Hero Slider</a>
+                <a href="manage_plans.php" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-medium">Meal Plans</a>
+                <a href="manage_payments.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Payment Methods</a>
+                <a href="manage_images.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Site Settings</a>
+                <a href="change_password.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Change Password</a>
+                <a href="../logout.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 transition-all text-zinc-500 hover:text-red-500">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-8 lg:p-12">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex justify-between items-center mb-12">
+                    <div>
+                        <h1 class="text-4xl font-black uppercase tracking-tighter text-emerald-500">Meal Packages</h1>
+                        <p class="text-zinc-500 text-sm mt-1">Manage your subscription packages and secure meal plan files.</p>
+                    </div>
+                </div>
         
         <?php if ($message): ?>
             <div class="bg-emerald-500/10 border border-emerald-500/50 p-4 rounded-xl mb-8 text-emerald-500 font-bold text-sm uppercase tracking-widest text-center"><?php echo $message; ?></div>
@@ -209,7 +225,7 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
                     </form>
                 </div>
             <?php endforeach; ?>
-        </div>
+        </main>
     </div>
 </body>
 </html>
