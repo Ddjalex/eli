@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach (['hero_bg_image', 'about_image', 'login_bg_image', 'register_bg_image', 'user_dashboard_bg', 'certificate_image'] as $key) {
         if (isset($_FILES[$key]) && $_FILES[$key]['error'] == 0) {
             $file_extension = pathinfo($_FILES[$key]["name"], PATHINFO_EXTENSION);
-            $filename = $key . "_" . time() . "." . $file_extension;
+            $filename = $key . "_" . time() . "_" . uniqid() . "." . $file_extension;
             $target_file = $target_dir . $filename;
             
             if (move_uploaded_file($_FILES[$key]["tmp_name"], $target_file)) {
