@@ -101,6 +101,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
     if ($initial_package) {
         $paid_packages[] = $initial_package;
     }
+    // Check for pending payments to prevent re-payment prompts
+    $stmt = $pdo->prepare("SELECT mp.package_type FROM payments p JOIN meal_plans mp ON p.meal_plan_id = mp.id WHERE p.user_id = ? AND p.status = 'pending'");
+    $pending_packages = [];
+    try {
+        $stmt->execute([$user_id]);
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $pending_packages[] = $row['package_type'];
+        }
+    } catch (Exception $e) {}
+
     $paid_packages = array_unique($paid_packages);
 
 
@@ -298,13 +308,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
                             // Show all plans, but lock those not paid for
                             foreach ($all_plans as $plan): 
                                 $has_access = in_array($plan['package_type'], $paid_packages);
+                                $is_pending = in_array($plan['package_type'], $pending_packages);
                             ?>
                                 <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex flex-col group hover:bg-white/[0.07] transition-all duration-500 shadow-xl relative">
                                     <?php if (!$has_access): ?>
                                         <div class="absolute inset-0 z-20 bg-black/60 backdrop-blur-[2px] rounded-[2rem] flex flex-col items-center justify-center p-6 text-center">
-                                            <span class="text-3xl mb-3">🔒</span>
-                                            <p class="text-[10px] font-bold uppercase tracking-widest text-white mb-4">Payment Required</p>
-                                            <a href="payment.php?plan_id=<?php echo $plan['id']; ?>" class="bg-emerald-600 text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all">Unlock Plan</a>
+                                            <span class="text-3xl mb-3"><?php echo $is_pending ? '⏳' : '🔒'; ?></span>
+                                            <p class="text-[10px] font-bold uppercase tracking-widest text-white mb-4">
+                                                <?php echo $is_pending ? 'Awaiting Approval' : 'Payment Required'; ?>
+                                            </p>
+                                            <?php if (!$is_pending): ?>
+                                                <a href="payment.php?plan_id=<?php echo $plan['id']; ?>" class="bg-emerald-600 text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all">Unlock Plan</a>
+                                            <?php else: ?>
+                                                <span class="px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/10 border border-emerald-500/20">Pending Verification</span>
+                                            <?php endif; ?>
                                         </div>
                                     <?php endif; ?>
                                     <div class="px-2">
