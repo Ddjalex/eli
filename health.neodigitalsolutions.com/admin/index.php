@@ -18,9 +18,18 @@ if (isset($_GET['approve'])) {
         $stmt = $pdo->prepare("UPDATE payments SET status = 'approved' WHERE user_id = ? AND meal_plan_id = ?");
         $stmt->execute([$user_id, $last_payment['meal_plan_id']]);
         
-        // Also update user status to active if they were pending
-        $stmt = $pdo->prepare("UPDATE users SET status = 'active' WHERE id = ?");
-        $stmt->execute([$user_id]);
+        // Also update user package and status
+        $stmt = $pdo->prepare("SELECT package_type FROM meal_plans WHERE id = ?");
+        $stmt->execute([$last_payment['meal_plan_id']]);
+        $package_type = $stmt->fetchColumn();
+        
+        if ($package_type) {
+            $stmt = $pdo->prepare("UPDATE users SET package = ?, status = 'active' WHERE id = ?");
+            $stmt->execute([$package_type, $user_id]);
+        } else {
+            $stmt = $pdo->prepare("UPDATE users SET status = 'approved' WHERE id = ?");
+            $stmt->execute([$user_id]);
+        }
     } else {
         // Global approval for main package
         $stmt = $pdo->prepare("UPDATE users SET status = 'approved' WHERE id = ?");
@@ -38,7 +47,7 @@ $stats = [
     'plans' => $pdo->query("SELECT COUNT(*) FROM meal_plans")->fetchColumn(),
 ];
 
-$stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number, p.meal_plan_id, mp.title as plan_title 
+    $stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number, p.meal_plan_id, p.status as payment_status, mp.title as plan_title 
     FROM users u 
     LEFT JOIN (
         SELECT p1.*
@@ -52,7 +61,7 @@ $stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number, p.meal_plan_id, m
     LEFT JOIN meal_plans mp ON p.meal_plan_id = mp.id
     WHERE u.role = 'user' 
     ORDER BY u.created_at DESC");
-$users = $stmt->fetchAll();
+    $users = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -200,7 +209,7 @@ $users = $stmt->fetchAll();
                                         <?php echo date('M d, Y', strtotime($u['created_at'])); ?>
                                     </td>
                                     <td class="px-8 py-6">
-                                        <?php if ($u['status'] === 'approved'): ?>
+                                        <?php if ($u['status'] === 'approved' || (isset($u['payment_status']) && $u['payment_status'] === 'approved')): ?>
                                             <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
                                                 Approved
                                             </span>
@@ -234,7 +243,7 @@ $users = $stmt->fetchAll();
                                         <a href="user_analytics.php?id=<?php echo $u['id']; ?>" class="bg-blue-600/10 text-blue-400 border border-blue-500/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
                                             Stats
                                         </a>
-                                        <?php if ($u['status'] === 'pending'): ?>
+                                        <?php if ($u['status'] === 'pending' || (isset($u['payment_status']) && $u['payment_status'] !== 'approved')): ?>
                                             <a href="?approve=<?php echo $u['id']; ?>" class="emerald-gradient text-white px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all inline-block">
                                                 Approve
                                             </a>
