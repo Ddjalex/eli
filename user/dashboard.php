@@ -151,7 +151,7 @@ $available_plans = $stmt->fetchAll();
                                         <?php endif; ?>
 
                                         <?php if (!empty($plan['video_url'])): ?>
-                                            <div class="aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black ring-1 ring-white/5 w-full">
+                                            <div class="rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black ring-1 ring-white/5 w-full aspect-video">
                                                 <iframe class="w-full h-full" src="<?php echo htmlspecialchars($plan['video_url']); ?>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                                             </div>
                                         <?php endif; ?>
