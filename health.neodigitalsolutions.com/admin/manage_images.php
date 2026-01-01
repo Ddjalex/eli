@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (move_uploaded_file($_FILES[$key]["tmp_name"], $target_file)) {
                 $db_path = "uploads/site/" . $filename;
                 
+                $update_settings_flag = false;
                 // If it's an about image, also add to about_slides
                 if ($key === 'about_image') {
                     $stmt_slide = $pdo->prepare("INSERT INTO about_slides (image_url) VALUES (?)");
@@ -128,7 +129,7 @@ try {
                 <div class="bg-emerald-500/10 border border-emerald-500/50 p-4 rounded-xl mb-8 text-emerald-500"><?php echo $message; ?></div>
             <?php endif; ?>
 
-            <form method="POST" enctype="multipart/form-data" class="space-y-8">
+            <form action="manage_images.php" method="POST" enctype="multipart/form-data" class="space-y-8">
                 <div class="grid md:grid-cols-2 gap-8">
                     <!-- Dashboard Background -->
                     <div class="glass p-8 rounded-3xl">
