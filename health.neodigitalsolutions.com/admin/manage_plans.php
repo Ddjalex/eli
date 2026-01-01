@@ -121,13 +121,12 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
             <div class="bg-emerald-500/10 border border-emerald-500/50 p-4 rounded-xl mb-8 text-emerald-500 font-bold text-sm uppercase tracking-widest text-center"><?php echo $message; ?></div>
         <?php endif; ?>
 
-        <!-- Add Package -->
         <div class="glass p-8 rounded-3xl mb-12 shadow-2xl">
             <h2 class="text-xl font-bold mb-8 uppercase tracking-tight text-white flex items-center gap-3">
                 <span class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-xs">+</span>
                 Create New Package
             </h2>
-            <form method="POST" class="grid md:grid-cols-4 gap-6">
+            <form method="POST" class="grid md:grid-cols-5 gap-6">
                 <input type="hidden" name="add_plan" value="1">
                 <div class="md:col-span-1">
                     <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Package Name</label>
@@ -140,6 +139,10 @@ $plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
                 <div class="md:col-span-1">
                     <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Payment Amount</label>
                     <input type="number" step="0.01" name="price" required placeholder="e.g. 50.00" class="w-full bg-black border border-white/10 p-4 rounded-xl focus:border-emerald-500 outline-none">
+                </div>
+                <div class="md:col-span-1">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Video URL</label>
+                    <input type="text" name="video_url" placeholder="YouTube/Vimeo Link" class="w-full bg-black border border-white/10 p-4 rounded-xl focus:border-emerald-500 outline-none">
                 </div>
                 <div class="md:col-span-1 flex items-end">
                     <button type="submit" class="w-full bg-emerald-600 py-4 rounded-xl font-black uppercase tracking-widest hover:bg-emerald-500 transition-all">Create Package</button>
