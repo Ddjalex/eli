@@ -76,7 +76,7 @@ if (!$blog) {
 
         <div class="flex items-center gap-4 mb-12 pb-12 border-b border-white/10">
             <?php
-            $stmt_img = $pdo->prepare("SELECT value FROM site_settings WHERE `key` = 'about_image'");
+            $stmt_img = $pdo->prepare("SELECT value FROM site_settings WHERE "key" = 'about_image'");
             $stmt_img->execute();
             $admin_img = $stmt_img->fetchColumn() ?: 'attached_assets/stock_images/professional_dietiti_8bb8decd.jpg';
             ?>

@@ -1,7 +1,7 @@
 <?php
 require_once 'includes/config.php';
 $blogs = $pdo->query("SELECT * FROM blogs ORDER BY created_at DESC")->fetchAll();
-$stmt_profile = $pdo->prepare("SELECT value FROM site_settings WHERE `key` = 'about_image'");
+$stmt_profile = $pdo->prepare("SELECT value FROM site_settings WHERE "key" = 'about_image'");
 $stmt_profile->execute();
 $profile_img = $stmt_profile->fetchColumn() ?: 'attached_assets/stock_images/professional_dietiti_8bb8decd.jpg';
 ?>

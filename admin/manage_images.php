@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
                     } else {
                         // MariaDB/MySQL syntax
-                        $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
+                        $stmt = $pdo->prepare("INSERT INTO site_settings ("key", value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
                     }
                     
                     $stmt->execute([$key, $db_path]);
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
         } else {
             // MariaDB/MySQL syntax
-            $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
+            $stmt = $pdo->prepare("INSERT INTO site_settings ("key", value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
         }
         
         if ($stmt->execute([$key, $val])) {

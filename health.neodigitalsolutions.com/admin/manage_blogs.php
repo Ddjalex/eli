@@ -86,7 +86,7 @@ if ($blog) {
                     <div class="bg-zinc-900 p-4 rounded-xl border border-white/5 flex justify-between items-center">
                         <div class="flex items-center gap-4">
                             <?php
-                            $stmt_profile = $pdo->prepare("SELECT value FROM site_settings WHERE `key` = 'about_image'");
+                            $stmt_profile = $pdo->prepare("SELECT value FROM site_settings WHERE "key" = 'about_image'");
                             $stmt_profile->execute();
                             $profile_img = $stmt_profile->fetchColumn() ?: 'attached_assets/stock_images/professional_dietiti_8bb8decd.jpg';
                             ?>
