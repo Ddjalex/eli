@@ -1,5 +1,6 @@
 { pkgs }: {
 	deps = [
+   pkgs.unzip
    pkgs.php82Extensions.gd
    pkgs.php82Extensions.mbstring
    pkgs.php82Extensions.pgsql
