@@ -69,12 +69,16 @@ $latest_stats = $analytics[0] ?? [
     'steps' => 0
 ];
 
-// Available meal plans based on user package
-$available_plans = [];
-if ($user['status'] === 'approved' || $user['status'] === 'active') {
-    $stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE (package_type = ? OR package_type IS NULL OR package_type = '') ORDER BY id ASC");
-    $stmt->execute([$user['package']]);
-    $available_plans = $stmt->fetchAll();
+// Fetch all active packages for update
+$all_plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
+
+// Handle package update request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user_package'])) {
+    $new_package = $_POST['new_package'];
+    $stmt = $pdo->prepare("UPDATE users SET package = ?, status = 'pending' WHERE id = ?");
+    $stmt->execute([$new_package, $user_id]);
+    header("Location: dashboard.php?package_updated=1");
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -198,6 +202,25 @@ if ($user['status'] === 'approved' || $user['status'] === 'active') {
                         <span class="text-xs font-bold uppercase tracking-widest"><?php echo ($user['status'] === 'approved' || $user['status'] === 'active') ? 'Active' : 'Pending Approval'; ?></span>
                         <span class="w-3 h-3 rounded-full <?php echo ($user['status'] === 'approved' || $user['status'] === 'active') ? 'bg-emerald-500' : 'bg-amber-500'; ?> animate-pulse"></span>
                     </div>
+                </div>
+
+                <!-- Update Package -->
+                <div class="glass p-8 rounded-[2.5rem] shadow-2xl">
+                    <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">Change Plan</h4>
+                    <?php if (isset($_GET['package_updated'])): ?>
+                        <p class="text-[10px] text-emerald-500 font-bold uppercase mb-4">Request sent! Awaiting approval.</p>
+                    <?php endif; ?>
+                    <form method="POST" class="space-y-4">
+                        <input type="hidden" name="update_user_package" value="1">
+                        <select name="new_package" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl text-[10px] font-bold uppercase text-white outline-none focus:border-emerald-500">
+                            <?php foreach ($all_plans as $p): ?>
+                                <option value="<?php echo htmlspecialchars($p['package_type']); ?>" <?php echo $user['package'] === $p['package_type'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($p['title']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <button type="submit" class="w-full bg-zinc-800 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all">Update Plan</button>
+                    </form>
                 </div>
             </div>
 
