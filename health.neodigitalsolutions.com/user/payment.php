@@ -20,9 +20,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
     $target = $upload_dir . $filename;
 
     if (move_uploaded_file($_FILES['receipt']['tmp_name'], $target)) {
-        $stmt = $pdo->prepare("INSERT INTO payments (user_id, receipt_path, trx_number, payment_method_id) VALUES (?, ?, ?, ?)");
+        $plan_id = $_POST['plan_id'] ?? null;
+        $stmt = $pdo->prepare("INSERT INTO payments (user_id, meal_plan_id, receipt_path, trx_number, payment_method_id) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([
             $_SESSION['user_id'], 
+            $plan_id,
             $target, 
             $_POST['trx_number'] ?? null,
             $_POST['payment_method'] ?? null
@@ -67,6 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
         <?php endif; ?>
 
         <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            <?php if (isset($_GET['plan_id'])): ?>
+                <input type="hidden" name="plan_id" value="<?php echo htmlspecialchars($_GET['plan_id']); ?>">
+            <?php endif; ?>
             <div>
                 <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500 mb-3">Select Payment Method</label>
                 <select name="payment_method" id="paymentMethod" class="w-full bg-black border border-white/10 p-4 rounded-xl focus:border-emerald-500 transition-all text-sm text-white outline-none" required onchange="updatePaymentDetails()">

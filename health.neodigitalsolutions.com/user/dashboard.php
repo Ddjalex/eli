@@ -77,10 +77,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
     $stmt->execute([$user['package']]);
     $current_plan = $stmt->fetch();
 
-    // Fetch available plans for approved users (matching their package)
+    // Fetch available plans for approved users
     $stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE package_type = ?");
     $stmt->execute([$user['package']]);
     $available_plans = $stmt->fetchAll();
+
+    // Check if user has paid for other plans
+    $stmt = $pdo->prepare("SELECT DISTINCT mp.package_type FROM payments p JOIN meal_plans mp ON p.meal_plan_id = mp.id WHERE p.user_id = ? AND p.status = 'approved'");
+    $stmt->execute([$user_id]);
+    $paid_packages = $stmt->fetchAll(PDO_FETCH_COLUMN);
+    $paid_packages[] = $user['package']; // User's registered package is always "available" if approved
+
 
     // Handle package update request
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user_package'])) {
@@ -256,10 +263,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
                     
                     <h2 class="text-3xl font-black uppercase tracking-tighter mb-8">My Custom <span class="text-emerald-500">Meal Plan</span></h2>
 
-                    <?php if ($user['status'] === 'approved' || $user['status'] === 'active'): ?>
+                    <?php 
+                    $is_approved = ($user['status'] === 'approved' || $user['status'] === 'active');
+                    if ($is_approved): ?>
                         <div class="grid sm:grid-cols-2 gap-6">
-                            <?php foreach ($available_plans as $plan): ?>
-                                <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex flex-col group hover:bg-white/[0.07] transition-all duration-500 shadow-xl">
+                            <?php 
+                            // Show all plans, but lock those not paid for
+                            foreach ($all_plans as $plan): 
+                                $has_access = in_array($plan['package_type'], $paid_packages);
+                            ?>
+                                <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex flex-col group hover:bg-white/[0.07] transition-all duration-500 shadow-xl relative">
+                                    <?php if (!$has_access): ?>
+                                        <div class="absolute inset-0 z-20 bg-black/60 backdrop-blur-[2px] rounded-[2rem] flex flex-col items-center justify-center p-6 text-center">
+                                            <span class="text-3xl mb-3">🔒</span>
+                                            <p class="text-[10px] font-bold uppercase tracking-widest text-white mb-4">Payment Required</p>
+                                            <a href="payment.php?plan_id=<?php echo $plan['id']; ?>" class="bg-emerald-600 text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all">Unlock Plan</a>
+                                        </div>
+                                    <?php endif; ?>
                                     <div class="px-2">
                                         <h3 class="text-xl font-black uppercase tracking-tighter mb-4 text-white group-hover:text-emerald-400 transition-colors"><?php echo htmlspecialchars($plan['title']); ?></h3>
                                         
@@ -277,12 +297,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
                                         </a>
                                     </div>
                                 </div>
-                                
-                                <?php if (!empty($plan['video_url'])): ?>
-                                    <div class="mt-6 rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black ring-1 ring-white/5 w-full aspect-video">
-                                        <iframe class="w-full h-full" src="<?php echo htmlspecialchars($plan['video_url']); ?>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                                    </div>
-                                <?php endif; ?>
                             <?php endforeach; ?>
                         </div>
                     <?php else: ?>
