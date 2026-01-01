@@ -2,7 +2,7 @@
 require_once 'includes/config.php';
 
 // 'key' በሚለው ቃል ዙሪያ ጋሻ (backticks) መጨመሩን እርግጠኛ ሁኚ
-$stmt = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = ?");
+$stmt = $pdo->prepare("SELECT value FROM site_settings WHERE `key` = ?");
 
 $stmt->execute(['hero_bg_image']);
 $hero_bg = $stmt->fetchColumn() ?: 'attached_assets/stock_images/modern_nutrition_hea_7726d1af.jpg';
