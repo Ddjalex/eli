@@ -20,7 +20,15 @@ $stats = [
     'plans' => $pdo->query("SELECT COUNT(*) FROM meal_plans")->fetchColumn(),
 ];
 
-$stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number FROM users u LEFT JOIN payments p ON u.id = p.user_id WHERE u.role = 'user' ORDER BY u.created_at DESC");
+$stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number 
+    FROM users u 
+    LEFT JOIN (
+        SELECT DISTINCT ON (user_id) * 
+        FROM payments 
+        ORDER BY user_id, created_at DESC
+    ) p ON u.id = p.user_id 
+    WHERE u.role = 'user' 
+    ORDER BY u.created_at DESC");
 $users = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
