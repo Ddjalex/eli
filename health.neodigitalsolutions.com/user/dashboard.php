@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
         $stmt->execute([$user_id]);
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $paid_packages[] = $row['package_type'];
-            $paid_plan_ids[] = $row['plan_id'];
+            $paid_plan_ids[] = (int)$row['plan_id'];
         }
     } catch (Exception $e) {}
     
@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
         $stmt->execute([$user_id]);
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $pending_packages[] = $row['package_type'];
-            $pending_plan_ids[] = $row['plan_id'];
+            $pending_plan_ids[] = (int)$row['plan_id'];
         }
     } catch (Exception $e) {}
 
@@ -123,12 +123,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
         $stmt = $pdo->prepare("SELECT id FROM meal_plans WHERE package_type = ?");
         $stmt->execute([$user['package']]);
         $primary_id = $stmt->fetchColumn();
-        if ($primary_id) $paid_plan_ids[] = $primary_id;
+        if ($primary_id) $paid_plan_ids[] = (int)$primary_id;
     }
 
     $paid_packages = array_unique($paid_packages);
     $paid_plan_ids = array_unique($paid_plan_ids);
     $pending_plan_ids = array_unique($pending_plan_ids);
+
+    // Final debug/verification: Ensure IDs are checked correctly
+    // (int) casting ensures in_array works with numeric IDs
 
 
     // Handle package update request
@@ -330,8 +333,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
                             <?php 
                             // Show all plans, but lock those not paid for
                             foreach ($all_plans as $plan): 
-                                $has_access = in_array($plan['id'], $paid_plan_ids);
-                                $is_pending = in_array($plan['id'], $pending_plan_ids);
+                                $has_access = in_array((int)$plan['id'], $paid_plan_ids, true);
+                                $is_pending = in_array((int)$plan['id'], $pending_plan_ids, true);
                             ?>
                                 <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex flex-col group hover:bg-white/[0.07] transition-all duration-500 shadow-xl relative">
                                     <?php if (!$has_access): ?>
