@@ -1,0 +1,21 @@
+Stack trace:
+#0 {main}
+  thrown in /home/neodigqi/health.neodigitalsolutions.com/user/payment.php on line 2
+[01-Jan-2026 13:36:18 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 275
+[01-Jan-2026 13:36:18 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 375
+[01-Jan-2026 13:36:18 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 375
+[01-Jan-2026 13:36:18 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 378
+[01-Jan-2026 13:36:18 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 381
+[01-Jan-2026 13:36:18 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 396
+[01-Jan-2026 13:46:51 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 275
+[01-Jan-2026 13:46:51 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 375
+[01-Jan-2026 13:46:51 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 375
+[01-Jan-2026 13:46:51 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 378
+[01-Jan-2026 13:46:51 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 381
+[01-Jan-2026 13:46:51 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 396
+[01-Jan-2026 13:48:11 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 275
+[01-Jan-2026 13:48:11 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 375
+[01-Jan-2026 13:48:11 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 375
+[01-Jan-2026 13:48:11 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 378
+[01-Jan-2026 13:48:11 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 381
+[01-Jan-2026 13:48:11 UTC] PHP Warning:  Undefined variable $has_any_pending in /home/neodigqi/health.neodigitalsolutions.com/user/dashboard.php on line 396

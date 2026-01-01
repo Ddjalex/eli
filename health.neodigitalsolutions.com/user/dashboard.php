@@ -132,6 +132,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
     
     // Explicitly define this to prevent warnings
     $has_any_pending = !empty($pending_plan_ids) || ($user['status'] ?? '') === 'pending';
+    
+    // Fallback for dashboard background if not set
+    if (!isset($dashboard_bg)) {
+        $dashboard_bg = 'attached_assets/stock_images/healthy_lifestyle_c_09890184.jpg';
+    }
 
     // Final debug/verification: Ensure IDs are checked correctly
     // (int) casting ensures in_array works with numeric IDs
