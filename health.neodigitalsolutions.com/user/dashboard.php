@@ -83,20 +83,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
     $available_plans = $stmt->fetchAll();
 
     // Check for approved plans using the new dedicated table
-    $stmt = $pdo->prepare("SELECT mp.package_type FROM user_plan_access upa JOIN meal_plans mp ON upa.meal_plan_id = mp.id WHERE upa.user_id = ? AND upa.status = 'approved'");
+    $stmt = $pdo->prepare("
+        SELECT mp.package_type 
+        FROM user_plan_access upa 
+        JOIN meal_plans mp ON upa.meal_plan_id = mp.id 
+        WHERE upa.user_id = ? AND upa.status = 'approved'
+        UNION
+        SELECT package as package_type FROM users WHERE id = ? AND status IN ('approved', 'active')
+    ");
     $paid_packages = [];
     try {
-        $stmt->execute([$user_id]);
+        $stmt->execute([$user_id, $user_id]);
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $paid_packages[] = $row['package_type'];
         }
     } catch (Exception $e) {}
     
     // Check for pending plans using the new dedicated table
-    $stmt = $pdo->prepare("SELECT mp.package_type FROM user_plan_access upa JOIN meal_plans mp ON upa.meal_plan_id = mp.id WHERE upa.user_id = ? AND upa.status = 'pending'");
+    $stmt = $pdo->prepare("
+        SELECT mp.package_type 
+        FROM user_plan_access upa 
+        JOIN meal_plans mp ON upa.meal_plan_id = mp.id 
+        WHERE upa.user_id = ? AND upa.status = 'pending'
+        UNION
+        SELECT package as package_type FROM users WHERE id = ? AND status = 'pending'
+    ");
     $pending_packages = [];
     try {
-        $stmt->execute([$user_id]);
+        $stmt->execute([$user_id, $user_id]);
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $pending_packages[] = $row['package_type'];
         }
