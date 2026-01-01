@@ -1,5 +1,6 @@
 <?php
 ob_start();
+error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
 require_once '../includes/config.php';
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
