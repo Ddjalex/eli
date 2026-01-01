@@ -203,6 +203,8 @@ if ($user['status'] === 'approved') {
         </div>
     </div>
 
+    <?php include '../includes/footer.php'; ?>
+
     <script>
         const analyticsData = <?php echo json_encode(array_reverse($analytics)); ?>;
         const labels = analyticsData.map(d => d.date);
