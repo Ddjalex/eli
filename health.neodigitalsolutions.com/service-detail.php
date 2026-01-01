@@ -38,7 +38,7 @@ if ($id === 'counseling') {
             'description' => $db_plan['description'] ?: "Achieve your " . str_replace('_', ' ', $db_plan['package_type']) . " goals with our scientifically backed nutrition strategy.",
             'price' => '$' . number_format($db_plan['price'], 2),
             'features' => $features,
-            'button_text' => 'Buy the Plan',
+            'button_text' => 'Join Now',
             'button_link' => 'register.php?plan=' . $db_plan['id'],
             'preview_link' => 'preview.php?id=' . $db_plan['id']
         ];
