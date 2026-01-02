@@ -58,13 +58,13 @@
 
         <!-- Branding -->
         <div class="flex flex-col items-start">
-            <div class="text-2xl sm:text-3xl font-black text-emerald-500 uppercase tracking-tighter mb-3 sm:mb-4">Eleni</div>
+            <div class="text-2xl sm:text-3xl font-black text-emerald-500 uppercase tracking-tighter mb-3 sm:mb-4">Diet & Nutritionist Eleni | Personalized Meal Plans</div>
             <p class="text-zinc-500 text-[9px] sm:text-xs italic leading-relaxed mb-6 sm:mb-8">
                 Elevating the standard of nutritional health in Ethiopia through science and empathy.
             </p>
         </div>
     </div>
-    
+
     <div class="mt-10 sm:mt-16 md:mt-20 pt-6 sm:pt-8 md:pt-10 border-t border-white/5 text-center flex flex-col items-center gap-4">
         <p class="text-zinc-600 text-[8px] sm:text-[10px] uppercase tracking-[0.4em] font-bold">
             Copyright &copy; 2026 Eleni Mekuria. All Rights Reserved.

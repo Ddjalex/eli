@@ -60,25 +60,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Slide deleted successfully!";
     }
 
-    if (isset($_POST['about_text'])) {
-        $key = 'about_text';
-        $val = $_POST['about_text'];
-        
-        $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-        
-        if ($driver === 'pgsql') {
-            // PostgreSQL syntax
-            $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
-        } else {
-            // MariaDB/MySQL syntax
-            $stmt = $pdo->prepare("INSERT INTO site_settings ("key", value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
+    if (isset($_POST['settings']) && is_array($_POST['settings'])) {
+        foreach ($_POST['settings'] as $key => $val) {
+            $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+            if ($driver === 'pgsql') {
+                $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
+            } else {
+                $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
+            }
+            $stmt->execute([$key, $val]);
         }
-        
-        if ($stmt->execute([$key, $val])) {
-            $message = "Settings updated successfully!";
-        } else {
-            $message = "Error saving text setting.";
-        }
+        $message = "Settings updated successfully!";
     }
 }
 
@@ -188,13 +180,25 @@ try {
                         <p class="text-[10px] text-zinc-500 mt-2 uppercase tracking-widest">Upload to add new slide</p>
                     </div>
 
-                    <!-- About Text -->
-                    <div class="glass p-8 rounded-3xl md:col-span-2">
-                        <label class="block text-sm font-bold uppercase tracking-widest text-zinc-500 mb-4">About Section Text</label>
-                        <textarea name="about_text" rows="6" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl text-sm text-white focus:border-emerald-500 outline-none"><?php echo htmlspecialchars($settings['about_text'] ?? ''); ?></textarea>
-                    </div>
-
-                    <!-- Certificate Image -->
+                    <?php
+                    $text_settings = [
+                        'about_text' => 'About Section Text',
+                        'footer_address' => 'Footer Address',
+                        'contact_phone' => 'Contact Phone',
+                        'footer_email' => 'Footer Email',
+                        'footer_tiktok' => 'TikTok Link',
+                        'contact_social_ig' => 'Instagram Link',
+                        'contact_whatsapp_link' => 'WhatsApp Link',
+                        'footer_telegram' => 'Telegram Link'
+                    ];
+                    foreach ($text_settings as $key => $label): ?>
+                        <div class="glass p-8 rounded-3xl <?php echo $key === 'about_text' ? 'md:col-span-2' : ''; ?>">
+                            <label class="block text-sm font-bold uppercase tracking-widest text-zinc-500 mb-4"><?php echo $label; ?></label>
+                            <textarea name="settings[<?php echo $key; ?>]" rows="<?php echo $key === 'about_text' ? '6' : '2'; ?>" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl text-sm text-white focus:border-emerald-500 outline-none"><?php echo htmlspecialchars($settings[$key] ?? ''); ?></textarea>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <!-- Certificate Image -->
                     <div class="glass p-8 rounded-3xl">
                         <label class="block text-sm font-bold uppercase tracking-widest text-zinc-500 mb-4">Certificate Image</label>
                         <?php if (isset($settings['certificate_image'])): ?>
