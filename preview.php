@@ -48,8 +48,8 @@ if (!$is_approved) {
 // To further enhance security, we can serve the PDF through a proxy, 
 // but for now, the preview.php check is sufficient since it's the only entry point.
 
-// Get meal plan file path
-$stmt = $pdo->prepare("SELECT file_url, title FROM meal_plans WHERE id = ?");
+// Get meal plan file path and video URL
+$stmt = $pdo->prepare("SELECT file_url, title, video_url FROM meal_plans WHERE id = ?");
 $stmt->execute([$plan_id]);
 $plan = $stmt->fetch();
 
@@ -58,6 +58,26 @@ if (!$plan || !$plan['file_url']) {
 }
 
 $file_path = $plan['file_url'];
+$video_url = $plan['video_url'] ?? '';
+
+// Helper to convert YouTube/Vimeo URLs to embed format
+function getEmbedUrl($url) {
+    if (empty($url)) return '';
+    
+    // YouTube
+    if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $url, $match)) {
+        return "https://www.youtube.com/embed/" . $match[1];
+    }
+    
+    // Vimeo
+    if (preg_match('/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)/', $url, $match)) {
+        return "https://player.vimeo.com/video/" . $match[3];
+    }
+    
+    return $url; // Return as is if already embed or unknown
+}
+
+$embed_url = getEmbedUrl($video_url);
 
 if (!file_exists($file_path)) {
     die("File error: The requested document could not be found on the server.");
@@ -116,6 +136,25 @@ if (!file_exists($file_path)) {
                 <button id="prev-btn-bottom" class="bg-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-lg font-bold uppercase text-[9px] sm:text-sm hover:bg-emerald-500 transition-all">← Previous Page</button>
                 <button id="next-btn-bottom" class="bg-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-lg font-bold uppercase text-[9px] sm:text-sm hover:bg-emerald-500 transition-all">Next Page →</button>
             </div>
+
+            <?php if (!empty($embed_url)): ?>
+            <!-- Video Section -->
+            <div class="mt-12 mb-12">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="h-1 w-12 bg-emerald-500 rounded-full"></div>
+                    <h2 class="text-xl font-bold uppercase tracking-widest text-white">Instructional Video</h2>
+                </div>
+                <div class="bg-zinc-900/50 border border-white/10 p-2 rounded-2xl overflow-hidden aspect-video shadow-2xl">
+                    <iframe 
+                        src="<?php echo htmlspecialchars($embed_url); ?>" 
+                        class="w-full h-full rounded-xl"
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 
