@@ -46,21 +46,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("DELETE FROM about_slides WHERE id = ?");
         $stmt->execute([$_POST['slide_id']]);
         $message = "Slide deleted successfully!";
+        header("Location: manage_images.php?success=1");
+        exit;
     }
 
     // Handle Text Settings
-    if (isset($_POST['settings']) && is_array($_POST['settings'])) {
-        foreach ($_POST['settings'] as $key => $val) {
-            $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-            if ($driver === 'pgsql') {
-                $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
-            } else {
-                $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
+    if (isset($_POST['save_text_settings'])) {
+        if (isset($_POST['settings']) && is_array($_POST['settings'])) {
+            foreach ($_POST['settings'] as $key => $val) {
+                $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+                if ($driver === 'pgsql') {
+                    $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
+                } else {
+                    $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
+                }
+                $stmt->execute([$key, $val]);
             }
-            $stmt->execute([$key, $val]);
+            $message = "Settings updated successfully!";
+            header("Location: manage_images.php?success=1");
+            exit;
         }
-        $message = "Settings updated successfully!";
     }
+}
+
+if (isset($_GET['success'])) {
+    $message = "Settings updated successfully!";
 }
 
 try {

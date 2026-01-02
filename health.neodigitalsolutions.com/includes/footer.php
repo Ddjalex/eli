@@ -8,17 +8,22 @@
                     <span class="text-emerald-500 text-lg sm:text-xl flex-shrink-0">📍</span>
                     <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed">
                         <?php 
-                        $val = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'footer_address'")->fetchColumn();
+                        $stmt_addr = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = 'footer_address'");
+                        $stmt_addr->execute();
+                        $val = $stmt_addr->fetchColumn();
                         echo htmlspecialchars($val ?: 'Addis Ababa, Ethiopia'); 
                         ?>
                     </p>
                 </div>
                 <div class="flex items-center gap-3 sm:gap-4">
                     <span class="text-emerald-500 text-lg sm:text-xl flex-shrink-0">📱</span>
-                    <a href="tel:<?php 
-                        $phone = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'contact_phone'")->fetchColumn() ?: '+251911000000';
-                        echo preg_replace('/[^0-9+]/', '', $phone); 
-                    ?>" class="text-zinc-400 text-xs sm:text-sm font-bold hover:text-emerald-500 transition-colors">
+                    <?php 
+                        $stmt_phone = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = 'contact_phone'");
+                        $stmt_phone->execute();
+                        $phone = $stmt_phone->fetchColumn();
+                        if (!$phone) $phone = '+251 942 543 234';
+                    ?>
+                    <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', $phone); ?>" class="text-zinc-400 text-xs sm:text-sm font-bold hover:text-emerald-500 transition-colors">
                         <?php echo htmlspecialchars($phone); ?>
                     </a>
                 </div>
@@ -26,7 +31,9 @@
                     <span class="text-emerald-500 text-lg sm:text-xl flex-shrink-0">✉️</span>
                     <p class="text-zinc-400 text-xs sm:text-sm">
                         <?php 
-                        $email = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'footer_email'")->fetchColumn();
+                        $stmt_email = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = 'footer_email'");
+                        $stmt_email->execute();
+                        $email = $stmt_email->fetchColumn();
                         echo htmlspecialchars($email ?: 'info@elenimekuria.com'); 
                         ?>
                     </p>
@@ -57,8 +64,10 @@
                     'contact_whatsapp_link' => ['Whatsapp', 'https://www.svgrepo.com/show/513060/whatsapp.svg'],
                     'footer_telegram' => ['Telegram', 'https://www.svgrepo.com/show/354443/telegram.svg']
                 ];
+                $stmt_social = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = ?");
                 foreach ($socials as $key => $info):
-                    $link = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = '$key'")->fetchColumn() ?: '#';
+                    $stmt_social->execute([$key]);
+                    $link = $stmt_social->fetchColumn() ?: '#';
                 ?>
                 <li><a href="<?php echo htmlspecialchars($link); ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-2 sm:gap-3 uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">
                     <img src="<?php echo $info[1]; ?>" class="w-3 sm:w-4 h-3 sm:h-4 invert opacity-50 hover:opacity-100" alt="<?php echo $info[0]; ?>"> <span class="hidden sm:inline"><?php echo $info[0]; ?></span>
