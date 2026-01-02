@@ -22,16 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (move_uploaded_file($_FILES[$key]["tmp_name"], $target_file)) {
                 $db_path = "uploads/site/" . $filename;
                 
-                $update_settings_flag = false;
                 if ($key === 'about_image') {
                     $stmt_slide = $pdo->prepare("INSERT INTO about_slides (image_url) VALUES (?)");
                     $stmt_slide->execute([$db_path]);
-                    $update_settings_flag = true;
                 } else {
-                    $update_settings_flag = true;
-                }
-
-                if ($update_settings_flag) {
                     $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
                     if ($driver === 'pgsql') {
                         $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
@@ -53,17 +47,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Slide deleted successfully!";
     }
 
-    if (isset($_POST['settings']) && is_array($_POST['settings'])) {
-        foreach ($_POST['settings'] as $key => $val) {
-            $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-            if ($driver === 'pgsql') {
-                $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
-            } else {
-                $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
+    if (isset($_POST['save_settings'])) {
+        if (isset($_POST['settings']) && is_array($_POST['settings'])) {
+            foreach ($_POST['settings'] as $key => $val) {
+                $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+                if ($driver === 'pgsql') {
+                    $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
+                } else {
+                    $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
+                }
+                $stmt->execute([$key, $val]);
             }
-            $stmt->execute([$key, $val]);
+            $message = "Settings updated successfully!";
         }
-        $message = "Settings updated successfully!";
     }
 }
 
@@ -160,12 +156,14 @@ try {
                             foreach ($about_slides as $slide): ?>
                                 <div class="relative group">
                                     <img src="../<?php echo $slide['image_url']; ?>" class="w-full h-24 object-cover rounded-lg border border-white/5">
-                                    <form method="POST" class="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
-                                        <input type="hidden" name="slide_id" value="<?php echo $slide['id']; ?>">
-                                        <button type="submit" name="delete_about_slide" value="1" class="text-red-500 hover:text-red-400">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                        </button>
-                                    </form>
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                                        <form method="POST" onsubmit="return confirm('Are you sure?')">
+                                            <input type="hidden" name="slide_id" value="<?php echo $slide['id']; ?>">
+                                            <button type="submit" name="delete_about_slide" value="1" class="text-red-500 hover:text-red-400">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -201,7 +199,7 @@ try {
                 </div>
 
                 <div class="flex justify-end pt-8">
-                    <button type="submit" class="bg-emerald-600 text-white px-10 py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-900/20">Save All Changes</button>
+                    <button type="submit" name="save_settings" value="1" class="bg-emerald-600 text-white px-10 py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-900/20 relative z-10">Save All Changes</button>
                 </div>
             </form>
         </main>
