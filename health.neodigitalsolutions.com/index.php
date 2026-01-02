@@ -134,38 +134,52 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                 <div class="w-full max-w-4xl">
                     <?php
                     try {
-                        $stmt_res = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC, id DESC LIMIT 1");
-                        $result = $stmt_res->fetch();
-                    } catch (Exception $e) { $result = null; }
+                        $stmt_res = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC, id DESC");
+                        $results = $stmt_res->fetchAll();
+                    } catch (Exception $e) { $results = []; }
                     
-                    if ($result): ?>
-                        <div class="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-900/50 p-3 sm:p-5 transition-all hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10">
-                            <div class="flex gap-2 sm:gap-4 mb-4 sm:mb-6">
-                                <div class="relative w-1/2 overflow-hidden rounded-2xl sm:rounded-[1.5rem] shadow-2xl bg-zinc-800">
-                                    <img src="/<?php echo htmlspecialchars($result['before_image_url']); ?>" class="w-full aspect-[4/5] object-cover scale-110" alt="Before Result">
-                                    <?php if ($result['is_blurred']): ?>
-                                        <div class="absolute bg-white/10 backdrop-blur-xl rounded-full border border-white/20 -translate-x-1/2 -translate-y-1/2 shadow-2xl z-20" 
-                                             style="left: <?php echo $result['before_blur_x'] ?? 50; ?>%; top: <?php echo $result['before_blur_y'] ?? 50; ?>%; width: <?php echo $result['blur_size'] ?? 40; ?>px; height: <?php echo $result['blur_size'] ?? 40; ?>px; box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);"></div>
-                                    <?php endif; ?>
-                                    <span class="absolute bottom-3 left-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-widest border border-white/10 z-30">Before</span>
+                    if (!empty($results)): ?>
+                        <div class="relative overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-900/50 p-3 sm:p-5 transition-all hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10" id="progress-slider">
+                            <?php foreach ($results as $index => $result): ?>
+                                <div class="progress-slide <?php echo $index === 0 ? 'active' : 'hidden'; ?>" data-index="<?php echo $index; ?>">
+                                    <div class="flex gap-2 sm:gap-4 mb-4 sm:mb-6">
+                                        <div class="relative w-1/2 overflow-hidden rounded-2xl sm:rounded-[1.5rem] shadow-2xl bg-zinc-800">
+                                            <img src="/<?php echo htmlspecialchars($result['before_image_url']); ?>" class="w-full aspect-[4/5] object-cover scale-110" alt="Before Result">
+                                            <?php if ($result['is_blurred']): ?>
+                                                <div class="absolute bg-white/10 backdrop-blur-xl rounded-full border border-white/20 -translate-x-1/2 -translate-y-1/2 shadow-2xl z-20" 
+                                                     style="left: <?php echo $result['before_blur_x'] ?? 50; ?>%; top: <?php echo $result['before_blur_y'] ?? 50; ?>%; width: <?php echo $result['blur_size'] ?? 40; ?>px; height: <?php echo $result['blur_size'] ?? 40; ?>px; box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);"></div>
+                                            <?php endif; ?>
+                                            <span class="absolute bottom-3 left-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-widest border border-white/10 z-30">Before</span>
+                                        </div>
+                                        <div class="relative w-1/2 overflow-hidden rounded-2xl sm:rounded-[1.5rem] shadow-2xl bg-zinc-800">
+                                            <img src="/<?php echo htmlspecialchars($result['after_image_url']); ?>" class="w-full aspect-[4/5] object-cover scale-110" alt="After Result">
+                                            <?php if ($result['is_blurred']): ?>
+                                                <div class="absolute bg-white/10 backdrop-blur-xl rounded-full border border-white/20 -translate-x-1/2 -translate-y-1/2 shadow-2xl z-20" 
+                                                     style="left: <?php echo $result['after_blur_x'] ?? 50; ?>%; top: <?php echo $result['after_blur_y'] ?? 50; ?>%; width: <?php echo $result['blur_size'] ?? 40; ?>px; height: <?php echo $result['blur_size'] ?? 40; ?>px; box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);"></div>
+                                            <?php endif; ?>
+                                            <span class="absolute bottom-3 left-3 bg-emerald-500/90 backdrop-blur-md px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-widest border border-emerald-400/20 z-30">After</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-center">
+                                        <h3 class="font-black uppercase tracking-[0.2em] text-[10px] sm:text-xs text-zinc-500 group-hover:text-emerald-500 transition-colors"><?php echo htmlspecialchars($result['title'] ?: 'REAL TRANSFORMATION'); ?></h3>
+                                        <div class="mt-2 flex justify-center gap-1">
+                                            <div class="w-8 h-[1px] bg-emerald-500/30"></div>
+                                            <div class="w-1 h-1 rounded-full bg-emerald-500"></div>
+                                            <div class="w-8 h-[1px] bg-emerald-500/30"></div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="relative w-1/2 overflow-hidden rounded-2xl sm:rounded-[1.5rem] shadow-2xl bg-zinc-800">
-                                    <img src="/<?php echo htmlspecialchars($result['after_image_url']); ?>" class="w-full aspect-[4/5] object-cover scale-110" alt="After Result">
-                                    <?php if ($result['is_blurred']): ?>
-                                        <div class="absolute bg-white/10 backdrop-blur-xl rounded-full border border-white/20 -translate-x-1/2 -translate-y-1/2 shadow-2xl z-20" 
-                                             style="left: <?php echo $result['after_blur_x'] ?? 50; ?>%; top: <?php echo $result['after_blur_y'] ?? 50; ?>%; width: <?php echo $result['blur_size'] ?? 40; ?>px; height: <?php echo $result['blur_size'] ?? 40; ?>px; box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);"></div>
-                                    <?php endif; ?>
-                                    <span class="absolute bottom-3 left-3 bg-emerald-500/90 backdrop-blur-md px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-widest border border-emerald-400/20 z-30">After</span>
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <h3 class="font-black uppercase tracking-[0.2em] text-[10px] sm:text-xs text-zinc-500 group-hover:text-emerald-500 transition-colors"><?php echo htmlspecialchars($result['title'] ?: 'REAL TRANSFORMATION'); ?></h3>
-                                <div class="mt-2 flex justify-center gap-1">
-                                    <div class="w-8 h-[1px] bg-emerald-500/30"></div>
-                                    <div class="w-1 h-1 rounded-full bg-emerald-500"></div>
-                                    <div class="w-8 h-[1px] bg-emerald-500/30"></div>
-                                </div>
-                            </div>
+                            <?php endforeach; ?>
+                            
+                            <!-- Slider Controls -->
+                            <?php if (count($results) > 1): ?>
+                                <button onclick="prevProgress()" class="absolute left-4 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-emerald-500 text-white p-2 rounded-full transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                                </button>
+                                <button onclick="nextProgress()" class="absolute right-4 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-emerald-500 text-white p-2 rounded-full transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                            <?php endif; ?>
                         </div>
                     <?php else: ?>
                         <!-- Fallback static card if database is empty -->
@@ -344,6 +358,28 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                 mobileMenu.classList.add('translate-x-full');
             });
         });
+
+        // Progress Slider Script
+        let currentProgressSlide = 0;
+        const progressSlides = document.querySelectorAll('.progress-slide');
+        
+        function showProgressSlide(index) {
+            progressSlides.forEach(slide => {
+                slide.classList.add('hidden');
+                slide.classList.remove('active');
+            });
+            
+            currentProgressSlide = (index + progressSlides.length) % progressSlides.length;
+            progressSlides[currentProgressSlide].classList.remove('hidden');
+            progressSlides[currentProgressSlide].classList.add('active');
+        }
+        
+        function nextProgress() { showProgressSlide(currentProgressSlide + 1); }
+        function prevProgress() { showProgressSlide(currentProgressSlide - 1); }
+        
+        if (progressSlides.length > 1) {
+            setInterval(nextProgress, 6000);
+        }
 
         // GSAP Scroll
         gsap.registerPlugin(ScrollTrigger);
