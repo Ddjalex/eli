@@ -124,8 +124,8 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
                         <img src="../<?php echo $photo['after_image_url']; ?>" class="w-1/2 aspect-square object-cover rounded-lg <?php echo $photo['is_blurred'] ? 'blur-md' : ''; ?>">
                     </div>
                     <div class="space-y-4">
-                        <h3 class="font-bold uppercase"><?php echo htmlspecialchars($photo['title']); ?></h3>
-                        <p class="text-xs text-zinc-500 italic"><?php echo htmlspecialchars($photo['description']); ?></p>
+                        <h3 class="font-bold uppercase"><?php echo htmlspecialchars($photo['title'] ?? 'Untitled'); ?></h3>
+                        <p class="text-xs text-zinc-500 italic"><?php echo htmlspecialchars($photo['description'] ?? ''); ?></p>
                         
                         <div class="flex justify-between items-center pt-4 border-t border-white/5">
                             <button onclick='openEditModal(<?php echo json_encode($photo); ?>)' class="text-emerald-500 text-xs uppercase font-bold hover:text-emerald-400">Edit</button>
