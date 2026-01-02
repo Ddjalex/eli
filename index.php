@@ -123,6 +123,47 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
         <?php endforeach; ?>
     </div>
 
+    <!-- Quick Results Section -->
+    <section class="py-12 sm:py-16 bg-black border-y border-white/5 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-center mb-10 uppercase tracking-tighter">
+                REAL <span class="text-emerald-500">RESULTS</span>
+            </h2>
+            
+            <div class="flex justify-center">
+                <div class="w-full max-w-sm sm:max-w-md lg:max-w-lg">
+                    <div class="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-900/50 p-3 sm:p-5 transition-all hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10">
+                        <div class="flex gap-2 sm:gap-4 mb-4 sm:mb-6">
+                            <div class="relative w-1/2 overflow-hidden rounded-2xl sm:rounded-[1.5rem] shadow-2xl">
+                                <img src="/attached_assets/image_1767344040668.png" class="w-full aspect-[4/5] object-cover object-left scale-110" alt="Before Result">
+                                <span class="absolute bottom-3 left-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-widest border border-white/10">Before</span>
+                            </div>
+                            <div class="relative w-1/2 overflow-hidden rounded-2xl sm:rounded-[1.5rem] shadow-2xl">
+                                <img src="/attached_assets/image_1767344040668.png" class="w-full aspect-[4/5] object-cover object-right scale-110" alt="After Result">
+                                <span class="absolute bottom-3 left-3 bg-emerald-500/90 backdrop-blur-md px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-widest border border-emerald-400/20">After</span>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="font-black uppercase tracking-[0.2em] text-[10px] sm:text-xs text-zinc-500 group-hover:text-emerald-500 transition-colors">UNTITLED JOURNEY</h3>
+                            <div class="mt-2 flex justify-center gap-1">
+                                <div class="w-8 h-[1px] bg-emerald-500/30"></div>
+                                <div class="w-1 h-1 rounded-full bg-emerald-500"></div>
+                                <div class="w-8 h-[1px] bg-emerald-500/30"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 text-center">
+                <a href="#progress" class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-emerald-500 hover:text-white transition-colors flex items-center justify-center gap-2">
+                    View More Success Stories
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
     <section id="about" class="py-16 sm:py-24 md:py-32 px-4 sm:px-6 lg:px-24 bg-zinc-950">
         <div class="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
             <div class="scroll-reveal order-2 md:order-1">
