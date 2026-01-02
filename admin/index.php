@@ -18,7 +18,7 @@ if (isset($_GET['approve'])) {
         $pdo->prepare("UPDATE payments SET status = 'approved' WHERE user_id = ? AND meal_plan_id = ?")->execute([$user_id, $last_payment['meal_plan_id']]);
         
         // Update user_plan_access table
-        $pdo->prepare("INSERT INTO user_plan_access (user_id, meal_plan_id, status) VALUES (?, ?, 'approved') ON DUPLICATE KEY UPDATE status = 'approved', updated_at = CURRENT_TIMESTAMP")->execute([$user_id, $last_payment['meal_plan_id']]);
+        $pdo->prepare("INSERT INTO user_plan_access (user_id, meal_plan_id, status) VALUES (?, ?, 'approved') ON CONFLICT (user_id, meal_plan_id) DO UPDATE SET status = 'approved', updated_at = CURRENT_TIMESTAMP")->execute([$user_id, $last_payment['meal_plan_id']]);
         
         // Fetch package type
         $stmt_pkg = $pdo->prepare("SELECT package_type FROM meal_plans WHERE id = ?");
@@ -43,7 +43,7 @@ if (isset($_GET['approve'])) {
             $stmt_mp->execute([$upkg]);
             $mpid = $stmt_mp->fetchColumn();
             if ($mpid) {
-                $pdo->prepare("INSERT INTO user_plan_access (user_id, meal_plan_id, status) VALUES (?, ?, 'approved') ON DUPLICATE KEY UPDATE status = 'approved'")->execute([$user_id, $mpid]);
+                $pdo->prepare("INSERT INTO user_plan_access (user_id, meal_plan_id, status) VALUES (?, ?, 'approved') ON CONFLICT (user_id, meal_plan_id) DO UPDATE SET status = 'approved'")->execute([$user_id, $mpid]);
             }
         }
     }
