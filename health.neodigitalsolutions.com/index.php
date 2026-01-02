@@ -194,6 +194,30 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
          </div>
     </section>
 
+    <!-- Progress Section -->
+    <section id="progress" class="py-16 sm:py-24 md:py-32 bg-zinc-950 px-4 sm:px-6">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-12 md:mb-20 uppercase tracking-tighter">Real <span class="text-emerald-500">Results</span></h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            <?php
+            $stmt_progress = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC, id DESC LIMIT 6");
+            while ($photo = $stmt_progress->fetch()): ?>
+                <div class="group relative overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/50 p-4 transition-all hover:border-emerald-500/50">
+                    <div class="flex gap-2 mb-6">
+                        <div class="relative w-1/2">
+                            <img src="<?php echo htmlspecialchars($photo['before_image_url']); ?>" class="w-full aspect-[3/4] object-cover rounded-2xl <?php echo $photo['is_blurred'] ? 'blur-xl' : ''; ?>">
+                            <span class="absolute bottom-2 left-2 bg-black/60 px-2 py-1 rounded text-[8px] uppercase font-bold tracking-widest">Before</span>
+                        </div>
+                        <div class="relative w-1/2">
+                            <img src="<?php echo htmlspecialchars($photo['after_image_url']); ?>" class="w-full aspect-[3/4] object-cover rounded-2xl <?php echo $photo['is_blurred'] ? 'blur-xl' : ''; ?>">
+                            <span class="absolute bottom-2 left-2 bg-emerald-500/80 px-2 py-1 rounded text-[8px] uppercase font-bold tracking-widest">After</span>
+                        </div>
+                    </div>
+                    <h3 class="text-center font-bold uppercase tracking-widest text-sm"><?php echo htmlspecialchars($photo['title']); ?></h3>
+                </div>
+            <?php endwhile; ?>
+        </div>
+    </section>
+
     <?php include 'includes/footer.php'; ?>
 
     <script>
