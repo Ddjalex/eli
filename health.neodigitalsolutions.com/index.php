@@ -195,12 +195,19 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
     </section>
 
     <!-- Progress Section -->
+    <?php
+    try {
+        $stmt_progress = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC, id DESC LIMIT 6");
+        $progress_photos = $stmt_progress->fetchAll();
+    } catch (Exception $e) {
+        $progress_photos = [];
+    }
+    
+    if (!empty($progress_photos)): ?>
     <section id="progress" class="py-16 sm:py-24 md:py-32 bg-zinc-950 px-4 sm:px-6">
         <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-12 md:mb-20 uppercase tracking-tighter">Real <span class="text-emerald-500">Results</span></h2>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            <?php
-            $stmt_progress = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC, id DESC LIMIT 6");
-            while ($photo = $stmt_progress->fetch()): ?>
+            <?php foreach ($progress_photos as $photo): ?>
                 <div class="group relative overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/50 p-4 transition-all hover:border-emerald-500/50">
                     <div class="flex gap-2 mb-6">
                         <div class="relative w-1/2">
@@ -214,9 +221,10 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                     </div>
                     <h3 class="text-center font-bold uppercase tracking-widest text-sm"><?php echo htmlspecialchars($photo['title']); ?></h3>
                 </div>
-            <?php endwhile; ?>
+            <?php endforeach; ?>
         </div>
     </section>
+    <?php endif; ?>
 
     <?php include 'includes/footer.php'; ?>
 
