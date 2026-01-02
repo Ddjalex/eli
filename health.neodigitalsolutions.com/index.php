@@ -1,4 +1,5 @@
 <?php
+/** @var PDO $pdo */
 require_once 'includes/config.php';
 
 // 'key' በሚለው ቃል ዙሪያ ጋሻ (backticks) መጨመሩን እርግጠኛ ሁኚ
@@ -144,18 +145,18 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                                 <div class="progress-slide <?php echo $index === 0 ? 'active' : 'hidden'; ?>" data-index="<?php echo $index; ?>">
                                     <div class="flex gap-2 sm:gap-4 mb-4 sm:mb-6">
                                         <div class="relative w-1/2 overflow-hidden rounded-2xl sm:rounded-[1.5rem] shadow-2xl bg-zinc-800 aspect-[4/5]">
-                                            <img src="/<?php echo htmlspecialchars($result['before_image_url']); ?>" class="absolute inset-0 w-full h-full object-cover" alt="Before Result">
+                                            <img src="/<?php echo htmlspecialchars($result['before_image_url']); ?>" class="absolute inset-0 w-full h-full object-cover">
                                             <?php if ($result['is_blurred']): ?>
                                                 <div class="absolute bg-white/10 backdrop-blur-xl rounded-full border border-white/20 -translate-x-1/2 -translate-y-1/2 shadow-2xl z-20" 
-                                                     style="left: <?php echo $result['before_blur_x'] ?? 50; ?>%; top: <?php echo $result['before_blur_y'] ?? 50; ?>%; width: <?php echo $result['blur_size'] ?? 40; ?>px; height: <?php echo $result['blur_size'] ?? 40; ?>px; box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);"></div>
+                                                     style="left: <?php echo $result['before_blur_x'] ?? 50; ?>%; top: <?php echo $result['before_blur_y'] ?? 50; ?>%; width: <?php echo $result['blur_size'] ?? 20; ?>%; aspect-ratio: 1/1; box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);"></div>
                                             <?php endif; ?>
                                             <span class="absolute bottom-3 left-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-widest border border-white/10 z-30">Before</span>
                                         </div>
                                         <div class="relative w-1/2 overflow-hidden rounded-2xl sm:rounded-[1.5rem] shadow-2xl bg-zinc-800 aspect-[4/5]">
-                                            <img src="/<?php echo htmlspecialchars($result['after_image_url']); ?>" class="absolute inset-0 w-full h-full object-cover" alt="After Result">
+                                            <img src="/<?php echo htmlspecialchars($result['after_image_url']); ?>" class="absolute inset-0 w-full h-full object-cover">
                                             <?php if ($result['is_blurred']): ?>
                                                 <div class="absolute bg-white/10 backdrop-blur-xl rounded-full border border-white/20 -translate-x-1/2 -translate-y-1/2 shadow-2xl z-20" 
-                                                     style="left: <?php echo $result['after_blur_x'] ?? 50; ?>%; top: <?php echo $result['after_blur_y'] ?? 50; ?>%; width: <?php echo $result['blur_size'] ?? 40; ?>px; height: <?php echo $result['blur_size'] ?? 40; ?>px; box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);"></div>
+                                                     style="left: <?php echo $result['after_blur_x'] ?? 50; ?>%; top: <?php echo $result['after_blur_y'] ?? 50; ?>%; width: <?php echo $result['blur_size'] ?? 20; ?>%; aspect-ratio: 1/1; box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);"></div>
                                             <?php endif; ?>
                                             <span class="absolute bottom-3 left-3 bg-emerald-500/90 backdrop-blur-md px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-widest border border-emerald-400/20 z-30">After</span>
                                         </div>

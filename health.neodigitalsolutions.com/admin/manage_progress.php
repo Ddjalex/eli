@@ -1,4 +1,5 @@
 <?php
+/** @var PDO $pdo */
 require_once '../includes/config.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -97,11 +98,12 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
     <style>
         .blur-control { position: relative; cursor: crosshair; }
         .blur-marker { 
-            position: absolute; width: 40px; height: 40px; 
+            position: absolute; width: 20%; aspect-ratio: 1/1; 
             border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; 
             background: rgba(255,255,255,0.1); backdrop-filter: blur(12px);
             transform: translate(-50%, -50%); pointer-events: none;
             box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);
+            z-index: 10;
         }
     </style>
 </head>
@@ -124,7 +126,7 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
             <div id="preview-container" class="grid grid-cols-2 gap-4 mb-6 hidden">
                 <div class="space-y-2">
                     <label class="block text-[10px] uppercase tracking-widest text-zinc-500">Position Blur (Click Image)</label>
-                    <div class="blur-control rounded-2xl overflow-hidden border border-white/10 aspect-[4/5] relative">
+                    <div class="blur-control rounded-2xl overflow-hidden border border-white/10 aspect-[4/5] relative" onclick="setBlur(event, 'before')">
                         <img id="before-preview" class="absolute inset-0 w-full h-full object-cover">
                         <div id="before-marker" class="blur-marker"></div>
                     </div>
@@ -133,7 +135,7 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
                 </div>
                 <div class="space-y-2">
                     <label class="block text-[10px] uppercase tracking-widest text-zinc-500">Position Blur (Click Image)</label>
-                    <div class="blur-control rounded-2xl overflow-hidden border border-white/10 aspect-[4/5] relative">
+                    <div class="blur-control rounded-2xl overflow-hidden border border-white/10 aspect-[4/5] relative" onclick="setBlur(event, 'after')">
                         <img id="after-preview" class="absolute inset-0 w-full h-full object-cover">
                         <div id="after-marker" class="blur-marker"></div>
                     </div>
@@ -168,8 +170,8 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
                     <label class="text-xs uppercase tracking-widest text-zinc-500">Blur Faces for Privacy?</label>
                 </div>
                 <div class="flex-1">
-                    <label class="block text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Blur Size</label>
-                    <input type="range" name="blur_size" id="blur_size_input" min="20" max="150" value="40" oninput="updateBlurSize(this.value)" class="w-full accent-emerald-500">
+                    <label class="block text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Blur Size (%)</label>
+                    <input type="range" name="blur_size" id="blur_size_input" min="5" max="60" value="20" oninput="updateBlurSize(this.value)" class="w-full accent-emerald-500">
                 </div>
             </div>
             <button type="submit" name="add_photo" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl uppercase tracking-widest transition-all">Upload Progress Photo</button>
@@ -183,14 +185,14 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
                             <img src="../<?php echo $photo['before_image_url']; ?>" class="absolute inset-0 w-full h-full object-cover">
                             <?php if ($photo['is_blurred']): ?>
                                 <div class="absolute bg-white/10 backdrop-blur-xl rounded-full border border-white/20 -translate-x-1/2 -translate-y-1/2 shadow-2xl" 
-                                     style="left: <?php echo $photo['before_blur_x'] ?? 50; ?>%; top: <?php echo $photo['before_blur_y'] ?? 50; ?>%; width: <?php echo $photo['blur_size'] ?? 40; ?>px; height: <?php echo $photo['blur_size'] ?? 40; ?>px; box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);"></div>
+                                     style="left: <?php echo $photo['before_blur_x'] ?? 50; ?>%; top: <?php echo $photo['before_blur_y'] ?? 50; ?>%; width: <?php echo $photo['blur_size'] ?? 20; ?>%; aspect-ratio: 1/1; box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);"></div>
                             <?php endif; ?>
                         </div>
                         <div class="relative w-1/2 overflow-hidden rounded-2xl aspect-[4/5]">
                             <img src="../<?php echo $photo['after_image_url']; ?>" class="absolute inset-0 w-full h-full object-cover">
                             <?php if ($photo['is_blurred']): ?>
                                 <div class="absolute bg-white/10 backdrop-blur-xl rounded-full border border-white/20 -translate-x-1/2 -translate-y-1/2 shadow-2xl"
-                                     style="left: <?php echo $photo['after_blur_x'] ?? 50; ?>%; top: <?php echo $photo['after_blur_y'] ?? 50; ?>%; width: <?php echo $photo['blur_size'] ?? 40; ?>px; height: <?php echo $photo['blur_size'] ?? 40; ?>px; box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);"></div>
+                                     style="left: <?php echo $photo['after_blur_x'] ?? 50; ?>%; top: <?php echo $photo['after_blur_y'] ?? 50; ?>%; width: <?php echo $photo['blur_size'] ?? 20; ?>%; aspect-ratio: 1/1; box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);"></div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -263,8 +265,8 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
                         <label class="text-xs uppercase tracking-widest text-zinc-500">Blur Faces?</label>
                     </div>
                     <div class="flex-1">
-                        <label class="block text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Blur Size</label>
-                        <input type="range" name="blur_size" id="edit_blur_size" min="20" max="150" value="40" oninput="updateBlurSize(this.value)" class="w-full accent-emerald-500">
+                        <label class="block text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Blur Size (%)</label>
+                        <input type="range" name="blur_size" id="edit_blur_size" min="5" max="60" value="20" oninput="updateBlurSize(this.value)" class="w-full accent-emerald-500">
                     </div>
                 </div>
                 <div class="flex gap-4 pt-4">
@@ -312,8 +314,7 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
 
         function updateBlurSize(size) {
             document.querySelectorAll('.blur-marker').forEach(m => {
-                m.style.width = size + 'px';
-                m.style.height = size + 'px';
+                m.style.width = size + '%';
             });
         }
 
@@ -322,8 +323,8 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
             document.getElementById('edit_title').value = photo.title || '';
             document.getElementById('edit_description').value = photo.description || '';
             document.getElementById('edit_blur').checked = photo.is_blurred == 1;
-            document.getElementById('edit_blur_size').value = photo.blur_size || 40;
-            updateBlurSize(photo.blur_size || 40);
+            document.getElementById('edit_blur_size').value = photo.blur_size || 20;
+            updateBlurSize(photo.blur_size || 20);
             
             document.getElementById('edit_before_preview').src = '../' + photo.before_image_url;
             document.getElementById('edit_after_preview').src = '../' + photo.after_image_url;
