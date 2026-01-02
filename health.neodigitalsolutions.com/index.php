@@ -165,6 +165,75 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
     </section>
 
     <section id="about" class="py-16 sm:py-24 md:py-32 px-4 sm:px-6 lg:px-24 bg-zinc-950">
+        <div class="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
+            <div class="scroll-reveal order-2 md:order-1">
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 md:mb-8 uppercase tracking-tighter">About <span class="text-emerald-500">Eleni</span></h2>
+                <div class="text-sm sm:text-base md:text-lg lg:text-xl text-zinc-400 leading-relaxed mb-4 md:mb-6 space-y-4">
+                    <?php echo nl2br(htmlspecialchars($about_bio)); ?>
+                </div>
+                <div class="border-l-4 border-emerald-500 pl-4 sm:pl-6 italic text-sm sm:text-base md:text-lg mb-6 md:mb-8">
+                    "My approach blends rigorous nutritional science with deep clinical empathy."
+                </div>
+            </div>
+            <div class="aspect-[4/5] rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 scroll-reveal order-1 md:order-2 relative" id="about-image-container">
+                <?php
+                try {
+                    $about_slides = $pdo->query("SELECT * FROM about_slides ORDER BY id DESC")->fetchAll();
+                } catch (Exception $e) { $about_slides = []; }
+
+                if (empty($about_slides)) {
+                    $about_slides = [['image_url' => $about_img]];
+                }
+
+                foreach ($about_slides as $index => $slide): ?>
+                    <img src="<?php echo htmlspecialchars($slide['image_url']); ?>" 
+                         class="about-slide absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-opacity duration-1000 <?php echo $index === 0 ? 'opacity-100' : 'opacity-0'; ?>">
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="py-16 sm:py-24 md:py-32 bg-black px-4 sm:px-6">
+         <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-12 md:mb-20 uppercase tracking-tighter">Premium <span class="text-emerald-500">Services</span></h2>
+         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-6xl mx-auto">
+             <div class="bg-zinc-900/50 p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all flex flex-col">
+                 <div class="text-3xl sm:text-4xl mb-4 md:mb-6">🤝</div>
+                 <h3 class="text-base sm:text-lg md:text-xl font-bold mb-3 md:mb-4 uppercase">1-on-1 Counseling</h3>
+                 <p class="text-zinc-500 text-xs sm:text-sm mb-6 md:mb-8">Personalized Online & In-person sessions tailored to your unique biology.</p>
+                 <div class="mt-auto flex gap-2 sm:gap-4 flex-col sm:flex-row">
+                     <a href="service-detail.php?id=counseling" class="inline-block text-center border border-white/10 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-white hover:text-black transition-all">Details</a>
+                     <a href="register.php" class="inline-block text-center bg-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-emerald-500 transition-all">Join Now</a>
+                 </div>
+             </div>
+
+             <?php
+             $market_plans = [];
+             try {
+                 // Fetch all 3 plans from the database
+                 $stmt_plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC");
+                 $market_plans = $stmt_plans->fetchAll();
+             } catch (PDOException $e) {
+                 // Fallback if table doesn't exist
+                 $market_plans = [];
+             }
+             
+             if (empty($market_plans)) {
+                 echo '<p class="text-zinc-500 text-center col-span-full">No meal plans available at the moment.</p>';
+             } else {
+                 foreach ($market_plans as $plan): ?>
+                 <div class="bg-zinc-900/50 p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all flex flex-col group">
+                     <div class="text-3xl sm:text-4xl mb-4 md:mb-6 group-hover:scale-110 transition-transform">🥗</div>
+                     <h3 class="text-base sm:text-lg md:text-xl font-bold mb-3 md:mb-4 uppercase"><?php echo htmlspecialchars($plan['title']); ?></h3>
+                     <p class="text-zinc-500 text-xs sm:text-sm mb-6 md:mb-8">Professional nutritional guide for <?php echo htmlspecialchars(str_replace('_', ' ', $plan['package_type'] ?: 'Health')); ?>.</p>
+                     <div class="mt-auto flex gap-2 sm:gap-4 flex-col sm:flex-row">
+                         <a href="service-detail.php?id=<?php echo $plan['id']; ?>" class="inline-block text-center border border-white/10 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-white hover:text-black transition-all">Details</a>
+                         <a href="register.php" class="inline-block text-center bg-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px] tracking-widest hover:bg-emerald-500 transition-all">Join Now</a>
+                     </div>
+                 </div>
+                 <?php endforeach; 
+             } ?>
+         </div>
+    </section>
 
     <?php include 'includes/footer.php'; ?>
 
@@ -182,14 +251,15 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
             
             if (currentScroll <= 0) {
                 nav.style.transform = 'translateY(0)';
+                nav.style.backgroundColor = 'rgba(0,0,0,0.5)';
                 return;
             }
             
+            nav.style.backgroundColor = 'rgba(0,0,0,0.8)';
+            
             if (currentScroll > lastScroll && currentScroll > 100) {
-                // Scrolling down
                 nav.style.transform = 'translateY(-100%)';
             } else {
-                // Scrolling up
                 nav.style.transform = 'translateY(0)';
             }
             lastScroll = currentScroll;
