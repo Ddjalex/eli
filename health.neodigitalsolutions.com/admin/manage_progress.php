@@ -124,8 +124,8 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
             <div id="preview-container" class="grid grid-cols-2 gap-4 mb-6 hidden">
                 <div class="space-y-2">
                     <label class="block text-[10px] uppercase tracking-widest text-zinc-500">Position Blur (Click Image)</label>
-                    <div class="blur-control rounded-2xl overflow-hidden border border-white/10" onclick="setBlur(event, 'before')">
-                        <img id="before-preview" class="w-full aspect-[4/5] object-cover scale-110">
+                    <div class="blur-control rounded-2xl overflow-hidden border border-white/10 aspect-[4/5] relative">
+                        <img id="before-preview" class="absolute inset-0 w-full h-full object-cover">
                         <div id="before-marker" class="blur-marker"></div>
                     </div>
                     <input type="hidden" name="before_blur_x" id="before_blur_x" value="50">
@@ -133,8 +133,8 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
                 </div>
                 <div class="space-y-2">
                     <label class="block text-[10px] uppercase tracking-widest text-zinc-500">Position Blur (Click Image)</label>
-                    <div class="blur-control rounded-2xl overflow-hidden border border-white/10" onclick="setBlur(event, 'after')">
-                        <img id="after-preview" class="w-full aspect-[4/5] object-cover scale-110">
+                    <div class="blur-control rounded-2xl overflow-hidden border border-white/10 aspect-[4/5] relative">
+                        <img id="after-preview" class="absolute inset-0 w-full h-full object-cover">
                         <div id="after-marker" class="blur-marker"></div>
                     </div>
                     <input type="hidden" name="after_blur_x" id="after_blur_x" value="50">
@@ -179,15 +179,15 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
             <?php foreach ($photos as $photo): ?>
                 <div class="bg-zinc-900 border border-white/10 p-4 rounded-3xl">
                     <div class="flex gap-2 mb-4">
-                        <div class="relative w-1/2 overflow-hidden rounded-2xl">
-                            <img src="../<?php echo $photo['before_image_url']; ?>" class="w-full aspect-[4/5] object-cover scale-110">
+                        <div class="relative w-1/2 overflow-hidden rounded-2xl aspect-[4/5]">
+                            <img src="../<?php echo $photo['before_image_url']; ?>" class="absolute inset-0 w-full h-full object-cover">
                             <?php if ($photo['is_blurred']): ?>
                                 <div class="absolute bg-white/10 backdrop-blur-xl rounded-full border border-white/20 -translate-x-1/2 -translate-y-1/2 shadow-2xl" 
                                      style="left: <?php echo $photo['before_blur_x'] ?? 50; ?>%; top: <?php echo $photo['before_blur_y'] ?? 50; ?>%; width: <?php echo $photo['blur_size'] ?? 40; ?>px; height: <?php echo $photo['blur_size'] ?? 40; ?>px; box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);"></div>
                             <?php endif; ?>
                         </div>
-                        <div class="relative w-1/2 overflow-hidden rounded-2xl">
-                            <img src="../<?php echo $photo['after_image_url']; ?>" class="w-full aspect-[4/5] object-cover scale-110">
+                        <div class="relative w-1/2 overflow-hidden rounded-2xl aspect-[4/5]">
+                            <img src="../<?php echo $photo['after_image_url']; ?>" class="absolute inset-0 w-full h-full object-cover">
                             <?php if ($photo['is_blurred']): ?>
                                 <div class="absolute bg-white/10 backdrop-blur-xl rounded-full border border-white/20 -translate-x-1/2 -translate-y-1/2 shadow-2xl"
                                      style="left: <?php echo $photo['after_blur_x'] ?? 50; ?>%; top: <?php echo $photo['after_blur_y'] ?? 50; ?>%; width: <?php echo $photo['blur_size'] ?? 40; ?>px; height: <?php echo $photo['blur_size'] ?? 40; ?>px; box-shadow: 0 0 20px 10px rgba(255,255,255,0.05);"></div>
@@ -221,8 +221,8 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
                         <label class="block text-[10px] uppercase tracking-widest text-zinc-500">Before Position</label>
-                        <div class="blur-control rounded-2xl overflow-hidden border border-white/10" onclick="setBlur(event, 'edit_before')">
-                            <img id="edit_before_preview" class="w-full aspect-[4/5] object-cover scale-110">
+                        <div class="blur-control rounded-2xl overflow-hidden border border-white/10 aspect-[4/5] relative" onclick="setBlur(event, 'edit_before')">
+                            <img id="edit_before_preview" class="absolute inset-0 w-full h-full object-cover">
                             <div id="edit_before_marker" class="blur-marker"></div>
                         </div>
                         <input type="hidden" name="before_blur_x" id="edit_before_blur_x">
@@ -230,8 +230,8 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
                     </div>
                     <div class="space-y-2">
                         <label class="block text-[10px] uppercase tracking-widest text-zinc-500">After Position</label>
-                        <div class="blur-control rounded-2xl overflow-hidden border border-white/10" onclick="setBlur(event, 'edit_after')">
-                            <img id="edit_after_preview" class="w-full aspect-[4/5] object-cover scale-110">
+                        <div class="blur-control rounded-2xl overflow-hidden border border-white/10 aspect-[4/5] relative" onclick="setBlur(event, 'edit_after')">
+                            <img id="edit_after_preview" class="absolute inset-0 w-full h-full object-cover">
                             <div id="edit_after_marker" class="blur-marker"></div>
                         </div>
                         <input type="hidden" name="after_blur_x" id="edit_after_blur_x">
