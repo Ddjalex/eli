@@ -7,8 +7,47 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 if (isset($_GET['approve'])) {
     $user_id = $_GET['approve'];
-    $stmt = $pdo->prepare("UPDATE users SET status = 'approved' WHERE id = ?");
+    
+    // Check if it is a plan-specific approval
+    $stmt = $pdo->prepare("SELECT meal_plan_id FROM payments WHERE user_id = ? ORDER BY created_at DESC LIMIT 1");
     $stmt->execute([$user_id]);
+    $last_payment = $stmt->fetch();
+    
+    if ($last_payment && $last_payment['meal_plan_id']) {
+        // Approve specific plan in payments
+        $pdo->prepare("UPDATE payments SET status = 'approved' WHERE user_id = ? AND meal_plan_id = ?")->execute([$user_id, $last_payment['meal_plan_id']]);
+        
+        // Update user_plan_access table
+        $pdo->prepare("INSERT INTO user_plan_access (user_id, meal_plan_id, status) VALUES (?, ?, 'approved') ON DUPLICATE KEY UPDATE status = 'approved', updated_at = CURRENT_TIMESTAMP")->execute([$user_id, $last_payment['meal_plan_id']]);
+        
+        // Fetch package type
+        $stmt_pkg = $pdo->prepare("SELECT package_type FROM meal_plans WHERE id = ?");
+        $stmt_pkg->execute([$last_payment['meal_plan_id']]);
+        $package_type = $stmt_pkg->fetchColumn();
+        
+        if ($package_type) {
+            $pdo->prepare("UPDATE users SET package = ?, status = 'active' WHERE id = ?")->execute([$package_type, $user_id]);
+        } else {
+            $pdo->prepare("UPDATE users SET status = 'active' WHERE id = ?")->execute([$user_id]);
+        }
+    } else {
+        // Global approval
+        $pdo->prepare("UPDATE users SET status = 'approved' WHERE id = ?")->execute([$user_id]);
+        
+        // If there's an initial package assigned, grant access
+        $stmt_user = $pdo->prepare("SELECT package FROM users WHERE id = ?");
+        $stmt_user->execute([$user_id]);
+        $upkg = $stmt_user->fetchColumn();
+        if ($upkg) {
+            $stmt_mp = $pdo->prepare("SELECT id FROM meal_plans WHERE package_type = ? LIMIT 1");
+            $stmt_mp->execute([$upkg]);
+            $mpid = $stmt_mp->fetchColumn();
+            if ($mpid) {
+                $pdo->prepare("INSERT INTO user_plan_access (user_id, meal_plan_id, status) VALUES (?, ?, 'approved') ON DUPLICATE KEY UPDATE status = 'approved'")->execute([$user_id, $mpid]);
+            }
+        }
+    }
+    
     header("Location: index.php");
     exit;
 }
@@ -20,7 +59,7 @@ $stats = [
     'plans' => $pdo->query("SELECT COUNT(*) FROM meal_plans")->fetchColumn(),
 ];
 
-$stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number 
+    $stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number, p.meal_plan_id, p.status as payment_status, mp.title as plan_title 
     FROM users u 
     LEFT JOIN (
         SELECT p1.*
@@ -31,9 +70,10 @@ $stmt = $pdo->query("SELECT u.*, p.receipt_path, p.trx_number
             GROUP BY user_id
         ) p2 ON p1.user_id = p2.user_id AND p1.created_at = p2.max_created
     ) p ON u.id = p.user_id 
+    LEFT JOIN meal_plans mp ON p.meal_plan_id = mp.id
     WHERE u.role = 'user' 
     ORDER BY u.created_at DESC");
-$users = $stmt->fetchAll();
+    $users = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -183,6 +223,9 @@ $users = $stmt->fetchAll();
                                             <div>
                                                 <div class="font-bold text-white group-hover:text-emerald-400 transition-colors"><?php echo htmlspecialchars($u['name']); ?></div>
                                                 <div class="text-sm text-zinc-500"><?php echo htmlspecialchars($u['email']); ?></div>
+                                                <?php if (isset($u['plan_title']) && $u['plan_title']): ?>
+                                                    <div class="text-[10px] text-emerald-500 font-bold uppercase mt-1">Paying for: <?php echo htmlspecialchars($u['plan_title']); ?></div>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </td>
@@ -190,7 +233,7 @@ $users = $stmt->fetchAll();
                                         <?php echo date('M d, Y', strtotime($u['created_at'])); ?>
                                     </td>
                                     <td class="px-8 py-6">
-                                        <?php if ($u['status'] === 'approved'): ?>
+                                        <?php if ($u['status'] === 'approved' || (isset($u['payment_status']) && $u['payment_status'] === 'approved')): ?>
                                             <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
                                                 Approved
                                             </span>
@@ -224,12 +267,14 @@ $users = $stmt->fetchAll();
                                         <a href="user_analytics.php?id=<?php echo $u['id']; ?>" class="bg-blue-600/10 text-blue-400 border border-blue-500/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
                                             Stats
                                         </a>
-                                        <?php if ($u['status'] === 'pending'): ?>
-                                            <a href="?approve=<?php echo $u['id']; ?>" class="emerald-gradient text-white px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all inline-block">
+                                        <?php 
+                                        $is_approved = ($u['status'] === 'active' || $u['status'] === 'approved' || (isset($u['payment_status']) && $u['payment_status'] === 'approved'));
+                                        if (!$is_approved): ?>
+                                            <a href="index.php?approve=<?php echo $u['id']; ?>" class="emerald-gradient text-white px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all inline-block">
                                                 Approve
                                             </a>
                                         <?php else: ?>
-                                            <span class="text-zinc-700">
+                                            <span class="text-emerald-500 bg-emerald-500/10 p-2 rounded-lg">
                                                 <svg class="w-6 h-6 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                             </span>
                                         <?php endif; ?>

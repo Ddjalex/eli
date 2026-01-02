@@ -35,12 +35,17 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
             background-size: cover; background-position: center; filter: brightness(0.4);
             width: 100%; height: 100%; object-fit: cover;
         }
+        @media (max-width: 640px) {
+            .hero-bg-image {
+                background-position: center top;
+            }
+        }
         .scroll-reveal { opacity: 0; transform: scale(0.95); }
         #main-nav { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
 <body class="bg-black text-white selection:bg-emerald-500">
-    <nav id="main-nav" class="fixed w-full z-50 p-3 sm:p-4 md:p-6 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/10">
+    <nav id="main-nav" class="fixed w-full z-50 p-3 sm:p-4 md:p-6 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/10 transition-all duration-300">
         <a href="#home" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <img src="/attached_assets/generated_images/elegant_luxury_logo_for_dietitian_eleni..png" alt="Logo" class="h-8 sm:h-10 md:h-12 w-auto">
             <div class="flex flex-col">
@@ -48,20 +53,43 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                 <span class="text-xs sm:text-sm font-medium tracking-widest uppercase text-white leading-none mt-1">Eleni</span>
             </div>
         </a>
+        
+        <!-- Desktop Menu -->
         <div class="hidden md:flex space-x-4 lg:space-x-8 uppercase text-[9px] lg:text-[10px] tracking-widest font-bold">
-            <a href="#home" class="hover:text-emerald-400">Home</a>
-            <a href="#about" class="hover:text-emerald-400">About</a>
-            <a href="portfolio.php" class="hover:text-emerald-400">Portfolio</a>
-            <a href="blog.php" class="hover:text-emerald-400">Blog</a>
-            <a href="#services" class="hover:text-emerald-400">Services</a>
-            <a href="#testimonials" class="hover:text-emerald-400">Stories</a>
-            <a href="#contact" class="hover:text-emerald-400">Contact</a>
-            <a href="login.php" class="bg-emerald-600 text-white px-4 sm:px-6 py-2 rounded-full hover:bg-emerald-500 transition-all">Portal</a>
+            <a href="#home" class="hover:text-emerald-400 transition-colors">Home</a>
+            <a href="#about" class="hover:text-emerald-400 transition-colors">About</a>
+            <a href="portfolio.php" class="hover:text-emerald-400 transition-colors">Portfolio</a>
+            <a href="blog.php" class="hover:text-emerald-400 transition-colors">Blog</a>
+            <a href="#services" class="hover:text-emerald-400 transition-colors">Services</a>
+            <a href="#testimonials" class="hover:text-emerald-400 transition-colors">Stories</a>
+            <a href="#contact" class="hover:text-emerald-400 transition-colors">Contact</a>
+            <a href="login.php" class="bg-emerald-600 text-white px-4 sm:px-6 py-2 rounded-full hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/20">Portal</a>
         </div>
-        <a href="login.php" class="md:hidden bg-emerald-600 text-white px-3 py-1 rounded-full hover:bg-emerald-500 transition-all text-[9px]">Portal</a>
+
+        <!-- Mobile Menu Toggle -->
+        <div class="flex items-center gap-3 md:hidden">
+            <a href="login.php" class="bg-emerald-600 text-white px-4 py-2 rounded-full hover:bg-emerald-500 transition-all text-[10px] font-bold uppercase tracking-widest">Portal</a>
+            <button id="menu-toggle" class="text-white p-2 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
     </nav>
 
-    <div id="home" class="relative h-screen flex items-center justify-center overflow-hidden">
+    <!-- Fullscreen Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] bg-black translate-x-full transition-transform duration-500 flex flex-col items-center justify-center space-y-8 text-2xl font-black uppercase tracking-tighter">
+        <button id="menu-close" class="absolute top-6 right-6 text-white p-2">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <a href="#home" class="mobile-link hover:text-emerald-500 transition-colors">Home</a>
+        <a href="#about" class="mobile-link hover:text-emerald-500 transition-colors">About</a>
+        <a href="portfolio.php" class="mobile-link hover:text-emerald-500 transition-colors">Portfolio</a>
+        <a href="blog.php" class="mobile-link hover:text-emerald-500 transition-colors">Blog</a>
+        <a href="#services" class="mobile-link hover:text-emerald-500 transition-colors">Services</a>
+        <a href="#testimonials" class="mobile-link hover:text-emerald-500 transition-colors">Stories</a>
+        <a href="#contact" class="mobile-link hover:text-emerald-500 transition-colors">Contact</a>
+    </div>
+
+    <div id="home" class="relative h-[60dvh] sm:h-[75dvh] lg:h-[85dvh] flex items-center justify-center overflow-hidden">
         <?php
         // hero_slides ዳታ ካለ ማምጣት
         try {
@@ -82,12 +110,14 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
         foreach ($slides as $index => $slide): ?>
             <div class="hero-slide <?php echo $index === 0 ? 'active' : ''; ?>">
                 <div class="absolute inset-0 hero-bg-image" style="background-image: url('<?php echo $slide['image_url']; ?>');"></div>
-                <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
-                    <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-9xl font-black uppercase tracking-tighter mb-3 sm:mb-4 leading-none">
+                <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 sm:px-12 pt-16 sm:pt-20">
+                    <h1 class="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter mb-2 sm:mb-4 leading-[0.9] drop-shadow-2xl">
                         <?php echo htmlspecialchars($slide['title_main']); ?> <br><span class="text-emerald-500"><?php echo htmlspecialchars($slide['title_accent']); ?></span>
                     </h1>
-                    <p class="text-xs sm:text-sm md:text-lg lg:text-xl tracking-[0.3em] uppercase text-zinc-400 mb-6 sm:mb-8"><?php echo htmlspecialchars($slide['subtitle']); ?></p>
-                    <a href="register.php" class="bg-white text-black px-6 sm:px-10 py-2 sm:py-4 rounded-full font-black uppercase tracking-widest text-xs sm:text-sm hover:bg-emerald-500 hover:text-white transition-all transform hover:scale-105 inline-block">Start Your Journey</a>
+                    <p class="text-[10px] sm:text-sm md:text-lg lg:text-xl tracking-[0.2em] sm:tracking-[0.4em] uppercase text-zinc-300 font-bold mb-6 sm:mb-10 max-w-2xl px-6 leading-tight">
+                        <?php echo htmlspecialchars($slide['subtitle']); ?>
+                    </p>
+                    <a href="register.php" class="bg-white text-black px-6 sm:px-12 py-3 sm:py-5 rounded-full font-black uppercase tracking-widest text-[9px] sm:text-sm hover:bg-emerald-500 hover:text-white transition-all transform hover:scale-105 shadow-2xl shadow-black/50">Start Your Journey</a>
                 </div>
             </div>
         <?php endforeach; ?>
@@ -254,6 +284,26 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                 aboutSlides[currentAboutSlide].style.opacity = '1';
             }, 3000);
         }
+
+        // Mobile Menu Logic
+        const menuToggle = document.getElementById('menu-toggle');
+        const menuClose = document.getElementById('menu-close');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.remove('translate-x-full');
+        });
+
+        menuClose.addEventListener('click', () => {
+            mobileMenu.classList.add('translate-x-full');
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('translate-x-full');
+            });
+        });
 
         // GSAP Scroll
         gsap.registerPlugin(ScrollTrigger);

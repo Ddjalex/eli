@@ -84,9 +84,17 @@ if ($blog) {
             <div class="grid gap-4">
                 <?php foreach ($blogs as $b): ?>
                     <div class="bg-zinc-900 p-4 rounded-xl border border-white/5 flex justify-between items-center">
-                        <div>
-                            <h3 class="font-bold"><?php echo htmlspecialchars($b['title']); ?></h3>
-                            <p class="text-xs text-zinc-500"><?php echo $b['created_at']; ?></p>
+                        <div class="flex items-center gap-4">
+                            <?php
+                            $stmt_profile = $pdo->prepare("SELECT value FROM site_settings WHERE "key" = 'about_image'");
+                            $stmt_profile->execute();
+                            $profile_img = $stmt_profile->fetchColumn() ?: 'attached_assets/stock_images/professional_dietiti_8bb8decd.jpg';
+                            ?>
+                            <img src="../<?php echo htmlspecialchars($profile_img); ?>" class="w-10 h-10 rounded-full object-cover border border-emerald-500/20">
+                            <div>
+                                <h3 class="font-bold"><?php echo htmlspecialchars($b['title']); ?></h3>
+                                <p class="text-xs text-zinc-500"><?php echo $b['created_at']; ?></p>
+                            </div>
                         </div>
                         <div class="flex gap-2">
                             <a href="?action=edit&id=<?php echo $b['id']; ?>" class="text-blue-400">Edit</a>

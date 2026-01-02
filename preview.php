@@ -7,9 +7,9 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $plan_id = $_GET['id'] ?? 0;
-$user_id = $_SESSION['user_id'];
 
-// Check user status and package
+// Check user status and individual plan access
+$user_id = $_SESSION['user_id'];
 $stmt = $pdo->prepare("SELECT status, package FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
@@ -17,12 +17,12 @@ $user = $stmt->fetch();
 $user_status = $user['status'];
 $user_package = $user['package'];
 
-// Check for explicit access in user_plan_access
+// Check if user has explicit access to this plan
 $stmt = $pdo->prepare("SELECT status FROM user_plan_access WHERE user_id = ? AND meal_plan_id = ?");
 $stmt->execute([$user_id, $plan_id]);
 $plan_access_status = $stmt->fetchColumn();
 
-// Get the plan's package type
+// Get the plan's package type to check against user's initial package
 $stmt = $pdo->prepare("SELECT package_type FROM meal_plans WHERE id = ?");
 $stmt->execute([$plan_id]);
 $plan_package_type = $stmt->fetchColumn();
@@ -79,8 +79,14 @@ function getEmbedUrl($url) {
 
 $embed_url = getEmbedUrl($video_url);
 
+// Fix: Adjust path for subdirectory structure
 if (!file_exists($file_path)) {
-    die("File error: The requested document could not be found on the server.");
+    $alt_path = "../" . $file_path;
+    if (file_exists($alt_path)) {
+        $file_path = $alt_path;
+    } else {
+        die("File error: The requested document could not be found on the server. Path: " . $file_path);
+    }
 }
 ?>
 <!DOCTYPE html>

@@ -16,7 +16,7 @@ $stats = [
 // Enhanced query to fetch user plan details
 $stmt = $pdo->query("
     SELECT u.*, 
-           (SELECT STRING_AGG(mp.title, ', ') 
+           (SELECT GROUP_CONCAT(mp.title SEPARATOR ', ') 
             FROM user_plan_access upa 
             JOIN meal_plans mp ON upa.meal_plan_id = mp.id 
             WHERE upa.user_id = u.id AND upa.status = 'approved') as paid_plans

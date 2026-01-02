@@ -10,10 +10,18 @@ $user_id = $_SESSION['user_id'];
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
+if (!$user) {
+    session_destroy();
+    header("Location: ../login.php");
+    exit;
+}
 
-$stmt = $pdo->prepare("SELECT value FROM site_settings WHERE key = 'user_dashboard_bg'");
-$stmt->execute();
-$dashboard_bg = $stmt->fetchColumn() ?: 'attached_assets/stock_images/healthy_lifestyle_c_09890184.jpg';
+$dashboard_bg = 'attached_assets/stock_images/healthy_lifestyle_c_09890184.jpg';
+try {
+    $stmt = $pdo->prepare("SELECT value FROM site_settings WHERE key = 'user_dashboard_bg'");
+    $stmt->execute();
+    $dashboard_bg = $stmt->fetchColumn() ?: $dashboard_bg;
+} catch (PDOException $e) {}
 
 // Handle progress photo upload
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
@@ -30,10 +38,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
             $stmt = $pdo->prepare("
                 INSERT INTO user_analytics (user_id, date, photo_path)
                 VALUES (?, CURRENT_DATE, ?)
-                ON CONFLICT (user_id, date) 
-                DO UPDATE SET photo_path = EXCLUDED.photo_path
+                ON DUPLICATE KEY UPDATE photo_path = VALUES(photo_path)
             ");
-            $stmt->execute([$_SESSION['user_id'], $photo_relative_path]);
+            try {
+                $stmt->execute([$_SESSION['user_id'], $photo_relative_path]);
+            } catch (PDOException $e) {
+                $stmt = $pdo->prepare("
+                    INSERT INTO user_analytics (user_id, date, photo_path)
+                    VALUES (?, CURRENT_DATE, ?)
+                    ON CONFLICT (user_id, date) 
+                    DO UPDATE SET photo_path = EXCLUDED.photo_path
+                ");
+                $stmt->execute([$_SESSION['user_id'], $photo_relative_path]);
+            }
             $photo_msg = "Photo uploaded successfully!";
         } else {
             $photo_msg = "Error moving uploaded file.";
@@ -41,16 +58,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
     }
 }
 
-// Fetch latest analytics
-$stmt = $pdo->prepare("SELECT * FROM user_analytics WHERE user_id = ? ORDER BY date DESC LIMIT 7");
-$stmt->execute([$user_id]);
-$analytics = $stmt->fetchAll();
-$latest_stats = $analytics[0] ?? [
-    'weight' => $user['weight'],
-    'calories_burned' => 0,
-    'water_intake' => 0,
-    'steps' => 0
-];
+    // Fetch latest analytics
+    $stmt = $pdo->prepare("SELECT * FROM user_analytics WHERE user_id = ? ORDER BY date DESC LIMIT 7");
+    $stmt->execute([$user_id]);
+    $analytics = $stmt->fetchAll();
+    $latest_stats = $analytics[0] ?? [
+        'weight' => $user['weight'],
+        'calories_burned' => 0,
+        'water_intake' => 0,
+        'steps' => 0
+    ];
+
+    // Fetch all active packages for update
+    $all_plans = $pdo->query("SELECT * FROM meal_plans ORDER BY id ASC")->fetchAll();
+
+    // Fetch the current plan details
+    $stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE package_type = ?");
+    $stmt->execute([$user['package']]);
+    $current_plan = $stmt->fetch();
+
+    // Fetch available plans for approved users
+    $stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE package_type = ?");
+    $stmt->execute([$user['package']]);
+    $available_plans = $stmt->fetchAll();
 
 // Fetch all active packages for update
 $all_plans = $pdo->query("SELECT mp.*, (SELECT COUNT(*) FROM user_plan_access upa WHERE upa.user_id = " . (int)$user_id . " AND upa.meal_plan_id = mp.id AND upa.status = 'approved') as has_access FROM meal_plans mp ORDER BY id ASC")->fetchAll();
@@ -100,22 +130,34 @@ if (($user['status'] === 'approved' || $user['status'] === 'active')) {
 $paid_plan_ids = array_unique($paid_plan_ids);
 $pending_plan_ids = array_unique($pending_plan_ids);
 $has_any_pending = !empty($pending_plan_ids) || ($user['status'] === 'pending');
+    
+    // Fallback for dashboard background if not set
+    if (!isset($dashboard_bg)) {
+        $dashboard_bg = 'attached_assets/stock_images/healthy_lifestyle_c_09890184.jpg';
+    }
 
-// Available meal plans based on user package
-$available_plans = [];
-if ($user['status'] === 'approved' || $user['status'] === 'active') {
-    $stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE package_type = ? OR package_type IS NULL ORDER BY id ASC");
-    $stmt->execute([$user['package']]);
-    $available_plans = $stmt->fetchAll();
-}
+    // Final debug/verification: Ensure IDs are checked correctly
+    // (int) casting ensures in_array works with numeric IDs
 
-// Available meal plans based on user package
-$available_plans = [];
-if ($user['status'] === 'approved' || $user['status'] === 'active') {
-    $stmt = $pdo->prepare("SELECT * FROM meal_plans WHERE package_type = ? OR package_type IS NULL ORDER BY id ASC");
-    $stmt->execute([$user['package']]);
-    $available_plans = $stmt->fetchAll();
-}
+
+    // Handle package update request
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user_package'])) {
+        $new_package = $_POST['new_package'];
+        
+        // Check if user already has access to this package
+        if (in_array($new_package, $paid_packages)) {
+            // User already paid for this! Just switch the active package
+            $stmt = $pdo->prepare("UPDATE users SET package = ?, status = 'active' WHERE id = ?");
+            $stmt->execute([$new_package, $user_id]);
+            header("Location: dashboard.php?package_switched=1");
+        } else {
+            // New package, needs approval
+            $stmt = $pdo->prepare("UPDATE users SET package = ?, status = 'pending' WHERE id = ?");
+            $stmt->execute([$new_package, $user_id]);
+            header("Location: dashboard.php?package_updated=1");
+        }
+        exit;
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -234,10 +276,42 @@ if ($user['status'] === 'approved' || $user['status'] === 'active') {
                 <!-- Account Status -->
                 <div class="glass p-8 rounded-[2.5rem] shadow-2xl">
                     <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">Subscription Status</h4>
-                    <div class="flex items-center justify-between p-4 rounded-2xl <?php echo $user['status'] === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-amber-500/10 border-amber-500/20'; ?> border">
-                        <span class="text-xs font-bold uppercase tracking-widest"><?php echo $user['status'] === 'approved' ? 'Active' : 'Pending Approval'; ?></span>
-                        <span class="w-3 h-3 rounded-full <?php echo $user['status'] === 'approved' ? 'bg-emerald-500' : 'bg-amber-500'; ?> animate-pulse"></span>
+                    <?php 
+                    $is_active = ($user['status'] === 'approved' || $user['status'] === 'active');
+                    $display_status = $is_active ? 'Active' : ($has_any_pending ? 'Pending Approval' : 'Payment Required');
+                    $status_color = $is_active ? 'bg-emerald-500' : 'bg-amber-500';
+                    $bg_color = $is_active ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-amber-500/10 border-amber-500/20';
+                    ?>
+                    <div class="flex items-center justify-between p-4 rounded-2xl <?php echo $bg_color; ?> border">
+                        <span class="text-xs font-bold uppercase tracking-widest"><?php echo $display_status; ?></span>
+                        <span class="w-3 h-3 rounded-full <?php echo $status_color; ?> animate-pulse"></span>
                     </div>
+                </div>
+
+                <!-- Update Package -->
+                <div class="glass p-8 rounded-[2.5rem] shadow-2xl">
+                    <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">Change Plan</h4>
+                    <?php if (isset($_GET['package_updated'])): ?>
+                        <p class="text-[10px] text-emerald-500 font-bold uppercase mb-4">Request sent! Awaiting approval.</p>
+                    <?php elseif (isset($_GET['package_switched'])): ?>
+                        <p class="text-[10px] text-emerald-500 font-bold uppercase mb-4">Plan switched! Welcome back.</p>
+                    <?php endif; ?>
+                    <form method="POST" class="space-y-4">
+                        <input type="hidden" name="update_user_package" value="1">
+                        <select name="new_package" id="packageSelect" onchange="updatePlanDescription()" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl text-[10px] font-bold uppercase text-white outline-none focus:border-emerald-500">
+                            <?php foreach ($all_plans as $p): ?>
+                                <option value="<?php echo htmlspecialchars($p['package_type']); ?>" 
+                                        data-description="<?php echo htmlspecialchars($p['description'] ?? ''); ?>"
+                                        <?php echo $user['package'] === $p['package_type'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($p['title']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div id="planDescriptionBox" class="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-xl hidden">
+                            <p id="planDescriptionText" class="text-[9px] text-zinc-400 leading-relaxed italic"></p>
+                        </div>
+                        <button type="submit" class="w-full bg-zinc-800 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all">Update Plan</button>
+                    </form>
                 </div>
             </div>
 
@@ -257,11 +331,10 @@ if ($user['status'] === 'approved' || $user['status'] === 'active') {
                     </div>
                     
                     <h2 class="text-3xl font-black uppercase tracking-tighter mb-8">My Custom <span class="text-emerald-500">Meal Plan</span></h2>
-
-                    <?php 
-                    $is_approved = ($user['status'] === 'approved' || $user['status'] === 'active');
-                    if ($is_approved): ?>
-                        <div class="grid sm:grid-cols-2 gap-6">
+<?php 
+                            $is_approved = ($user['status'] === 'approved' || $user['status'] === 'active');
+                            if ($is_approved): ?>
+                                <div class="grid sm:grid-cols-2 gap-6">
                             <?php 
                             foreach ($all_plans as $plan): 
                                 $has_access = in_array((int)$plan['id'], $paid_plan_ids, true) || (isset($plan['has_access']) && $plan['has_access'] > 0);
@@ -308,14 +381,28 @@ if ($user['status'] === 'approved' || $user['status'] === 'active') {
                             <h3 class="text-xl font-bold uppercase tracking-widest text-white mb-3">
                                 <?php echo $has_any_pending ? 'Verification in Progress' : 'Content Locked'; ?>
                             </h3>
-                            <p class="max-w-md mx-auto text-zinc-500 text-sm leading-relaxed mb-10">
+                            <p class="max-w-md mx-auto text-zinc-500 text-sm leading-relaxed mb-4">
                                 <?php echo $has_any_pending ? 'Your receipt is being reviewed. You will have full access once Eleni approves your payment.' : 'Complete your payment and upload your receipt to unlock your premium nutritional guide.'; ?>
                             </p>
-                            <?php if (!$has_any_pending): ?>
-                                <div class="flex justify-center">
-                                    <a href="payment.php" class="bg-emerald-600 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-900/40">Unlock Now</a>
+                            
+                            <?php if ($current_plan): ?>
+                                <div class="bg-emerald-500/10 border border-emerald-500/20 p-6 rounded-2xl mb-8 max-w-xs mx-auto">
+                                    <p class="text-[10px] font-bold uppercase tracking-widest text-emerald-500 mb-1">Required Investment</p>
+                                    <p class="text-3xl font-black text-white"><?php echo number_format($current_plan['price'], 2); ?> <span class="text-xs font-bold text-emerald-500">ETB</span></p>
+                                    <p class="text-[9px] text-zinc-500 mt-2 uppercase font-bold"><?php echo htmlspecialchars($current_plan['title']); ?></p>
+                                    <?php if (!empty($current_plan['description'])): ?>
+                                        <p class="text-[10px] text-zinc-400 mt-4 leading-relaxed italic border-t border-white/5 pt-4"><?php echo htmlspecialchars($current_plan['description']); ?></p>
+                                    <?php endif; ?>
                                 </div>
                             <?php endif; ?>
+
+                            <div class="flex justify-center">
+                                <?php if ($has_any_pending): ?>
+                                    <span class="bg-amber-500/20 text-amber-500 border border-amber-500/30 px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest">Awaiting Verification</span>
+                                <?php else: ?>
+                                    <a href="payment.php" class="bg-emerald-600 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-900/40">Unlock Now</a>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -326,6 +413,24 @@ if ($user['status'] === 'approved' || $user['status'] === 'active') {
     <?php include '../includes/footer.php'; ?>
 
     <script>
+        function updatePlanDescription() {
+            const select = document.getElementById('packageSelect');
+            const box = document.getElementById('planDescriptionBox');
+            const text = document.getElementById('planDescriptionText');
+            const selected = select.options[select.selectedIndex];
+            const description = selected.getAttribute('data-description');
+            
+            if (description && description.trim() !== '') {
+                text.textContent = description;
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', updatePlanDescription);
+
         const analyticsData = <?php echo json_encode(array_reverse($analytics)); ?>;
         const labels = analyticsData.map(d => d.date);
         const weightData = analyticsData.map(d => d.weight);

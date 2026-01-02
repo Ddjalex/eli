@@ -1,5 +1,7 @@
 <?php
 require_once '../includes/config.php';
+if (!isset($_SESSION['user_id'])) exit;
+
 $user_id = $_SESSION['user_id'];
 
 // Check if user already has access to this plan
@@ -33,13 +35,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
     $target = $upload_dir . $filename;
 
     if (move_uploaded_file($_FILES['receipt']['tmp_name'], $target)) {
-        $stmt = $pdo->prepare("INSERT INTO payments (user_id, receipt_path, trx_number, payment_method_id) VALUES (?, ?, ?, ?)");
-        $stmt->execute([
-            $_SESSION['user_id'], 
-            $target, 
-            $_POST['trx_number'] ?? null,
-            $_POST['payment_method'] ?? null
-        ]);
+        $plan_id = $_POST['plan_id'] ?? null;
+        try {
+            $stmt = $pdo->prepare("INSERT INTO payments (user_id, meal_plan_id, receipt_path, trx_number, payment_method_id) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $_SESSION['user_id'], 
+                $plan_id,
+                $target, 
+                $_POST['trx_number'] ?? null,
+                $_POST['payment_method'] ?? null
+            ]);
+            
+            // Also create a record in user_plan_access with pending status
+            if ($plan_id) {
+                try {
+                    $pdo->prepare("INSERT INTO user_plan_access (user_id, meal_plan_id, status) VALUES (?, ?, 'pending') ON DUPLICATE KEY UPDATE status = 'pending', updated_at = CURRENT_TIMESTAMP")->execute([$_SESSION['user_id'], $plan_id]);
+                } catch (PDOException $e) {
+                    // Fallback if the access table check fails
+                }
+            }
+        } catch (PDOException $e) {
+            // Fallback for older schema
+            $stmt = $pdo->prepare("INSERT INTO payments (user_id, receipt_path, trx_number, payment_method_id) VALUES (?, ?, ?, ?)");
+            $stmt->execute([
+                $_SESSION['user_id'], 
+                $target, 
+                $_POST['trx_number'] ?? null,
+                $_POST['payment_method'] ?? null
+            ]);
+        }
         header("Location: payment.php?success=1");
         exit;
     }
@@ -80,6 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['receipt'])) {
         <?php endif; ?>
 
         <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            <?php if (isset($_GET['plan_id'])): ?>
+                <input type="hidden" name="plan_id" value="<?php echo htmlspecialchars($_GET['plan_id']); ?>">
+            <?php endif; ?>
             <div>
                 <label class="block text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500 mb-3">Select Payment Method</label>
                 <select name="payment_method" id="paymentMethod" class="w-full bg-black border border-white/10 p-4 rounded-xl focus:border-emerald-500 transition-all text-sm text-white outline-none" required onchange="updatePaymentDetails()">
