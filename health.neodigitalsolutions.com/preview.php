@@ -150,7 +150,7 @@ if (!file_exists($file_path)) {
                     <div class="h-1 w-12 bg-emerald-500 rounded-full"></div>
                     <h2 class="text-xl font-bold uppercase tracking-widest text-white">Instructional Video</h2>
                 </div>
-                <div class="bg-zinc-900/50 border border-white/10 p-2 rounded-2xl overflow-hidden aspect-video shadow-2xl">
+                <div class="bg-zinc-900/50 border border-white/10 p-2 rounded-2xl overflow-hidden aspect-video shadow-2xl relative">
                     <iframe 
                         src="<?php echo htmlspecialchars($embed_url); ?>" 
                         class="w-full h-full rounded-xl"
@@ -158,6 +158,10 @@ if (!file_exists($file_path)) {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen>
                     </iframe>
+                    <!-- Overlay to hide title/top bar on hover/load -->
+                    <div class="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-black/80 to-transparent pointer-events-none opacity-0 hover:opacity-100 transition-opacity"></div>
+                    <!-- Bottom overlay to hide "Watch on YouTube" -->
+                    <div class="absolute bottom-0 left-0 w-full h-16 bg-black pointer-events-none"></div>
                 </div>
             </div>
             <?php endif; ?>
