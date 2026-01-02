@@ -20,7 +20,13 @@ $credentials = $pdo->query("SELECT * FROM credentials ORDER BY `display_order` A
 </head>
 <body class="bg-zinc-950 text-white selection:bg-emerald-500">
     <nav id="main-nav" class="fixed w-full z-50 p-3 sm:p-4 md:p-6 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/10 transition-all duration-300">
-        <div class="text-lg sm:text-xl md:text-2xl font-bold tracking-tighter uppercase text-emerald-500">Eleni</div>
+        <a href="index.php#home" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <img src="/attached_assets/generated_images/elegant_luxury_logo_for_dietitian_eleni..png" alt="Logo" class="h-8 sm:h-10 md:h-12 w-auto">
+            <div class="flex flex-col">
+                <span class="text-sm sm:text-base font-bold tracking-tighter uppercase text-emerald-500 leading-none">Diet & Nutritionist</span>
+                <span class="text-xs sm:text-sm font-medium tracking-widest uppercase text-white leading-none mt-1">Eleni</span>
+            </div>
+        </a>
         <div class="hidden md:flex space-x-4 lg:space-x-8 uppercase text-[9px] lg:text-[10px] tracking-widest font-bold">
             <a href="index.php#home" class="hover:text-emerald-400">Home</a>
             <a href="index.php#about" class="hover:text-emerald-400">About</a>
@@ -115,37 +121,54 @@ $credentials = $pdo->query("SELECT * FROM credentials ORDER BY `display_order` A
                     <h3 class="text-xl font-bold uppercase tracking-widest text-zinc-500 mb-8 flex items-center gap-4">
                         <span class="w-12 h-[1px] bg-emerald-500"></span> MSc Research
                     </h3>
-                    <div class="space-y-8">
-                        <?php foreach ($credentials as $cred): if ($cred['type'] !== 'research') continue; ?>
-                            <div class="group">
-                                <div class="text-xs font-bold text-emerald-500 mb-1"><?php echo htmlspecialchars($cred['year']); ?></div>
-                                <h4 class="text-lg font-bold group-hover:text-emerald-400 transition-colors"><?php echo htmlspecialchars($cred['title']); ?></h4>
-                                <p class="text-zinc-500 text-sm"><?php echo htmlspecialchars($cred['institution']); ?></p>
+                            <div class="space-y-8">
+                                <?php 
+                                $has_research = false;
+                                if (!empty($credentials)) {
+                                    foreach ($credentials as $cred): 
+                                        $type = strtolower($cred['type'] ?? $cred['category'] ?? '');
+                                        if ($type !== 'research') continue; 
+                                        $has_research = true;
+                                ?>
+                                    <div class="group">
+                                        <div class="text-xs font-bold text-emerald-500 mb-1"><?php echo htmlspecialchars($cred['year']); ?></div>
+                                        <h4 class="text-lg font-bold group-hover:text-emerald-400 transition-colors"><?php echo htmlspecialchars($cred['title']); ?></h4>
+                                        <p class="text-zinc-500 text-sm"><?php echo htmlspecialchars($cred['institution']); ?></p>
+                                    </div>
+                                <?php endforeach; } ?>
+                                <?php if (!$has_research): ?>
+                                    <p class="text-zinc-600 text-sm italic">Master of Science academic data loading...</p>
+                                <?php endif; ?>
                             </div>
-                        <?php endforeach; ?>
-                        <?php if (empty($credentials)): ?>
-                            <p class="text-zinc-600 text-sm italic">Master of Science academic data loading...</p>
-                        <?php endif; ?>
-                    </div>
                 </div>
                 <div class="scroll-reveal">
                     <h3 class="text-xl font-bold uppercase tracking-widest text-zinc-500 mb-8 flex items-center gap-4">
                         <span class="w-12 h-[1px] bg-emerald-500"></span> Professional Licenses
                     </h3>
-                    <div class="space-y-8">
-                        <?php foreach ($credentials as $cred): if ($cred['type'] !== 'license') continue; ?>
-                            <div class="flex gap-6 items-start">
-                                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
-                                    <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-lg"><?php echo htmlspecialchars($cred['title']); ?></h4>
-                                    <p class="text-zinc-500 text-sm"><?php echo htmlspecialchars($cred['institution']); ?></p>
-                                    <p class="text-[10px] font-bold text-emerald-500/80 uppercase tracking-widest mt-1">Verified License</p>
-                                </div>
+                            <div class="space-y-8">
+                                <?php 
+                                $has_license = false;
+                                if (!empty($credentials)) {
+                                    foreach ($credentials as $cred): 
+                                        $type = strtolower($cred['type'] ?? $cred['category'] ?? '');
+                                        if ($type !== 'license') continue; 
+                                        $has_license = true;
+                                ?>
+                                    <div class="flex gap-6 items-start">
+                                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                                            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-lg"><?php echo htmlspecialchars($cred['title']); ?></h4>
+                                            <p class="text-zinc-500 text-sm"><?php echo htmlspecialchars($cred['institution']); ?></p>
+                                            <p class="text-[10px] font-bold text-emerald-500/80 uppercase tracking-widest mt-1">Verified License</p>
+                                        </div>
+                                    </div>
+                                <?php endforeach; } ?>
+                                <?php if (!$has_license): ?>
+                                    <p class="text-zinc-600 text-sm italic">Professional licenses are being verified...</p>
+                                <?php endif; ?>
                             </div>
-                        <?php endforeach; ?>
-                    </div>
                 </div>
             </div>
         </section>
