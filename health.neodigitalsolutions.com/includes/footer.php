@@ -65,12 +65,10 @@
                     'footer_telegram' => ['Telegram', 'https://www.svgrepo.com/show/354443/telegram.svg']
                 ];
                 
-                // Get all settings at once for efficiency
-                $all_settings_stmt = $pdo->query("SELECT \"key\", value FROM site_settings");
-                $all_settings = $all_settings_stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-
+                $stmt_social = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = ?");
                 foreach ($socials as $db_key => $info):
-                    $link = isset($all_settings[$db_key]) ? $all_settings[$db_key] : '#';
+                    $stmt_social->execute([$db_key]);
+                    $link = $stmt_social->fetchColumn() ?: '#';
                 ?>
                 <li><a href="<?php echo htmlspecialchars($link); ?>" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-2 sm:gap-3 uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">
                     <img src="<?php echo $info[1]; ?>" class="w-3 sm:w-4 h-3 sm:h-4 invert opacity-50 hover:opacity-100" alt="<?php echo $info[0]; ?>"> <span class="hidden sm:inline"><?php echo $info[0]; ?></span>
