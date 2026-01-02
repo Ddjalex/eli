@@ -209,7 +209,7 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
             </div>
             
             <div class="mt-12 text-center">
-                <a href="/#testimonials" class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-emerald-500 hover:text-white transition-colors flex items-center justify-center gap-2">
+                <a href="#testimonials" class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-emerald-500 hover:text-white transition-colors flex items-center justify-center gap-2">
                     View More Success Stories
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                 </a>
@@ -242,6 +242,43 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                     <img src="<?php echo htmlspecialchars($slide['image_url']); ?>" 
                          class="about-slide absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-opacity duration-1000 <?php echo $index === 0 ? 'opacity-100' : 'opacity-0'; ?>">
                 <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-16 sm:py-24 md:py-32 bg-zinc-950 px-4 sm:px-6">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-12 md:mb-20 uppercase tracking-tighter">What My <span class="text-emerald-500">Clients Say</span></h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div class="bg-zinc-900/50 p-8 rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all">
+                <p class="text-zinc-400 italic mb-6">"Eleni's personalized approach changed my life. I finally understand my body's needs."</p>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-black">A</div>
+                    <div>
+                        <h4 class="font-bold uppercase text-xs">Abebe K.</h4>
+                        <p class="text-[10px] text-zinc-500 uppercase tracking-widest">Weight Loss Client</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-zinc-900/50 p-8 rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all">
+                <p class="text-zinc-400 italic mb-6">"The meal plans are easy to follow and actually delicious. I highly recommend her services."</p>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-black">S</div>
+                    <div>
+                        <h4 class="font-bold uppercase text-xs">Sara M.</h4>
+                        <p class="text-[10px] text-zinc-500 uppercase tracking-widest">Wellness Client</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-zinc-900/50 p-8 rounded-3xl border border-white/5 hover:border-emerald-500/50 transition-all">
+                <p class="text-zinc-400 italic mb-6">"Finally a nutritionist who listens and uses science to back everything up."</p>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-black">M</div>
+                    <div>
+                        <h4 class="font-bold uppercase text-xs">Mulugeta T.</h4>
+                        <p class="text-[10px] text-zinc-500 uppercase tracking-widest">Athletic Performance</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
