@@ -58,9 +58,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $after_blur_x = (int)($_POST['after_blur_x'] ?? 50);
         $after_blur_y = (int)($_POST['after_blur_y'] ?? 50);
         
+        $blur_size = (int)($_POST['blur_size'] ?? 40);
+        
         try {
-            $stmt = $pdo->prepare("UPDATE progress_photos SET title = ?, description = ?, is_blurred = ?, before_blur_x = ?, before_blur_y = ?, after_blur_x = ?, after_blur_y = ? WHERE id = ?");
-            $stmt->execute([$title, $description, $is_blurred, $before_blur_x, $before_blur_y, $after_blur_x, $after_blur_y, $id]);
+            $stmt = $pdo->prepare("UPDATE progress_photos SET title = ?, description = ?, is_blurred = ?, before_blur_x = ?, before_blur_y = ?, after_blur_x = ?, after_blur_y = ?, blur_size = ? WHERE id = ?");
+            $stmt->execute([$title, $description, $is_blurred, $before_blur_x, $before_blur_y, $after_blur_x, $after_blur_y, $blur_size, $id]);
             
             if (isset($_FILES['before_image']) && $_FILES['before_image']['error'] === 0) {
                 $before_img = 'uploads/progress/' . time() . '_before_' . $_FILES['before_image']['name'];
@@ -243,9 +245,15 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
                         <input type="file" name="after_image" accept="image/*" onchange="previewImg(this, 'edit_after')" class="w-full text-xs text-zinc-500">
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" name="is_blurred" id="edit_blur" onchange="toggleMarkers('edit')" class="w-5 h-5 accent-emerald-500">
-                    <label class="text-xs uppercase tracking-widest text-zinc-500">Blur Faces?</label>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" name="is_blurred" id="edit_blur" onchange="toggleMarkers('edit')" class="w-5 h-5 accent-emerald-500">
+                        <label class="text-xs uppercase tracking-widest text-zinc-500">Blur Faces?</label>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Blur Size</label>
+                        <input type="range" name="blur_size" id="edit_blur_size" min="20" max="150" value="40" oninput="updateBlurSize(this.value)" class="w-full accent-emerald-500">
+                    </div>
                 </div>
                 <div class="flex gap-4 pt-4">
                     <button type="button" onclick="closeEditModal()" class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-3 rounded-xl uppercase tracking-widest transition-all">Cancel</button>
@@ -290,11 +298,20 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
             markers.forEach(m => m.style.display = isBlurred ? 'block' : 'none');
         }
 
+        function updateBlurSize(size) {
+            document.querySelectorAll('.blur-marker').forEach(m => {
+                m.style.width = size + 'px';
+                m.style.height = size + 'px';
+            });
+        }
+
         function openEditModal(photo) {
             document.getElementById('edit_id').value = photo.id;
             document.getElementById('edit_title').value = photo.title || '';
             document.getElementById('edit_description').value = photo.description || '';
             document.getElementById('edit_blur').checked = photo.is_blurred == 1;
+            document.getElementById('edit_blur_size').value = photo.blur_size || 40;
+            updateBlurSize(photo.blur_size || 40);
             
             document.getElementById('edit_before_preview').src = '../' + photo.before_image_url;
             document.getElementById('edit_after_preview').src = '../' + photo.after_image_url;

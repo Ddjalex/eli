@@ -183,16 +183,16 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                         <div class="relative w-1/2 overflow-hidden rounded-2xl">
                             <img src="<?php echo htmlspecialchars($photo['before_image_url']); ?>" class="w-full aspect-[3/4] object-cover">
                             <?php if ($photo['is_blurred']): ?>
-                                <div class="absolute w-[30px] sm:w-[40px] h-[30px] sm:h-[40px] bg-white/10 backdrop-blur-2xl rounded-full border border-white/10 -translate-x-1/2 -translate-y-1/2" 
-                                     style="left: <?php echo $photo['before_blur_x'] ?? 50; ?>%; top: <?php echo $photo['before_blur_y'] ?? 50; ?>%;"></div>
+                                <div class="absolute bg-white/10 backdrop-blur-2xl rounded-full border border-white/10 -translate-x-1/2 -translate-y-1/2 shadow-2xl" 
+                                     style="left: <?php echo $photo['before_blur_x'] ?? 50; ?>%; top: <?php echo $photo['before_blur_y'] ?? 50; ?>%; width: <?php echo $photo['blur_size'] ?? 40; ?>px; height: <?php echo $photo['blur_size'] ?? 40; ?>px;"></div>
                             <?php endif; ?>
                             <span class="absolute bottom-2 left-2 bg-black/60 px-2 py-1 rounded text-[8px] uppercase font-bold tracking-widest">Before</span>
                         </div>
                         <div class="relative w-1/2 overflow-hidden rounded-2xl">
                             <img src="<?php echo htmlspecialchars($photo['after_image_url']); ?>" class="w-full aspect-[3/4] object-cover">
                             <?php if ($photo['is_blurred']): ?>
-                                <div class="absolute w-[30px] sm:w-[40px] h-[30px] sm:h-[40px] bg-white/10 backdrop-blur-2xl rounded-full border border-white/10 -translate-x-1/2 -translate-y-1/2"
-                                     style="left: <?php echo $photo['after_blur_x'] ?? 50; ?>%; top: <?php echo $photo['after_blur_y'] ?? 50; ?>%;"></div>
+                                <div class="absolute bg-white/10 backdrop-blur-2xl rounded-full border border-white/10 -translate-x-1/2 -translate-y-1/2 shadow-2xl"
+                                     style="left: <?php echo $photo['after_blur_x'] ?? 50; ?>%; top: <?php echo $photo['after_blur_y'] ?? 50; ?>%; width: <?php echo $photo['blur_size'] ?? 40; ?>px; height: <?php echo $photo['blur_size'] ?? 40; ?>px;"></div>
                             <?php endif; ?>
                             <span class="absolute bottom-2 left-2 bg-emerald-500/80 px-2 py-1 rounded text-[8px] uppercase font-bold tracking-widest">After</span>
                         </div>
