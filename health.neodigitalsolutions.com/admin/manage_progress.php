@@ -17,8 +17,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $description = $_POST['description'] ?? '';
         $is_blurred = isset($_POST['is_blurred']) ? 1 : 0;
         
-        $stmt = $pdo->prepare("UPDATE progress_photos SET title = ?, description = ?, is_blurred = ? WHERE id = ?");
-        $stmt->execute([$title, $description, $is_blurred, $id]);
+        try {
+            $stmt = $pdo->prepare("UPDATE progress_photos SET title = ?, description = ?, is_blurred = ? WHERE id = ?");
+            $stmt->execute([$title, $description, $is_blurred, $id]);
+        } catch (PDOException $e) {
+            // Fallback if description column missing
+            $stmt = $pdo->prepare("UPDATE progress_photos SET title = ?, is_blurred = ? WHERE id = ?");
+            $stmt->execute([$title, $is_blurred, $id]);
+        }
         
         // Handle image updates if provided
         if (isset($_FILES['before_image']) && $_FILES['before_image']['error'] === 0) {
