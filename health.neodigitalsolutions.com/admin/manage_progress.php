@@ -126,8 +126,18 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
             <?php foreach ($photos as $photo): ?>
                 <div class="bg-zinc-900 border border-white/10 p-4 rounded-2xl">
                     <div class="flex gap-2 mb-4">
-                        <img src="../<?php echo $photo['before_image_url']; ?>" class="w-1/2 aspect-square object-cover rounded-lg <?php echo $photo['is_blurred'] ? 'blur-md' : ''; ?>">
-                        <img src="../<?php echo $photo['after_image_url']; ?>" class="w-1/2 aspect-square object-cover rounded-lg <?php echo $photo['is_blurred'] ? 'blur-md' : ''; ?>">
+                        <div class="relative w-1/2 overflow-hidden rounded-lg">
+                            <img src="../<?php echo $photo['before_image_url']; ?>" class="w-full aspect-square object-cover">
+                            <?php if ($photo['is_blurred']): ?>
+                                <div class="absolute top-0 left-0 w-full h-1/3 bg-white/20 backdrop-blur-md pointer-events-none" style="mask-image: linear-gradient(to bottom, black 50%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);"></div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="relative w-1/2 overflow-hidden rounded-lg">
+                            <img src="../<?php echo $photo['after_image_url']; ?>" class="w-full aspect-square object-cover">
+                            <?php if ($photo['is_blurred']): ?>
+                                <div class="absolute top-0 left-0 w-full h-1/3 bg-white/20 backdrop-blur-md pointer-events-none" style="mask-image: linear-gradient(to bottom, black 50%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);"></div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                     <div class="space-y-4">
                         <h3 class="font-bold uppercase"><?php echo htmlspecialchars($photo['title'] ?? 'Untitled'); ?></h3>
