@@ -1,7 +1,7 @@
 <?php
 require_once '../includes/config.php';
 
-if (!isset($_SESSION['admin_id'])) {
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit;
 }
