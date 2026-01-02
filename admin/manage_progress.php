@@ -10,13 +10,13 @@ $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add_photo'])) {
-        $title = $_POST['title'];
-        $description = isset($_POST['description']) ? $_POST['description'] : '';
+        $title = $_POST['title'] ?? 'Untitled';
+        $description = $_POST['description'] ?? '';
         $is_blurred = isset($_POST['is_blurred']) ? 1 : 0;
-        
+
         $before_img = '';
         $after_img = '';
-        
+
         if (isset($_FILES['before_image']) && $_FILES['before_image']['error'] === 0) {
             $before_img = 'uploads/progress/' . time() . '_before_' . $_FILES['before_image']['name'];
             $upload_path = '../' . $before_img;
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             move_uploaded_file($_FILES['before_image']['tmp_name'], $upload_path);
         }
-        
+
         if (isset($_FILES['after_image']) && $_FILES['after_image']['error'] === 0) {
             $after_img = 'uploads/progress/' . time() . '_after_' . $_FILES['after_image']['name'];
             $upload_path = '../' . $after_img;
@@ -34,11 +34,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             move_uploaded_file($_FILES['after_image']['tmp_name'], $upload_path);
         }
-        
+
         if ($before_img && $after_img) {
-            $stmt = $pdo->prepare("INSERT INTO progress_photos (title, description, before_image_url, after_image_url, is_blurred) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $description, $before_img, $after_img, $is_blurred]);
-            $message = "Photo added successfully!";
+            try {
+                $stmt = $pdo->prepare("INSERT INTO progress_photos (title, description, before_image_url, after_image_url, is_blurred) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$title, $description, $before_img, $after_img, $is_blurred]);
+                $message = "Photo added successfully!";
+            } catch (PDOException $e) {
+                // If it fails because column doesn't exist, try without description as fallback
+                $stmt = $pdo->prepare("INSERT INTO progress_photos (title, before_image_url, after_image_url, is_blurred) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$title, $before_img, $after_img, $is_blurred]);
+                $message = "Photo added (description skipped due to database sync).";
+            }
         }
     } elseif (isset($_POST['delete_photo'])) {
         $id = $_POST['photo_id'];
