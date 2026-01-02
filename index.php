@@ -21,7 +21,7 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eleni Mekuria | Dietitian & Nutritionist</title>
+    <title>Diet & Nutritionist Eleni | Personalized Meal Plans</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -41,7 +41,13 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
 </head>
 <body class="bg-black text-white selection:bg-emerald-500">
     <nav id="main-nav" class="fixed w-full z-50 p-3 sm:p-4 md:p-6 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/10">
-        <div class="text-lg sm:text-xl md:text-2xl font-bold tracking-tighter uppercase text-emerald-500">Eleni</div>
+        <div class="flex items-center gap-3">
+            <img src="assets/images/logo.png" alt="Logo" class="h-8 sm:h-10 md:h-12 w-auto">
+            <div class="flex flex-col">
+                <span class="text-sm sm:text-base font-bold tracking-tighter uppercase text-emerald-500 leading-none">Diet & Nutritionist</span>
+                <span class="text-xs sm:text-sm font-medium tracking-widest uppercase text-white leading-none mt-1">Eleni</span>
+            </div>
+        </div>
         <div class="hidden md:flex space-x-4 lg:space-x-8 uppercase text-[9px] lg:text-[10px] tracking-widest font-bold">
             <a href="#home" class="hover:text-emerald-400">Home</a>
             <a href="#about" class="hover:text-emerald-400">About</a>
