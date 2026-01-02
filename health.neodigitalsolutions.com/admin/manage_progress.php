@@ -10,35 +10,6 @@ $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add_photo'])) {
-        // Existing add logic...
-    } elseif (isset($_POST['edit_photo'])) {
-        $id = $_POST['photo_id'];
-        $title = $_POST['title'] ?? 'Untitled';
-        $description = $_POST['description'] ?? '';
-        $is_blurred = isset($_POST['is_blurred']) ? 1 : 0;
-        
-        try {
-            $stmt = $pdo->prepare("UPDATE progress_photos SET title = ?, description = ?, is_blurred = ? WHERE id = ?");
-            $stmt->execute([$title, $description, $is_blurred, $id]);
-        } catch (PDOException $e) {
-            // Fallback if description column missing
-            $stmt = $pdo->prepare("UPDATE progress_photos SET title = ?, is_blurred = ? WHERE id = ?");
-            $stmt->execute([$title, $is_blurred, $id]);
-        }
-        
-        // Handle image updates if provided
-        if (isset($_FILES['before_image']) && $_FILES['before_image']['error'] === 0) {
-            $before_img = 'uploads/progress/' . time() . '_before_' . $_FILES['before_image']['name'];
-            move_uploaded_file($_FILES['before_image']['tmp_name'], '../' . $before_img);
-            $pdo->prepare("UPDATE progress_photos SET before_image_url = ? WHERE id = ?")->execute([$before_img, $id]);
-        }
-        if (isset($_FILES['after_image']) && $_FILES['after_image']['error'] === 0) {
-            $after_img = 'uploads/progress/' . time() . '_after_' . $_FILES['after_image']['name'];
-            move_uploaded_file($_FILES['after_image']['tmp_name'], '../' . $after_img);
-            $pdo->prepare("UPDATE progress_photos SET after_image_url = ? WHERE id = ?")->execute([$after_img, $id]);
-        }
-        $message = "Photo updated successfully!";
-    } elseif (isset($_POST['delete_photo'])) {
         $title = $_POST['title'] ?? 'Untitled';
         $description = $_POST['description'] ?? '';
         $is_blurred = isset($_POST['is_blurred']) ? 1 : 0;
@@ -70,12 +41,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$title, $description, $before_img, $after_img, $is_blurred]);
                 $message = "Photo added successfully!";
             } catch (PDOException $e) {
-                // If it fails because column doesn't exist, try without description as fallback
                 $stmt = $pdo->prepare("INSERT INTO progress_photos (title, before_image_url, after_image_url, is_blurred) VALUES (?, ?, ?, ?)");
                 $stmt->execute([$title, $before_img, $after_img, $is_blurred]);
-                $message = "Photo added (description skipped due to database sync).";
+                $message = "Photo added (description skipped).";
             }
         }
+    } elseif (isset($_POST['edit_photo'])) {
+        $id = $_POST['photo_id'];
+        $title = $_POST['title'] ?? 'Untitled';
+        $description = $_POST['description'] ?? '';
+        $is_blurred = isset($_POST['is_blurred']) ? 1 : 0;
+        
+        try {
+            $stmt = $pdo->prepare("UPDATE progress_photos SET title = ?, description = ?, is_blurred = ? WHERE id = ?");
+            $stmt->execute([$title, $description, $is_blurred, $id]);
+        } catch (PDOException $e) {
+            $stmt = $pdo->prepare("UPDATE progress_photos SET title = ?, is_blurred = ? WHERE id = ?");
+            $stmt->execute([$title, $is_blurred, $id]);
+        }
+        
+        if (isset($_FILES['before_image']) && $_FILES['before_image']['error'] === 0) {
+            $before_img = 'uploads/progress/' . time() . '_before_' . $_FILES['before_image']['name'];
+            move_uploaded_file($_FILES['before_image']['tmp_name'], '../' . $before_img);
+            $pdo->prepare("UPDATE progress_photos SET before_image_url = ? WHERE id = ?")->execute([$before_img, $id]);
+        }
+        if (isset($_FILES['after_image']) && $_FILES['after_image']['error'] === 0) {
+            $after_img = 'uploads/progress/' . time() . '_after_' . $_FILES['after_image']['name'];
+            move_uploaded_file($_FILES['after_image']['tmp_name'], '../' . $after_img);
+            $pdo->prepare("UPDATE progress_photos SET after_image_url = ? WHERE id = ?")->execute([$after_img, $id]);
+        }
+        $message = "Photo updated successfully!";
     } elseif (isset($_POST['delete_photo'])) {
         $id = $_POST['photo_id'];
         $stmt = $pdo->prepare("DELETE FROM progress_photos WHERE id = ?");
@@ -105,6 +100,10 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
             <h2 class="text-xl font-bold mb-6 uppercase">Add New Comparison</h2>
             <div class="grid grid-cols-1 gap-6 mb-6">
                 <div>
+                    <label class="block text-xs uppercase tracking-widest text-zinc-500 mb-2">Client Name / Title</label>
+                    <input type="text" name="title" required class="w-full bg-black border border-white/10 rounded-lg p-3 text-white">
+                </div>
+                <div>
                     <label class="block text-xs uppercase tracking-widest text-zinc-500 mb-2">Description / Notes</label>
                     <textarea name="description" class="w-full bg-black border border-white/10 rounded-lg p-3 text-white h-24"></textarea>
                 </div>
@@ -119,6 +118,10 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
                     <input type="file" name="after_image" required class="w-full text-zinc-500">
                 </div>
             </div>
+            <div class="flex items-center gap-2 mb-6">
+                <input type="checkbox" name="is_blurred" class="w-6 h-6 accent-emerald-500">
+                <label class="text-xs uppercase tracking-widest text-zinc-500">Blur Faces for Privacy?</label>
+            </div>
             <button type="submit" name="add_photo" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl uppercase tracking-widest transition-all">Upload Progress Photo</button>
         </form>
 
@@ -129,13 +132,13 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
                         <div class="relative w-1/2 overflow-hidden rounded-lg">
                             <img src="../<?php echo $photo['before_image_url']; ?>" class="w-full aspect-square object-cover">
                             <?php if ($photo['is_blurred']): ?>
-                                <div class="absolute top-0 left-0 w-full h-1/3 bg-white/20 backdrop-blur-md pointer-events-none" style="mask-image: linear-gradient(to bottom, black 50%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);"></div>
+                                <div class="absolute top-[10%] left-1/2 -translate-x-1/2 w-[60%] h-[35%] bg-white/10 backdrop-blur-xl rounded-[100%] pointer-events-none border border-white/10"></div>
                             <?php endif; ?>
                         </div>
                         <div class="relative w-1/2 overflow-hidden rounded-lg">
                             <img src="../<?php echo $photo['after_image_url']; ?>" class="w-full aspect-square object-cover">
                             <?php if ($photo['is_blurred']): ?>
-                                <div class="absolute top-0 left-0 w-full h-1/3 bg-white/20 backdrop-blur-md pointer-events-none" style="mask-image: linear-gradient(to bottom, black 50%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);"></div>
+                                <div class="absolute top-[10%] left-1/2 -translate-x-1/2 w-[60%] h-[35%] bg-white/10 backdrop-blur-xl rounded-[100%] pointer-events-none border border-white/10"></div>
                             <?php endif; ?>
                         </div>
                     </div>

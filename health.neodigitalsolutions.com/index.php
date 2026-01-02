@@ -210,20 +210,20 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
             <?php foreach ($progress_photos as $photo): ?>
                 <div class="group relative overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/50 p-4 transition-all hover:border-emerald-500/50">
                     <div class="flex gap-2 mb-6">
-                            <div class="relative w-1/2 overflow-hidden rounded-2xl">
-                                <img src="<?php echo htmlspecialchars($photo['before_image_url']); ?>" class="w-full aspect-[3/4] object-cover">
-                                <?php if ($photo['is_blurred']): ?>
-                                    <div class="absolute top-0 left-0 w-full h-1/3 bg-white/20 backdrop-blur-xl pointer-events-none" style="mask-image: linear-gradient(to bottom, black 50%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);"></div>
-                                <?php endif; ?>
-                                <span class="absolute bottom-2 left-2 bg-black/60 px-2 py-1 rounded text-[8px] uppercase font-bold tracking-widest">Before</span>
-                            </div>
-                            <div class="relative w-1/2 overflow-hidden rounded-2xl">
-                                <img src="<?php echo htmlspecialchars($photo['after_image_url']); ?>" class="w-full aspect-[3/4] object-cover">
-                                <?php if ($photo['is_blurred']): ?>
-                                    <div class="absolute top-0 left-0 w-full h-1/3 bg-white/20 backdrop-blur-xl pointer-events-none" style="mask-image: linear-gradient(to bottom, black 50%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);"></div>
-                                <?php endif; ?>
-                                <span class="absolute bottom-2 left-2 bg-emerald-500/80 px-2 py-1 rounded text-[8px] uppercase font-bold tracking-widest">After</span>
-                            </div>
+                        <div class="relative w-1/2 overflow-hidden rounded-2xl">
+                            <img src="<?php echo htmlspecialchars($photo['before_image_url']); ?>" class="w-full aspect-[3/4] object-cover">
+                            <?php if ($photo['is_blurred']): ?>
+                                <div class="absolute top-[10%] left-1/2 -translate-x-1/2 w-[60%] h-[35%] bg-white/10 backdrop-blur-2xl rounded-[100%] pointer-events-none border border-white/10"></div>
+                            <?php endif; ?>
+                            <span class="absolute bottom-2 left-2 bg-black/60 px-2 py-1 rounded text-[8px] uppercase font-bold tracking-widest">Before</span>
+                        </div>
+                        <div class="relative w-1/2 overflow-hidden rounded-2xl">
+                            <img src="<?php echo htmlspecialchars($photo['after_image_url']); ?>" class="w-full aspect-[3/4] object-cover">
+                            <?php if ($photo['is_blurred']): ?>
+                                <div class="absolute top-[10%] left-1/2 -translate-x-1/2 w-[60%] h-[35%] bg-white/10 backdrop-blur-2xl rounded-[100%] pointer-events-none border border-white/10"></div>
+                            <?php endif; ?>
+                            <span class="absolute bottom-2 left-2 bg-emerald-500/80 px-2 py-1 rounded text-[8px] uppercase font-bold tracking-widest">After</span>
+                        </div>
                     </div>
                     <h3 class="text-center font-bold uppercase tracking-widest text-sm"><?php echo htmlspecialchars($photo['title']); ?></h3>
                 </div>
