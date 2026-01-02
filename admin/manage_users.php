@@ -13,7 +13,17 @@ $stats = [
     'pending' => $pdo->query("SELECT COUNT(*) FROM users WHERE status = 'pending' AND role = 'user'")->fetchColumn(),
 ];
 
-$stmt = $pdo->query("SELECT * FROM users WHERE role = 'user' ORDER BY created_at DESC");
+// Enhanced query to fetch user plan details
+$stmt = $pdo->query("
+    SELECT u.*, 
+           (SELECT string_agg(mp.title, ', ') 
+            FROM user_plan_access upa 
+            JOIN meal_plans mp ON upa.meal_plan_id = mp.id 
+            WHERE upa.user_id = u.id AND upa.status = 'approved') as paid_plans
+    FROM users u 
+    WHERE u.role = 'user' 
+    ORDER BY u.created_at DESC
+");
 $users = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
@@ -74,7 +84,8 @@ $users = $stmt->fetchAll();
                     <thead>
                         <tr class="text-left text-zinc-500 text-xs uppercase tracking-widest bg-black/20">
                             <th class="px-8 py-5 font-bold">Client Name</th>
-                            <th class="px-8 py-5 font-bold">Package</th>
+                            <th class="px-8 py-5 font-bold">Primary Package</th>
+                            <th class="px-8 py-5 font-bold">Paid Plans</th>
                             <th class="px-8 py-5 font-bold">Subscription Status</th>
                             <th class="px-8 py-5 font-bold">Joined Date</th>
                             <th class="px-8 py-5 font-bold text-right">Actions</th>
@@ -91,6 +102,19 @@ $users = $stmt->fetchAll();
                                 <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-white/5 border border-white/10">
                                     <?php echo htmlspecialchars(str_replace('_', ' ', $u['package'] ?: 'No Plan')); ?>
                                 </span>
+                            </td>
+                            <td class="px-8 py-6 text-sm">
+                                <?php if (!empty($u['paid_plans'])): ?>
+                                    <div class="flex flex-wrap gap-1">
+                                        <?php foreach (explode(', ', $u['paid_plans']) as $plan): ?>
+                                            <span class="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                                <?php echo htmlspecialchars($plan); ?>
+                                            </span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php else: ?>
+                                    <span class="text-[10px] text-zinc-600 font-bold uppercase italic">None</span>
+                                <?php endif; ?>
                             </td>
                             <td class="px-8 py-6">
                                 <div class="flex items-center gap-2">
