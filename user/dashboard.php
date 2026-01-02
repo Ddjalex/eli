@@ -95,10 +95,6 @@ if (($user['status'] === 'approved' || $user['status'] === 'active')) {
             $paid_plan_ids[] = (int)$primary_plan['id'];
         }
     }
-    // For user 4 specifically as a fallback if the above fails
-    if ((int)$user_id === 4) {
-        $paid_plan_ids[] = 1;
-    }
 }
 
 $paid_plan_ids = array_unique($paid_plan_ids);
@@ -269,10 +265,6 @@ if ($user['status'] === 'approved' || $user['status'] === 'active') {
                             <?php 
                             foreach ($all_plans as $plan): 
                                 $has_access = in_array((int)$plan['id'], $paid_plan_ids, true) || (isset($plan['has_access']) && $plan['has_access'] > 0);
-                                // Force access for user 4 or this specific email
-                                if ((int)$user_id === 4 || (isset($user['email']) && $user['email'] === 'almesagadw@gmail.com')) {
-                                    $has_access = true;
-                                }
                                 $is_pending = in_array((int)$plan['id'], $pending_plan_ids, true);
                             ?>
                                 <div class="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex flex-col group hover:bg-white/[0.07] transition-all duration-500 shadow-xl relative">
