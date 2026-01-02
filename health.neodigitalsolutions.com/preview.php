@@ -34,7 +34,7 @@ $is_approved = false;
 // 2. OR User is active/approved and this plan matches their main package
 if ($plan_access_status === 'approved') {
     $is_approved = true;
-} elseif (($user_status === 'active' || $user_status === 'approved') && $plan_package_type === $user_package) {
+} elseif (($user_status === 'active' || $user_status === 'approved') && !empty($user_package) && $plan_package_type === $user_package) {
     $is_approved = true;
 }
 

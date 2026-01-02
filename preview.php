@@ -7,13 +7,38 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $plan_id = $_GET['id'] ?? 0;
+$user_id = $_SESSION['user_id'];
 
-// Check user status
-$stmt = $pdo->prepare("SELECT status FROM users WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$user_status = $stmt->fetchColumn();
+// Check user status and package
+$stmt = $pdo->prepare("SELECT status, package FROM users WHERE id = ?");
+$stmt->execute([$user_id]);
+$user = $stmt->fetch();
 
-if ($user_status !== 'approved') {
+$user_status = $user['status'];
+$user_package = $user['package'];
+
+// Check for explicit access in user_plan_access
+$stmt = $pdo->prepare("SELECT status FROM user_plan_access WHERE user_id = ? AND meal_plan_id = ?");
+$stmt->execute([$user_id, $plan_id]);
+$plan_access_status = $stmt->fetchColumn();
+
+// Get the plan's package type
+$stmt = $pdo->prepare("SELECT package_type FROM meal_plans WHERE id = ?");
+$stmt->execute([$plan_id]);
+$plan_package_type = $stmt->fetchColumn();
+
+$is_approved = false;
+
+// Access granted if:
+// 1. User has an 'approved' record in user_plan_access for this specific plan
+// 2. OR User is active/approved and this plan matches their main package
+if ($plan_access_status === 'approved') {
+    $is_approved = true;
+} elseif (($user_status === 'active' || $user_status === 'approved') && !empty($user_package) && $plan_package_type === $user_package) {
+    $is_approved = true;
+}
+
+if (!$is_approved) {
     header("Location: user/payment.php?reason=unauthorized");
     exit;
 }
