@@ -23,28 +23,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $db_path = "uploads/site/" . $filename;
                 
                 $update_settings_flag = false;
-                // If it's an about image, also add to about_slides
                 if ($key === 'about_image') {
                     $stmt_slide = $pdo->prepare("INSERT INTO about_slides (image_url) VALUES (?)");
                     $stmt_slide->execute([$db_path]);
-                    // Also update the site_settings for the single fallback
                     $update_settings_flag = true;
                 } else {
                     $update_settings_flag = true;
                 }
 
                 if ($update_settings_flag) {
-                    // Get driver name to determine syntax
                     $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-                    
                     if ($driver === 'pgsql') {
-                        // PostgreSQL syntax
                         $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
                     } else {
-                        // MariaDB/MySQL syntax
-                        $stmt = $pdo->prepare("INSERT INTO site_settings ("key", value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
+                        $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
                     }
-                    
                     $stmt->execute([$key, $db_path]);
                 }
                 $message = "Settings updated successfully!";
@@ -66,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($driver === 'pgsql') {
                 $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON CONFLICT (\"key\") DO UPDATE SET value = EXCLUDED.value");
             } else {
-                $stmt = $pdo->prepare("INSERT INTO site_settings (\"key\", value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
+                $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE value = VALUES(value)");
             }
             $stmt->execute([$key, $val]);
         }
@@ -74,7 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Always reload settings for the form display
 try {
     $stmt = $pdo->query("SELECT * FROM site_settings");
     $settings = [];
@@ -107,6 +99,7 @@ try {
                 <a href="manage_plans.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Meal Plans</a>
                 <a href="manage_payments.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Payment Methods</a>
                 <a href="manage_images.php" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-medium">Site Settings</a>
+                <a href="manage_testimonials.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Testimonials</a>
                 <a href="change_password.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white">Change Password</a>
             </nav>
         </aside>
@@ -197,8 +190,7 @@ try {
                             <textarea name="settings[<?php echo $key; ?>]" rows="<?php echo $key === 'about_text' ? '6' : '2'; ?>" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl text-sm text-white focus:border-emerald-500 outline-none"><?php echo htmlspecialchars($settings[$key] ?? ''); ?></textarea>
                         </div>
                     <?php endforeach; ?>
-                </div>
-                <!-- Certificate Image -->
+
                     <div class="glass p-8 rounded-3xl">
                         <label class="block text-sm font-bold uppercase tracking-widest text-zinc-500 mb-4">Certificate Image</label>
                         <?php if (isset($settings['certificate_image'])): ?>
