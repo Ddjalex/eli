@@ -7,19 +7,28 @@
                 <div class="flex items-start gap-3 sm:gap-4">
                     <span class="text-emerald-500 text-lg sm:text-xl flex-shrink-0">📍</span>
                     <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed">
-                        <?php echo $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'footer_address'")->fetchColumn() ?: 'Addis Ababa, Ethiopia'; ?>
+                        <?php 
+                        $val = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'footer_address'")->fetchColumn();
+                        echo htmlspecialchars($val ?: 'Addis Ababa, Ethiopia'); 
+                        ?>
                     </p>
                 </div>
                 <div class="flex items-center gap-3 sm:gap-4">
                     <span class="text-emerald-500 text-lg sm:text-xl flex-shrink-0">📱</span>
-                    <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'contact_phone'")->fetchColumn() ?: '+251911000000'); ?>" class="text-zinc-400 text-xs sm:text-sm font-bold hover:text-emerald-500 transition-colors">
-                        <?php echo $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'contact_phone'")->fetchColumn() ?: '+251 911 000 000'; ?>
+                    <a href="tel:<?php 
+                        $phone = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'contact_phone'")->fetchColumn() ?: '+251911000000';
+                        echo preg_replace('/[^0-9+]/', '', $phone); 
+                    ?>" class="text-zinc-400 text-xs sm:text-sm font-bold hover:text-emerald-500 transition-colors">
+                        <?php echo htmlspecialchars($phone); ?>
                     </a>
                 </div>
                 <div class="flex items-center gap-3 sm:gap-4">
                     <span class="text-emerald-500 text-lg sm:text-xl flex-shrink-0">✉️</span>
                     <p class="text-zinc-400 text-xs sm:text-sm">
-                        <?php echo $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'footer_email'")->fetchColumn() ?: 'info@elenimekuria.com'; ?>
+                        <?php 
+                        $email = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'footer_email'")->fetchColumn();
+                        echo htmlspecialchars($email ?: 'info@elenimekuria.com'); 
+                        ?>
                     </p>
                 </div>
             </div>
@@ -41,18 +50,20 @@
         <div>
             <h3 class="text-[9px] sm:text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-4 sm:mb-8">Social Networks</h3>
             <ul class="space-y-2 sm:space-y-4 text-sm">
-                <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'footer_tiktok'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-2 sm:gap-3 uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">
-                    <img src="https://www.svgrepo.com/show/333611/tiktok.svg" class="w-3 sm:w-4 h-3 sm:h-4 invert opacity-50 hover:opacity-100" alt="TikTok"> <span class="hidden sm:inline">Tiktok</span>
+                <?php
+                $socials = [
+                    'footer_tiktok' => ['TikTok', 'https://www.svgrepo.com/show/333611/tiktok.svg'],
+                    'contact_social_ig' => ['Instagram', 'https://www.svgrepo.com/show/521711/instagram.svg'],
+                    'contact_whatsapp_link' => ['Whatsapp', 'https://www.svgrepo.com/show/513060/whatsapp.svg'],
+                    'footer_telegram' => ['Telegram', 'https://www.svgrepo.com/show/354443/telegram.svg']
+                ];
+                foreach ($socials as $key => $info):
+                    $link = $pdo->query("SELECT value FROM site_settings WHERE \"key\" = '$key'")->fetchColumn() ?: '#';
+                ?>
+                <li><a href="<?php echo htmlspecialchars($link); ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-2 sm:gap-3 uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">
+                    <img src="<?php echo $info[1]; ?>" class="w-3 sm:w-4 h-3 sm:h-4 invert opacity-50 hover:opacity-100" alt="<?php echo $info[0]; ?>"> <span class="hidden sm:inline"><?php echo $info[0]; ?></span>
                 </a></li>
-                <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'contact_social_ig'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-2 sm:gap-3 uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">
-                    <img src="https://www.svgrepo.com/show/521711/instagram.svg" class="w-3 sm:w-4 h-3 sm:h-4 invert opacity-50 hover:opacity-100" alt="Instagram"> <span class="hidden sm:inline">Instagram</span>
-                </a></li>
-                <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'contact_whatsapp_link'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-2 sm:gap-3 uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">
-                    <img src="https://www.svgrepo.com/show/513060/whatsapp.svg" class="w-3 sm:w-4 h-3 sm:h-4 invert opacity-50 hover:opacity-100" alt="WhatsApp"> <span class="hidden sm:inline">Whatsapp</span>
-                </a></li>
-                <li><a href="<?php echo $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'footer_telegram'")->fetchColumn() ?: '#'; ?>" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-2 sm:gap-3 uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">
-                    <img src="https://www.svgrepo.com/show/354443/telegram.svg" class="w-3 sm:w-4 h-3 sm:h-4 invert opacity-50 hover:opacity-100" alt="Telegram"> <span class="hidden sm:inline">Telegram</span>
-                </a></li>
+                <?php endforeach; ?>
             </ul>
         </div>
 
