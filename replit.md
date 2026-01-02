@@ -1,83 +1,75 @@
-# Diet & Nutritionist Eleni - Portfolio & Meal Planning Platform
+# Health & Nutrition Website - Eleni Mekuria
 
 ## Overview
-A comprehensive PHP-based website for a professional dietitian/nutritionist featuring:
-- Public-facing portfolio and blog
-- User registration and authentication system
-- Meal plan management and purchases
-- Admin dashboard for content management
-- Progress tracking with before/after photos
+A professional dietitian and nutritionist website for Eleni Mekuria, built with PHP and PostgreSQL. The site features meal plans, blog posts, portfolio, testimonials, and an admin dashboard for content management.
 
-## Project Architecture
-
-### Tech Stack
-- **Backend**: PHP 8.2 with PDO for database access
-- **Database**: PostgreSQL (Neon-backed via Replit)
-- **Frontend**: HTML, Tailwind CSS (via CDN), GSAP animations
-- **Server**: PHP built-in development server on port 5000
-
-### Directory Structure
+## Project Structure
 ```
-/
-├── admin/                 # Admin panel pages
-│   ├── index.php         # Admin dashboard
-│   ├── manage_users.php  # User management
-│   ├── manage_plans.php  # Meal plan CRUD
-│   ├── manage_blogs.php  # Blog management
-│   ├── manage_hero.php   # Hero slider management
-│   └── ...               # Other admin features
+health.neodigitalsolutions.com/
+├── admin/                    # Admin dashboard pages
+│   ├── index.php            # Admin home/dashboard
+│   ├── manage_blogs.php     # Blog management
+│   ├── manage_case_studies.php
+│   ├── manage_credentials.php
+│   ├── manage_hero.php      # Hero slider management
+│   ├── manage_images.php    # Site images/settings
+│   ├── manage_payments.php  # Payment options
+│   ├── manage_plans.php     # Meal plans
+│   ├── manage_portfolio.php
+│   ├── manage_progress.php
+│   ├── manage_testimonials.php
+│   ├── manage_users.php
+│   └── user_analytics.php
 ├── includes/
-│   ├── config.php        # Database configuration
-│   └── footer.php        # Shared footer component
-├── user/
-│   └── dashboard.php     # User dashboard
-├── attached_assets/      # Uploaded images and files
-│   ├── generated_images/
-│   └── stock_images/
-├── index.php             # Homepage
-├── login.php             # User login
-├── register.php          # User registration
-├── blog.php              # Blog listing
-├── portfolio.php         # Portfolio page
-└── ...                   # Other public pages
+│   ├── config.php           # Database connection (PostgreSQL)
+│   └── footer.php           # Shared footer component
+├── user/                    # User portal pages
+│   ├── dashboard.php
+│   ├── logout.php
+│   └── payment.php
+├── uploads/                 # User uploaded files
+├── attached_assets/         # Site assets and images
+├── index.php               # Homepage
+├── login.php               # User login
+├── register.php            # User registration
+├── blog.php                # Blog listing
+├── blog-detail.php         # Single blog post
+├── portfolio.php           # Portfolio page
+└── service-detail.php      # Service details
 ```
 
-### Database Tables
-- `users` - User accounts (admin and regular users)
-- `site_settings` - Key-value store for site configuration
-- `hero_slides` - Homepage hero carousel content
-- `about_slides` - About section image slider
-- `meal_plans` - Available meal plan packages
-- `payments` - Payment records
-- `payment_options` - Payment method configurations
-- `blogs` - Blog posts
+## Tech Stack
+- **Backend**: PHP 8.2
+- **Database**: PostgreSQL (Replit Neon)
+- **Frontend**: HTML, Tailwind CSS (CDN)
+- **Server**: PHP built-in development server
+
+## Database Tables
+- `users` - User accounts and authentication
+- `site_settings` - Key-value site configuration
+- `hero_slides` - Homepage hero slider
+- `meal_plans` - Subscription meal plans
+- `payments` - Payment transactions
+- `user_plan_access` - User plan subscriptions
+- `progress_photos` - User progress tracking
+- `testimonials` - Client testimonials
+- `payment_options` - Available payment methods
+- `case_studies` - Clinical case studies
+- `credentials` - Professional credentials
 - `portfolio_projects` - Portfolio items
-- `progress_photos` - Before/after transformation photos
-- `case_studies` - Clinical case study content
-- `credentials` - Professional certifications
-- `user_plan_access` - User meal plan subscriptions
-- `user_analytics` - User health metrics tracking
+- `about_slides` - About section images
+- `user_analytics` - User health metrics
+- `blogs` - Blog posts
 
-### Default Admin Credentials
+## Default Admin Access
 - Email: admin@example.com
-- Password: password (hashed in database)
+- Password: password (hashed with bcrypt)
 
-## Development Commands
-
-### Run Development Server
-```bash
-php -S 0.0.0.0:5000
-```
-
-### Database Connection
-The app uses PostgreSQL environment variables:
-- `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`
-- These are automatically configured by Replit
-
-## User Preferences
-- Language comments in code may be in Amharic (Ethiopian language)
-- Design uses dark theme with emerald/green accent colors
-- Mobile-responsive design is important
+## Running the Project
+The PHP development server runs on port 5000, serving from the `health.neodigitalsolutions.com` directory.
 
 ## Recent Changes
-- **2026-01-02**: Initial import to Replit environment, database schema created
+- January 2, 2026: Initial migration to Replit environment
+  - Set up PostgreSQL database with all required tables
+  - Fixed PHP syntax errors in footer.php (quote escaping)
+  - Verified site is functional and accessible
