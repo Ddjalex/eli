@@ -135,11 +135,11 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                     <div class="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-900/50 p-3 sm:p-5 transition-all hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10">
                         <div class="flex gap-2 sm:gap-4 mb-4 sm:mb-6">
                             <div class="relative w-1/2 overflow-hidden rounded-2xl sm:rounded-[1.5rem] shadow-2xl bg-zinc-800">
-                                <img src="attached_assets/image_1767344040668.png" class="w-full aspect-[4/5] object-cover object-left scale-110" alt="Before Result" onerror="this.src='/attached_assets/image_1767344040668.png'">
+                                <img src="/attached_assets/image_1767344040668.png" class="w-full aspect-[4/5] object-cover object-left scale-110" alt="Before Result">
                                 <span class="absolute bottom-3 left-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-widest border border-white/10">Before</span>
                             </div>
                             <div class="relative w-1/2 overflow-hidden rounded-2xl sm:rounded-[1.5rem] shadow-2xl bg-zinc-800">
-                                <img src="attached_assets/image_1767344040668.png" class="w-full aspect-[4/5] object-cover object-right scale-110" alt="After Result" onerror="this.src='/attached_assets/image_1767344040668.png'">
+                                <img src="/attached_assets/image_1767344040668.png" class="w-full aspect-[4/5] object-cover object-right scale-110" alt="After Result">
                                 <span class="absolute bottom-3 left-3 bg-emerald-500/90 backdrop-blur-md px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-widest border border-emerald-400/20">After</span>
                             </div>
                         </div>
