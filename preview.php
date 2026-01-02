@@ -66,7 +66,7 @@ function getEmbedUrl($url) {
     
     // YouTube
     if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $url, $match)) {
-        return "https://www.youtube.com/embed/" . $match[1];
+        return "https://www.youtube.com/embed/" . $match[1] . "?modestbranding=1&rel=0&showinfo=0";
     }
     
     // Vimeo
