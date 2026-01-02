@@ -134,17 +134,17 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
                 <div class="w-full max-w-sm sm:max-w-md lg:max-w-lg">
                     <div class="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-900/50 p-3 sm:p-5 transition-all hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10">
                         <div class="flex gap-2 sm:gap-4 mb-4 sm:mb-6">
-                            <div class="relative w-1/2 overflow-hidden rounded-2xl sm:rounded-[1.5rem] shadow-2xl">
-                                <img src="/attached_assets/image_1767344040668.png" class="w-full aspect-[4/5] object-cover object-left scale-110" alt="Before Result">
+                            <div class="relative w-1/2 overflow-hidden rounded-2xl sm:rounded-[1.5rem] shadow-2xl bg-zinc-800">
+                                <img src="attached_assets/image_1767344040668.png" class="w-full aspect-[4/5] object-cover object-left scale-110" alt="Before Result" onerror="this.src='/attached_assets/image_1767344040668.png'">
                                 <span class="absolute bottom-3 left-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-widest border border-white/10">Before</span>
                             </div>
-                            <div class="relative w-1/2 overflow-hidden rounded-2xl sm:rounded-[1.5rem] shadow-2xl">
-                                <img src="/attached_assets/image_1767344040668.png" class="w-full aspect-[4/5] object-cover object-right scale-110" alt="After Result">
+                            <div class="relative w-1/2 overflow-hidden rounded-2xl sm:rounded-[1.5rem] shadow-2xl bg-zinc-800">
+                                <img src="attached_assets/image_1767344040668.png" class="w-full aspect-[4/5] object-cover object-right scale-110" alt="After Result" onerror="this.src='/attached_assets/image_1767344040668.png'">
                                 <span class="absolute bottom-3 left-3 bg-emerald-500/90 backdrop-blur-md px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-widest border border-emerald-400/20">After</span>
                             </div>
                         </div>
                         <div class="text-center">
-                            <h3 class="font-black uppercase tracking-[0.2em] text-[10px] sm:text-xs text-zinc-500 group-hover:text-emerald-500 transition-colors">UNTITLED JOURNEY</h3>
+                            <h3 class="font-black uppercase tracking-[0.2em] text-[10px] sm:text-xs text-zinc-500 group-hover:text-emerald-500 transition-colors">REAL TRANSFORMATION</h3>
                             <div class="mt-2 flex justify-center gap-1">
                                 <div class="w-8 h-[1px] bg-emerald-500/30"></div>
                                 <div class="w-1 h-1 rounded-full bg-emerald-500"></div>
@@ -156,7 +156,7 @@ $about_bio = $stmt->fetchColumn() ?: 'MSc from Addis Ababa University, Afrihealt
             </div>
             
             <div class="mt-12 text-center">
-                <a href="#progress" class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-emerald-500 hover:text-white transition-colors flex items-center justify-center gap-2">
+                <a href="#testimonials" class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-emerald-500 hover:text-white transition-colors flex items-center justify-center gap-2">
                     View More Success Stories
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                 </a>
