@@ -1,8 +1,8 @@
-# Eleni Mekuria - Dietitian Portfolio & Meal Planning Platform
+# Diet & Nutritionist Eleni - Portfolio & Meal Planning Platform
 
 ## Overview
 
-A high-end, luxury-style portfolio and meal planning platform for Eleni Mekuria, a professional Dietitian/Nutritionist. The platform serves dual purposes: showcasing professional credentials and providing a monetized meal plan subscription service.
+A high-end, luxury-style portfolio and meal planning platform for Diet & Nutritionist Eleni (Eleni Mekuria). The platform serves dual purposes: showcasing professional credentials and providing a monetized meal plan subscription service.
 
 **Core Purpose:**
 - Professional portfolio displaying certifications, media appearances, and client testimonials
