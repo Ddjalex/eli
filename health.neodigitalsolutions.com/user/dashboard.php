@@ -58,6 +58,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_photo'])) {
     }
 }
 
+    // Handle feedback submission
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_feedback'])) {
+        $feedback_content = $_POST['feedback_content'] ?? '';
+        if (!empty($feedback_content)) {
+            $stmt = $pdo->prepare("INSERT INTO testimonials (user_id, client_name, client_role, content, status) VALUES (?, ?, ?, ?, 'pending')");
+            $stmt->execute([$user_id, $user['name'], $user['package'] ?? 'Client', $feedback_content]);
+            $feedback_msg = "Thank you! Your feedback has been sent for approval.";
+        }
+    }
+
     // Fetch latest analytics
     $stmt = $pdo->prepare("SELECT * FROM user_analytics WHERE user_id = ? ORDER BY date DESC LIMIT 7");
     $stmt->execute([$user_id]);
@@ -273,7 +283,7 @@ $has_any_pending = !empty($pending_plan_ids) || ($user['status'] === 'pending');
                     </div>
                 </div>
 
-                <!-- Account Status -->
+                <!-- Subscription Status -->
                 <div class="glass p-8 rounded-[2.5rem] shadow-2xl">
                     <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">Subscription Status</h4>
                     <?php 
@@ -286,6 +296,18 @@ $has_any_pending = !empty($pending_plan_ids) || ($user['status'] === 'pending');
                         <span class="text-xs font-bold uppercase tracking-widest"><?php echo $display_status; ?></span>
                         <span class="w-3 h-3 rounded-full <?php echo $status_color; ?> animate-pulse"></span>
                     </div>
+                </div>
+
+                <!-- Feedback Form -->
+                <div class="glass p-8 rounded-[2.5rem] shadow-2xl">
+                    <h4 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-6">Share Your Experience</h4>
+                    <?php if (isset($feedback_msg)): ?>
+                        <div class="bg-emerald-500/20 border border-emerald-500/20 p-4 rounded-xl text-[10px] font-bold uppercase text-emerald-500 mb-4"><?php echo $feedback_msg; ?></div>
+                    <?php endif; ?>
+                    <form method="POST" class="space-y-4">
+                        <textarea name="feedback_content" required placeholder="Tell us about your journey..." class="w-full bg-black/50 border border-white/10 p-4 rounded-xl text-xs text-white outline-none focus:border-emerald-500 h-32"></textarea>
+                        <button type="submit" name="submit_feedback" class="w-full bg-emerald-600 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all">Submit Feedback</button>
+                    </form>
                 </div>
 
                 <!-- Update Package -->
