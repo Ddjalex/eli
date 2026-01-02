@@ -67,14 +67,10 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
 
         <form method="POST" enctype="multipart/form-data" class="bg-zinc-900 p-6 rounded-2xl border border-white/10 mb-12">
             <h2 class="text-xl font-bold mb-6 uppercase">Add New Comparison</h2>
-            <div class="grid grid-cols-2 gap-6 mb-6">
+            <div class="grid grid-cols-1 gap-6 mb-6">
                 <div>
-                    <label class="block text-xs uppercase tracking-widest text-zinc-500 mb-2">Title</label>
-                    <input type="text" name="title" required class="w-full bg-black border border-white/10 rounded-lg p-3 text-white">
-                </div>
-                <div>
-                    <label class="block text-xs uppercase tracking-widest text-zinc-500 mb-2">Blur Faces?</label>
-                    <input type="checkbox" name="is_blurred" class="w-6 h-6 accent-emerald-500">
+                    <label class="block text-xs uppercase tracking-widest text-zinc-500 mb-2">Description / Notes</label>
+                    <textarea name="description" class="w-full bg-black border border-white/10 rounded-lg p-3 text-white h-24"></textarea>
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-6 mb-6">
