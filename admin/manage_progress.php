@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $before_blur_y = (int)($_POST['before_blur_y'] ?? 50);
         $after_blur_x = (int)($_POST['after_blur_x'] ?? 50);
         $after_blur_y = (int)($_POST['after_blur_y'] ?? 50);
+        $blur_size = (int)($_POST['blur_size'] ?? 40);
 
         $before_img = '';
         $after_img = '';
@@ -41,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($before_img && $after_img) {
             try {
-                $stmt = $pdo->prepare("INSERT INTO progress_photos (title, description, before_image_url, after_image_url, is_blurred, before_blur_x, before_blur_y, after_blur_x, after_blur_y) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$title, $description, $before_img, $after_img, $is_blurred, $before_blur_x, $before_blur_y, $after_blur_x, $after_blur_y]);
+                $stmt = $pdo->prepare("INSERT INTO progress_photos (title, description, before_image_url, after_image_url, is_blurred, before_blur_x, before_blur_y, after_blur_x, after_blur_y, blur_size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$title, $description, $before_img, $after_img, $is_blurred, $before_blur_x, $before_blur_y, $after_blur_x, $after_blur_y, $blur_size]);
                 $message = "Photo added successfully!";
             } catch (PDOException $e) {
                 $message = "Error: " . $e->getMessage();
@@ -57,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $before_blur_y = (int)($_POST['before_blur_y'] ?? 50);
         $after_blur_x = (int)($_POST['after_blur_x'] ?? 50);
         $after_blur_y = (int)($_POST['after_blur_y'] ?? 50);
-        
         $blur_size = (int)($_POST['blur_size'] ?? 40);
         
         try {
@@ -156,9 +156,15 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
                     <input type="file" name="after_image" required accept="image/*" onchange="previewImg(this, 'after')" class="w-full text-zinc-500">
                 </div>
             </div>
-            <div class="flex items-center gap-2 mb-6">
-                <input type="checkbox" name="is_blurred" id="is_blurred" onchange="toggleMarkers()" class="w-6 h-6 accent-emerald-500">
-                <label class="text-xs uppercase tracking-widest text-zinc-500">Blur Faces for Privacy?</label>
+            <div class="flex items-center gap-4 mb-6">
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" name="is_blurred" id="is_blurred" onchange="toggleMarkers()" class="w-6 h-6 accent-emerald-500">
+                    <label class="text-xs uppercase tracking-widest text-zinc-500">Blur Faces for Privacy?</label>
+                </div>
+                <div class="flex-1">
+                    <label class="block text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Blur Size</label>
+                    <input type="range" name="blur_size" id="blur_size_input" min="20" max="150" value="40" oninput="updateBlurSize(this.value)" class="w-full accent-emerald-500">
+                </div>
             </div>
             <button type="submit" name="add_photo" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl uppercase tracking-widest transition-all">Upload Progress Photo</button>
         </form>
@@ -170,15 +176,15 @@ $photos = $pdo->query("SELECT * FROM progress_photos ORDER BY display_order ASC,
                         <div class="relative w-1/2 overflow-hidden rounded-lg">
                             <img src="../<?php echo $photo['before_image_url']; ?>" class="w-full aspect-square object-cover">
                             <?php if ($photo['is_blurred']): ?>
-                                <div class="absolute w-[40px] h-[40px] bg-white/10 backdrop-blur-xl rounded-full border border-white/10 -translate-x-1/2 -translate-y-1/2" 
-                                     style="left: <?php echo $photo['before_blur_x'] ?? 50; ?>%; top: <?php echo $photo['before_blur_y'] ?? 50; ?>%;"></div>
+                                <div class="absolute bg-white/10 backdrop-blur-xl rounded-full border border-white/10 -translate-x-1/2 -translate-y-1/2" 
+                                     style="left: <?php echo $photo['before_blur_x'] ?? 50; ?>%; top: <?php echo $photo['before_blur_y'] ?? 50; ?>%; width: <?php echo $photo['blur_size'] ?? 40; ?>px; height: <?php echo $photo['blur_size'] ?? 40; ?>px;"></div>
                             <?php endif; ?>
                         </div>
                         <div class="relative w-1/2 overflow-hidden rounded-lg">
                             <img src="../<?php echo $photo['after_image_url']; ?>" class="w-full aspect-square object-cover">
                             <?php if ($photo['is_blurred']): ?>
-                                <div class="absolute w-[40px] h-[40px] bg-white/10 backdrop-blur-xl rounded-full border border-white/10 -translate-x-1/2 -translate-y-1/2"
-                                     style="left: <?php echo $photo['after_blur_x'] ?? 50; ?>%; top: <?php echo $photo['after_blur_y'] ?? 50; ?>%;"></div>
+                                <div class="absolute bg-white/10 backdrop-blur-xl rounded-full border border-white/10 -translate-x-1/2 -translate-y-1/2"
+                                     style="left: <?php echo $photo['after_blur_x'] ?? 50; ?>%; top: <?php echo $photo['after_blur_y'] ?? 50; ?>%; width: <?php echo $photo['blur_size'] ?? 40; ?>px; height: <?php echo $photo['blur_size'] ?? 40; ?>px;"></div>
                             <?php endif; ?>
                         </div>
                     </div>
