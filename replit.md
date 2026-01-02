@@ -1,36 +1,83 @@
 # Diet & Nutritionist Eleni - Portfolio & Meal Planning Platform
 
 ## Overview
-A PHP-based dietitian website for Eleni featuring personalized meal plans, blog, portfolio, user portal, and admin dashboard.
+A comprehensive PHP-based website for a professional dietitian/nutritionist featuring:
+- Public-facing portfolio and blog
+- User registration and authentication system
+- Meal plan management and purchases
+- Admin dashboard for content management
+- Progress tracking with before/after photos
 
 ## Project Architecture
-- **Language**: PHP 8.2
-- **Database**: PostgreSQL (Replit native)
-- **Frontend**: TailwindCSS (CDN), GSAP animations
+
+### Tech Stack
+- **Backend**: PHP 8.2 with PDO for database access
+- **Database**: PostgreSQL (Neon-backed via Replit)
+- **Frontend**: HTML, Tailwind CSS (via CDN), GSAP animations
 - **Server**: PHP built-in development server on port 5000
 
-## Key Files
-- `index.php` - Main landing page with hero, about, services sections
-- `login.php`, `register.php` - User authentication
-- `portfolio.php`, `blog.php` - Content pages
-- `admin/` - Admin dashboard for managing content, users, payments
-- `includes/config.php` - Database configuration (uses Replit PostgreSQL env vars)
-
-## Database Tables
-- users, site_settings, hero_slides, about_slides
-- meal_plans, payment_options, payments
-- blogs, portfolio_projects, progress_photos
-- user_meal_plans, user_downloads
-
-## Default Admin Credentials
-- Email: admin@example.com
-- Password: password (hashed with bcrypt)
-
-## Running the Project
-The PHP development server runs on port 5000:
+### Directory Structure
 ```
+/
+├── admin/                 # Admin panel pages
+│   ├── index.php         # Admin dashboard
+│   ├── manage_users.php  # User management
+│   ├── manage_plans.php  # Meal plan CRUD
+│   ├── manage_blogs.php  # Blog management
+│   ├── manage_hero.php   # Hero slider management
+│   └── ...               # Other admin features
+├── includes/
+│   ├── config.php        # Database configuration
+│   └── footer.php        # Shared footer component
+├── user/
+│   └── dashboard.php     # User dashboard
+├── attached_assets/      # Uploaded images and files
+│   ├── generated_images/
+│   └── stock_images/
+├── index.php             # Homepage
+├── login.php             # User login
+├── register.php          # User registration
+├── blog.php              # Blog listing
+├── portfolio.php         # Portfolio page
+└── ...                   # Other public pages
+```
+
+### Database Tables
+- `users` - User accounts (admin and regular users)
+- `site_settings` - Key-value store for site configuration
+- `hero_slides` - Homepage hero carousel content
+- `about_slides` - About section image slider
+- `meal_plans` - Available meal plan packages
+- `payments` - Payment records
+- `payment_options` - Payment method configurations
+- `blogs` - Blog posts
+- `portfolio_projects` - Portfolio items
+- `progress_photos` - Before/after transformation photos
+- `case_studies` - Clinical case study content
+- `credentials` - Professional certifications
+- `user_plan_access` - User meal plan subscriptions
+- `user_analytics` - User health metrics tracking
+
+### Default Admin Credentials
+- Email: admin@example.com
+- Password: password (hashed in database)
+
+## Development Commands
+
+### Run Development Server
+```bash
 php -S 0.0.0.0:5000
 ```
 
+### Database Connection
+The app uses PostgreSQL environment variables:
+- `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`
+- These are automatically configured by Replit
+
+## User Preferences
+- Language comments in code may be in Amharic (Ethiopian language)
+- Design uses dark theme with emerald/green accent colors
+- Mobile-responsive design is important
+
 ## Recent Changes
-- January 2, 2026: Migrated to Replit environment, created PostgreSQL database schema
+- **2026-01-02**: Initial import to Replit environment, database schema created
