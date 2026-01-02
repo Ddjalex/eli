@@ -13,10 +13,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $title = $_POST['title'] ?? 'Untitled';
         $description = $_POST['description'] ?? '';
         $is_blurred = isset($_POST['is_blurred']) ? 1 : 0;
-        $before_blur_x = $_POST['before_blur_x'] ?? 50;
-        $before_blur_y = $_POST['before_blur_y'] ?? 50;
-        $after_blur_x = $_POST['after_blur_x'] ?? 50;
-        $after_blur_y = $_POST['after_blur_y'] ?? 50;
+        $before_blur_x = (int)($_POST['before_blur_x'] ?? 50);
+        $before_blur_y = (int)($_POST['before_blur_y'] ?? 50);
+        $after_blur_x = (int)($_POST['after_blur_x'] ?? 50);
+        $after_blur_y = (int)($_POST['after_blur_y'] ?? 50);
 
         $before_img = '';
         $after_img = '';
@@ -45,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$title, $description, $before_img, $after_img, $is_blurred, $before_blur_x, $before_blur_y, $after_blur_x, $after_blur_y]);
                 $message = "Photo added successfully!";
             } catch (PDOException $e) {
-                // Fallback for missing description or other columns if necessary, but we've verified the schema
                 $message = "Error: " . $e->getMessage();
             }
         }
@@ -54,25 +53,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $title = $_POST['title'] ?? 'Untitled';
         $description = $_POST['description'] ?? '';
         $is_blurred = isset($_POST['is_blurred']) ? 1 : 0;
-        $before_blur_x = $_POST['before_blur_x'] ?? 50;
-        $before_blur_y = $_POST['before_blur_y'] ?? 50;
-        $after_blur_x = $_POST['after_blur_x'] ?? 50;
-        $after_blur_y = $_POST['after_blur_y'] ?? 50;
+        $before_blur_x = (int)($_POST['before_blur_x'] ?? 50);
+        $before_blur_y = (int)($_POST['before_blur_y'] ?? 50);
+        $after_blur_x = (int)($_POST['after_blur_x'] ?? 50);
+        $after_blur_y = (int)($_POST['after_blur_y'] ?? 50);
         
-        $stmt = $pdo->prepare("UPDATE progress_photos SET title = ?, description = ?, is_blurred = ?, before_blur_x = ?, before_blur_y = ?, after_blur_x = ?, after_blur_y = ? WHERE id = ?");
-        $stmt->execute([$title, $description, $is_blurred, $before_blur_x, $before_blur_y, $after_blur_x, $after_blur_y, $id]);
-        
-        if (isset($_FILES['before_image']) && $_FILES['before_image']['error'] === 0) {
-            $before_img = 'uploads/progress/' . time() . '_before_' . $_FILES['before_image']['name'];
-            move_uploaded_file($_FILES['before_image']['tmp_name'], '../' . $before_img);
-            $pdo->prepare("UPDATE progress_photos SET before_image_url = ? WHERE id = ?")->execute([$before_img, $id]);
+        try {
+            $stmt = $pdo->prepare("UPDATE progress_photos SET title = ?, description = ?, is_blurred = ?, before_blur_x = ?, before_blur_y = ?, after_blur_x = ?, after_blur_y = ? WHERE id = ?");
+            $stmt->execute([$title, $description, $is_blurred, $before_blur_x, $before_blur_y, $after_blur_x, $after_blur_y, $id]);
+            
+            if (isset($_FILES['before_image']) && $_FILES['before_image']['error'] === 0) {
+                $before_img = 'uploads/progress/' . time() . '_before_' . $_FILES['before_image']['name'];
+                move_uploaded_file($_FILES['before_image']['tmp_name'], '../' . $before_img);
+                $pdo->prepare("UPDATE progress_photos SET before_image_url = ? WHERE id = ?")->execute([$before_img, $id]);
+            }
+            if (isset($_FILES['after_image']) && $_FILES['after_image']['error'] === 0) {
+                $after_img = 'uploads/progress/' . time() . '_after_' . $_FILES['after_image']['name'];
+                move_uploaded_file($_FILES['after_image']['tmp_name'], '../' . $after_img);
+                $pdo->prepare("UPDATE progress_photos SET after_image_url = ? WHERE id = ?")->execute([$after_img, $id]);
+            }
+            $message = "Photo updated successfully!";
+        } catch (PDOException $e) {
+            $message = "Error: " . $e->getMessage();
         }
-        if (isset($_FILES['after_image']) && $_FILES['after_image']['error'] === 0) {
-            $after_img = 'uploads/progress/' . time() . '_after_' . $_FILES['after_image']['name'];
-            move_uploaded_file($_FILES['after_image']['tmp_name'], '../' . $after_img);
-            $pdo->prepare("UPDATE progress_photos SET after_image_url = ? WHERE id = ?")->execute([$after_img, $id]);
-        }
-        $message = "Photo updated successfully!";
     } elseif (isset($_POST['delete_photo'])) {
         $id = $_POST['photo_id'];
         $stmt = $pdo->prepare("DELETE FROM progress_photos WHERE id = ?");
