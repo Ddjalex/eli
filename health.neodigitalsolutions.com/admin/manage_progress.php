@@ -19,12 +19,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if (isset($_FILES['before_image']) && $_FILES['before_image']['error'] === 0) {
             $before_img = 'uploads/progress/' . time() . '_before_' . $_FILES['before_image']['name'];
-            move_uploaded_file($_FILES['before_image']['tmp_name'], '../' . $before_img);
+            $upload_path = '../' . $before_img;
+            if (!is_dir(dirname($upload_path))) {
+                mkdir(dirname($upload_path), 0777, true);
+            }
+            move_uploaded_file($_FILES['before_image']['tmp_name'], $upload_path);
         }
         
         if (isset($_FILES['after_image']) && $_FILES['after_image']['error'] === 0) {
             $after_img = 'uploads/progress/' . time() . '_after_' . $_FILES['after_image']['name'];
-            move_uploaded_file($_FILES['after_image']['tmp_name'], '../' . $after_img);
+            $upload_path = '../' . $after_img;
+            if (!is_dir(dirname($upload_path))) {
+                mkdir(dirname($upload_path), 0777, true);
+            }
+            move_uploaded_file($_FILES['after_image']['tmp_name'], $upload_path);
         }
         
         if ($before_img && $after_img) {
