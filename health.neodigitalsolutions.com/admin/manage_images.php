@@ -178,7 +178,7 @@ try {
                         foreach ($text_settings as $key => $label): ?>
                             <div class="glass p-8 rounded-3xl <?php echo $key === 'about_text' ? 'md:col-span-2' : ''; ?>">
                                 <label class="block text-sm font-bold uppercase tracking-widest text-zinc-500 mb-4"><?php echo $label; ?></label>
-                                <textarea name="settings[<?php echo $key; ?>]" rows="<?php echo $key === 'about_text' ? '6' : '2'; ?>" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl text-sm text-white focus:border-emerald-500 outline-none"><?php echo htmlspecialchars($settings[$key] ?? ''); ?></textarea>
+                                <textarea name="settings[<?php echo $key; ?>]" rows="<?php echo $key === 'about_text' ? '6' : '1'; ?>" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl text-sm text-white focus:border-emerald-500 outline-none"><?php echo htmlspecialchars($settings[$key] ?? ''); ?></textarea>
                             </div>
                         <?php endforeach; ?>
                     </div>

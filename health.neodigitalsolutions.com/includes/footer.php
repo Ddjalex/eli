@@ -12,9 +12,9 @@
                 </div>
                 <div class="flex items-center gap-3 sm:gap-4">
                     <span class="text-emerald-500 text-lg sm:text-xl flex-shrink-0">📱</span>
-                    <p class="text-zinc-400 text-xs sm:text-sm font-bold">
+                    <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'contact_phone'")->fetchColumn() ?: '+251911000000'); ?>" class="text-zinc-400 text-xs sm:text-sm font-bold hover:text-emerald-500 transition-colors">
                         <?php echo $pdo->query("SELECT value FROM site_settings WHERE \"key\" = 'contact_phone'")->fetchColumn() ?: '+251 911 000 000'; ?>
-                    </p>
+                    </a>
                 </div>
                 <div class="flex items-center gap-3 sm:gap-4">
                     <span class="text-emerald-500 text-lg sm:text-xl flex-shrink-0">✉️</span>
