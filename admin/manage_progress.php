@@ -11,7 +11,7 @@ $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add_photo'])) {
         $title = $_POST['title'];
-        $description = $_POST['description'];
+        $description = isset($_POST['description']) ? $_POST['description'] : '';
         $is_blurred = isset($_POST['is_blurred']) ? 1 : 0;
         
         $before_img = '';
