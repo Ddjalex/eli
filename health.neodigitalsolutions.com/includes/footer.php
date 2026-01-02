@@ -65,9 +65,13 @@
         </div>
     </div>
     
-    <div class="mt-10 sm:mt-16 md:mt-20 pt-6 sm:pt-8 md:pt-10 border-t border-white/5 text-center">
+    <div class="mt-10 sm:mt-16 md:mt-20 pt-6 sm:pt-8 md:pt-10 border-t border-white/5 text-center flex flex-col items-center gap-4">
         <p class="text-zinc-600 text-[8px] sm:text-[10px] uppercase tracking-[0.4em] font-bold">
             Copyright &copy; 2026 Eleni Mekuria. All Rights Reserved.
         </p>
+        <a href="https://neodigitalsolutions.com/" target="_blank" class="flex items-center gap-2 opacity-50 hover:opacity-100 transition-opacity">
+            <span class="text-zinc-600 text-[8px] sm:text-[10px] uppercase tracking-[0.2em] font-medium">Powered by</span>
+            <img src="../attached_assets/neo-logo_1767354870043.png" alt="Neo Printing and Advertising" class="h-8 sm:h-10 w-auto">
+        </a>
     </div>
 </footer>
