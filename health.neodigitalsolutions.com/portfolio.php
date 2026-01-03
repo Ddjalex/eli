@@ -58,7 +58,7 @@ $credentials = $pdo->query("SELECT * FROM credentials ORDER BY display_order ASC
                 <?php else: ?>
                     <?php foreach ($projects as $p): ?>
                         <div class="bg-zinc-900/50 rounded-3xl border border-white/5 overflow-hidden group hover:border-emerald-500/50 transition-all scroll-reveal">
-                            <?php if ($p['video_url']): ?>
+                            <?php if (!empty($p['video_url'])): ?>
                                 <div class="aspect-video overflow-hidden bg-black">
                                     <?php 
                                     $video_url = $p['video_url'];
@@ -77,7 +77,7 @@ $credentials = $pdo->query("SELECT * FROM credentials ORDER BY display_order ASC
                                     }
                                     ?>
                                 </div>
-                            <?php elseif ($p['image_url']): ?>
+                            <?php elseif (!empty($p['image_url'])): ?>
                                 <div class="aspect-square overflow-hidden">
                                     <img src="<?php echo htmlspecialchars($p['image_url']); ?>" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700">
                                 </div>
