@@ -107,13 +107,18 @@
 
                     // Special handling for TikTok
                     if (strpos($link, 'tiktok.com') !== false) {
-                        // Ensure it uses the direct www.tiktok.com/@user format
+                        // Aggressively clean any URL components to get just the @username
                         $path = parse_url($link, PHP_URL_PATH);
+                        if (!$path) $path = $link;
+                        
                         $path = ltrim($path, '/');
-                        // Extract just the @username part
-                        if (preg_match('/^(@[^\/\?]+)/', $path, $matches)) {
+                        // Extract just the @username part, supporting handles with or without @
+                        if (preg_match('/(@?[a-zA-Z0-9._]+)/', $path, $matches)) {
                             $username = $matches[1];
-                            $link = "https://www.tiktok.com/" . $username;
+                            if (strpos($username, '@') !== 0) {
+                                $username = '@' . $username;
+                            }
+                            $link = "https://tiktok.com/" . $username;
                         }
                     }
                 ?>
