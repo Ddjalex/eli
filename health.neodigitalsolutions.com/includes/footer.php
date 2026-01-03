@@ -13,7 +13,7 @@
                         $val = $stmt_addr->fetchColumn();
                         echo htmlspecialchars($val ?: 'Addis Ababa, Ethiopia'); 
                         ?>
-                    </p>
+                    </p>a
                 </div>
                 <div class="flex items-center gap-3 sm:gap-4">
                     <span class="text-emerald-500 text-lg sm:text-xl flex-shrink-0">📱</span>
