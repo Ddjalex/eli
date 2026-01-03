@@ -66,7 +66,8 @@
                 ];
                 
                 foreach ($socials as $db_key => $info):
-                    $stmt_social = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = ?");
+                    // Use double quotes for MySQL compatibility on your server
+                    $stmt_social = $pdo->prepare("SELECT value FROM site_settings WHERE `key` = ?");
                     $stmt_social->execute([$db_key]);
                     $link = $stmt_social->fetchColumn();
                     
@@ -76,10 +77,10 @@
                         $link = "https://" . $link;
                     }
                 ?>
-                <li class="flex items-center mb-2">
-                    <a href="<?php echo htmlspecialchars($link); ?>" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-3 uppercase tracking-widest font-bold text-[10px]">
-                        <div class="w-5 h-5 flex items-center justify-center bg-white/10 rounded-full hover:bg-emerald-500/20 transition-colors">
-                            <img src="<?php echo $info[1]; ?>" class="w-3 h-3" style="filter: brightness(0) invert(1);" alt="<?php echo $info[0]; ?>">
+                <li class="flex items-center mb-4">
+                    <a href="<?php echo htmlspecialchars($link); ?>" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-4 uppercase tracking-widest font-bold text-[11px]">
+                        <div class="w-6 h-6 flex items-center justify-center bg-white/10 rounded-full hover:bg-emerald-500/20 transition-all">
+                            <img src="<?php echo $info[1]; ?>" class="w-3.5 h-3.5" style="filter: brightness(0) invert(1); display: block;" alt="<?php echo $info[0]; ?>">
                         </div>
                         <span class="inline"><?php echo $info[0]; ?></span>
                     </a>
