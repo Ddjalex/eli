@@ -65,20 +65,25 @@
                     'telegram_link' => ['Telegram', 'https://www.svgrepo.com/show/354443/telegram.svg']
                 ];
                 
-                $stmt_social = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = ?");
                 foreach ($socials as $db_key => $info):
+                    $stmt_social = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = ?");
                     $stmt_social->execute([$db_key]);
                     $link = $stmt_social->fetchColumn();
+                    
                     if (!$link || $link === '#' || trim($link) === '') continue;
                     
-                    // Add protocol if missing
                     if (!preg_match('~^(?:f|ht)tps?://~i', $link)) {
                         $link = "https://" . $link;
                     }
                 ?>
-                <li><a href="<?php echo htmlspecialchars($link); ?>" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-2 sm:gap-3 uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">
-                    <img src="<?php echo $info[1]; ?>" class="w-4 h-4 sm:w-5 sm:h-5 invert brightness-0 grayscale-0" style="filter: brightness(0) invert(1); display: inline-block; min-width: 16px; min-height: 16px;" alt="<?php echo $info[0]; ?>"> <span class="hidden sm:inline"><?php echo $info[0]; ?></span>
-                </a></li>
+                <li class="flex items-center mb-2">
+                    <a href="<?php echo htmlspecialchars($link); ?>" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-3 uppercase tracking-widest font-bold text-[10px]">
+                        <div class="w-5 h-5 flex items-center justify-center bg-white/10 rounded-full hover:bg-emerald-500/20 transition-colors">
+                            <img src="<?php echo $info[1]; ?>" class="w-3 h-3" style="filter: brightness(0) invert(1);" alt="<?php echo $info[0]; ?>">
+                        </div>
+                        <span class="inline"><?php echo $info[0]; ?></span>
+                    </a>
+                </li>
                 <?php endforeach; ?>
             </ul>
         </div>
