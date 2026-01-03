@@ -94,11 +94,26 @@
                 ];
 
                 foreach ($social_platforms as $key => $platform):
-                    $link = $site_data[$key] ?? '';
-                    if (!$link || $link === '#' || trim($link) === '') continue;
+                    $link = trim($site_data[$key] ?? '');
+                    if (!$link || $link === '#' || $link === '') continue;
                     
-                    if (!preg_match('~^(?:f|ht)tps?://~i', $link)) {
-                        $link = "https://" . $link;
+                    // Forcefully remove any hidden characters (like zero-width spaces or tracking cruft)
+                    $link = preg_replace('/[\x00-\x1F\x7F-\x9F\xAD\x{200B}-\x{200D}\x{FEFF}]/u', '', $link);
+                    $link = trim($link);
+                    
+                    if (!preg_match('~^https?://~i', $link)) {
+                        $link = "https://" . ltrim($link, '/');
+                    }
+
+                    // Ensure TikTok links use the correct standard domain and format
+                    if (strpos($link, 'tiktok.com') !== false) {
+                        if (strpos($link, 'www.tiktok.com') === false) {
+                            $link = str_replace('tiktok.com', 'www.tiktok.com', $link);
+                        }
+                        // Remove tracking parameters that sometimes break the link on mobile/certain regions
+                        if (strpos($link, '?') !== false) {
+                            $link = explode('?', $link)[0];
+                        }
                     }
                 ?>
                 <li class="flex items-center mb-5 group">
