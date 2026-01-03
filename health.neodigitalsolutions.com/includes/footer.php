@@ -66,7 +66,7 @@
                 ];
                 
                 foreach ($socials as $db_key => $info):
-                    // Use standard double quotes for PostgreSQL/standard SQL compatibility
+                    // Use double quotes for MySQL/PostgreSQL compatibility
                     $stmt_social = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = ?");
                     $stmt_social->execute([$db_key]);
                     $link = $stmt_social->fetchColumn();
@@ -80,7 +80,7 @@
                 <li class="flex items-center mb-5 group">
                     <a href="<?php echo htmlspecialchars($link); ?>" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-5 uppercase tracking-widest font-black text-[12px]">
                         <div class="w-12 h-12 flex items-center justify-center bg-zinc-900/50 rounded-2xl border border-white/5 group-hover:bg-emerald-500 group-hover:border-emerald-400 shadow-lg group-hover:shadow-emerald-500/20 transition-all duration-500 transform group-hover:-rotate-6 group-hover:scale-110 overflow-hidden">
-                            <img src="<?php echo $info[1]; ?>" class="w-6 h-6 brightness-0 invert opacity-60 group-hover:opacity-100 transition-all duration-300" style="object-fit: contain;" alt="<?php echo $info[0]; ?>">
+                            <img src="<?php echo $info[1]; ?>" class="w-6 h-6 brightness-0 invert opacity-60 group-hover:opacity-100 transition-all duration-300" style="object-fit: contain; width: 24px; height: 24px; display: block;" alt="<?php echo $info[0]; ?>">
                         </div>
                         <div class="flex flex-col">
                             <span class="inline leading-none"><?php echo $info[0]; ?></span>
