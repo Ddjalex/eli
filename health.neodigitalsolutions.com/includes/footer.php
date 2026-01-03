@@ -59,10 +59,10 @@
             <ul class="space-y-2 sm:space-y-4 text-sm">
                 <?php
                 $socials = [
-                    'tiktok_link' => ['TikTok', 'https://www.svgrepo.com/show/440011/tiktok.svg'],
-                    'instagram_link' => ['Instagram', 'https://www.svgrepo.com/show/440191/instagram.svg'],
-                    'whatsapp_link' => ['Whatsapp', 'https://www.svgrepo.com/show/439775/whatsapp.svg'],
-                    'telegram_link' => ['Telegram', 'https://www.svgrepo.com/show/439757/telegram.svg']
+                    'tiktok_link' => ['TikTok', 'https://www.svgrepo.com/show/333611/tiktok.svg'],
+                    'instagram_link' => ['Instagram', 'https://www.svgrepo.com/show/521711/instagram.svg'],
+                    'whatsapp_link' => ['Whatsapp', 'https://www.svgrepo.com/show/513060/whatsapp.svg'],
+                    'telegram_link' => ['Telegram', 'https://www.svgrepo.com/show/354443/telegram.svg']
                 ];
                 
                 foreach ($socials as $db_key => $info):
