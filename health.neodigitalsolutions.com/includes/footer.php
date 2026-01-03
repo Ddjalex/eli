@@ -59,15 +59,14 @@
             <ul class="space-y-2 sm:space-y-4 text-sm">
                 <?php
                 $socials = [
-                    'tiktok_link' => ['TikTok', 'https://www.svgrepo.com/show/333611/tiktok.svg'],
-                    'instagram_link' => ['Instagram', 'https://www.svgrepo.com/show/521711/instagram.svg'],
-                    'whatsapp_link' => ['Whatsapp', 'https://www.svgrepo.com/show/513060/whatsapp.svg'],
-                    'telegram_link' => ['Telegram', 'https://www.svgrepo.com/show/354443/telegram.svg']
+                    'tiktok_link' => ['TikTok', 'https://www.svgrepo.com/show/440011/tiktok.svg'],
+                    'instagram_link' => ['Instagram', 'https://www.svgrepo.com/show/440191/instagram.svg'],
+                    'whatsapp_link' => ['Whatsapp', 'https://www.svgrepo.com/show/439775/whatsapp.svg'],
+                    'telegram_link' => ['Telegram', 'https://www.svgrepo.com/show/439757/telegram.svg']
                 ];
                 
                 foreach ($socials as $db_key => $info):
-                    // Use double quotes for MySQL compatibility on your server
-                    $stmt_social = $pdo->prepare("SELECT value FROM site_settings WHERE `key` = ?");
+                    $stmt_social = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = ?");
                     $stmt_social->execute([$db_key]);
                     $link = $stmt_social->fetchColumn();
                     
@@ -77,12 +76,12 @@
                         $link = "https://" . $link;
                     }
                 ?>
-                <li class="flex items-center mb-4">
+                <li class="flex items-center mb-4 group">
                     <a href="<?php echo htmlspecialchars($link); ?>" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-4 uppercase tracking-widest font-bold text-[11px]">
-                        <div class="w-6 h-6 flex items-center justify-center bg-white/10 rounded-full hover:bg-emerald-500/20 transition-all">
-                            <img src="<?php echo $info[1]; ?>" class="w-3.5 h-3.5" style="filter: brightness(0) invert(1); display: block;" alt="<?php echo $info[0]; ?>">
+                        <div class="w-10 h-10 flex items-center justify-center bg-white/5 rounded-full border border-white/10 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/50 transition-all duration-300 transform group-hover:scale-110">
+                            <img src="<?php echo $info[1]; ?>" class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity" style="filter: brightness(0) invert(1);" alt="<?php echo $info[0]; ?>">
                         </div>
-                        <span class="inline"><?php echo $info[0]; ?></span>
+                        <span class="inline opacity-80 group-hover:opacity-100 group-hover:translate-x-1 transition-all"><?php echo $info[0]; ?></span>
                     </a>
                 </li>
                 <?php endforeach; ?>
