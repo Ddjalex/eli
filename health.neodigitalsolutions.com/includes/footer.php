@@ -97,7 +97,7 @@
                     $link = trim($site_data[$key] ?? '');
                     if (!$link || $link === '#' || $link === '') continue;
                     
-                    // Forcefully remove any hidden characters (like zero-width spaces or tracking cruft)
+                    // Clean the link aggressively
                     $link = preg_replace('/[\x00-\x1F\x7F-\x9F\xAD\x{200B}-\x{200D}\x{FEFF}]/u', '', $link);
                     $link = trim($link);
                     
@@ -105,14 +105,15 @@
                         $link = "https://" . ltrim($link, '/');
                     }
 
-                    // Ensure TikTok links use the correct standard domain and format
+                    // Special handling for TikTok
                     if (strpos($link, 'tiktok.com') !== false) {
-                        if (strpos($link, 'www.tiktok.com') === false) {
-                            $link = str_replace('tiktok.com', 'www.tiktok.com', $link);
-                        }
-                        // Remove tracking parameters that sometimes break the link on mobile/certain regions
-                        if (strpos($link, '?') !== false) {
-                            $link = explode('?', $link)[0];
+                        // Ensure it uses the direct www.tiktok.com/@user format
+                        $path = parse_url($link, PHP_URL_PATH);
+                        $path = ltrim($path, '/');
+                        // Extract just the @username part
+                        if (preg_match('/^(@[^\/\?]+)/', $path, $matches)) {
+                            $username = $matches[1];
+                            $link = "https://www.tiktok.com/" . $username;
                         }
                     }
                 ?>
