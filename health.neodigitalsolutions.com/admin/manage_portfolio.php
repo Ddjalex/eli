@@ -11,6 +11,7 @@ $id = $_GET['id'] ?? null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
     $description = $_POST['description'];
+    $video_url = $_POST['video_url'] ?? '';
     $image_url = $_POST['existing_image'] ?? '';
 
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -24,11 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($id) {
-        $stmt = $pdo->prepare("UPDATE portfolio_projects SET title = ?, description = ?, image_url = ? WHERE id = ?");
-        $stmt->execute([$title, $description, $image_url, $id]);
+        $stmt = $pdo->prepare("UPDATE portfolio_projects SET title = ?, description = ?, image_url = ?, video_url = ? WHERE id = ?");
+        $stmt->execute([$title, $description, $image_url, $video_url, $id]);
     } else {
-        $stmt = $pdo->prepare("INSERT INTO portfolio_projects (title, description, image_url) VALUES (?, ?, ?)");
-        $stmt->execute([$title, $description, $image_url]);
+        $stmt = $pdo->prepare("INSERT INTO portfolio_projects (title, description, image_url, video_url) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$title, $description, $image_url, $video_url]);
     }
     header("Location: manage_portfolio.php");
     exit;
@@ -74,7 +75,11 @@ if ($project) {
                     <textarea name="description" rows="5" class="w-full bg-black border border-white/10 p-2 rounded-lg" required><?php echo $project['description'] ?? ''; ?></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">Image</label>
+                    <label class="block text-sm font-medium mb-1">Video URL (YouTube/Vimeo/Link)</label>
+                    <input type="text" name="video_url" value="<?php echo $project['video_url'] ?? ''; ?>" class="w-full bg-black border border-white/10 p-2 rounded-lg" placeholder="https://www.youtube.com/watch?v=...">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Image (Thumbnail/Fallback)</label>
                     <input type="file" name="image" class="w-full bg-black border border-white/10 p-2 rounded-lg">
                 </div>
                 <button type="submit" class="bg-emerald-600 px-6 py-2 rounded-lg font-bold">Save Project</button>

@@ -58,7 +58,26 @@ $credentials = $pdo->query("SELECT * FROM credentials ORDER BY display_order ASC
                 <?php else: ?>
                     <?php foreach ($projects as $p): ?>
                         <div class="bg-zinc-900/50 rounded-3xl border border-white/5 overflow-hidden group hover:border-emerald-500/50 transition-all scroll-reveal">
-                            <?php if ($p['image_url']): ?>
+                            <?php if ($p['video_url']): ?>
+                                <div class="aspect-video overflow-hidden bg-black">
+                                    <?php 
+                                    $video_url = $p['video_url'];
+                                    if (strpos($video_url, 'youtube.com') !== false || strpos($video_url, 'youtu.be') !== false) {
+                                        $video_id = '';
+                                        if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $video_url, $match)) {
+                                            $video_id = $match[1];
+                                        }
+                                        echo '<iframe class="w-full h-full" src="https://www.youtube.com/embed/'.$video_id.'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                                    } elseif (strpos($video_url, 'vimeo.com') !== false) {
+                                        preg_match('/vimeo.com\/(\d+)/', $video_url, $match);
+                                        $video_id = $match[1] ?? '';
+                                        echo '<iframe class="w-full h-full" src="https://player.vimeo.com/video/'.$video_id.'" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>';
+                                    } else {
+                                        echo '<video src="'.htmlspecialchars($video_url).'" controls class="w-full h-full object-cover"></video>';
+                                    }
+                                    ?>
+                                </div>
+                            <?php elseif ($p['image_url']): ?>
                                 <div class="aspect-square overflow-hidden">
                                     <img src="<?php echo htmlspecialchars($p['image_url']); ?>" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700">
                                 </div>
