@@ -1,8 +1,8 @@
 <?php
 require_once 'includes/config.php';
 $projects = $pdo->query("SELECT * FROM portfolio_projects ORDER BY created_at DESC")->fetchAll();
-$case_studies = $pdo->query("SELECT * FROM case_studies ORDER BY `display_order` ASC, `id` DESC")->fetchAll();
-$credentials = $pdo->query("SELECT * FROM credentials ORDER BY `display_order` ASC, `id` DESC")->fetchAll();
+$case_studies = $pdo->query("SELECT * FROM case_studies ORDER BY display_order ASC, id DESC")->fetchAll();
+$credentials = $pdo->query("SELECT * FROM credentials ORDER BY display_order ASC, id DESC")->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
