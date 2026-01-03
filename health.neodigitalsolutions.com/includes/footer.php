@@ -69,10 +69,15 @@
                 foreach ($socials as $db_key => $info):
                     $stmt_social->execute([$db_key]);
                     $link = $stmt_social->fetchColumn();
-                    if (!$link || $link === '#') continue;
+                    if (!$link || $link === '#' || trim($link) === '') continue;
+                    
+                    // Add protocol if missing
+                    if (!preg_match('~^(?:f|ht)tps?://~i', $link)) {
+                        $link = "https://" . $link;
+                    }
                 ?>
                 <li><a href="<?php echo htmlspecialchars($link); ?>" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-2 sm:gap-3 uppercase tracking-widest font-bold text-[8px] sm:text-[10px]">
-                    <img src="<?php echo $info[1]; ?>" class="w-3 sm:w-4 h-3 sm:h-4 invert opacity-50 hover:opacity-100" alt="<?php echo $info[0]; ?>"> <span class="hidden sm:inline"><?php echo $info[0]; ?></span>
+                    <img src="<?php echo $info[1]; ?>" class="w-3 sm:w-4 h-3 sm:h-4 invert opacity-70 hover:opacity-100" style="filter: brightness(0) invert(1);" alt="<?php echo $info[0]; ?>"> <span class="hidden sm:inline"><?php echo $info[0]; ?></span>
                 </a></li>
                 <?php endforeach; ?>
             </ul>
