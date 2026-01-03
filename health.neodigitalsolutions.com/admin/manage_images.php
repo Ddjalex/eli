@@ -180,10 +180,10 @@ try {
                             'footer_address' => 'Footer Address',
                             'contact_phone' => 'Contact Phone',
                             'footer_email' => 'Footer Email',
-                            'footer_tiktok' => 'TikTok Link',
-                            'contact_social_ig' => 'Instagram Link',
-                            'contact_whatsapp_link' => 'WhatsApp Link',
-                            'footer_telegram' => 'Telegram Link'
+                            'tiktok_link' => 'TikTok Link',
+                            'instagram_link' => 'Instagram Link',
+                            'whatsapp_link' => 'WhatsApp Link',
+                            'telegram_link' => 'Telegram Link'
                         ];
                         foreach ($text_settings as $key => $label): ?>
                             <div class="glass p-8 rounded-3xl <?php echo $key === 'about_text' ? 'md:col-span-2' : ''; ?>">
