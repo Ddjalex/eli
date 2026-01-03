@@ -15,7 +15,7 @@ $credentials = $pdo->query("SELECT * FROM credentials ORDER BY display_order ASC
     <script src="https://cdnjs.cloudflare.com/api/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
         :root { --accent-green: #10b981; }
-        .scroll-reveal { opacity: 0; transform: translateY(30px); }
+        .scroll-reveal { opacity: 1; transform: none; }
     </style>
 </head>
 <body class="bg-zinc-950 text-white selection:bg-emerald-500">
@@ -51,24 +51,30 @@ $credentials = $pdo->query("SELECT * FROM credentials ORDER BY display_order ASC
         <section class="mb-32">
             <h1 class="text-4xl sm:text-7xl font-black mb-16 uppercase tracking-tighter scroll-reveal">Creative <span class="text-emerald-500">Media</span></h1>
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                <?php foreach ($projects as $p): ?>
-                    <div class="bg-zinc-900/50 rounded-3xl border border-white/5 overflow-hidden group hover:border-emerald-500/50 transition-all scroll-reveal">
-                        <?php if ($p['image_url']): ?>
-                            <div class="aspect-square overflow-hidden">
-                                <img src="<?php echo htmlspecialchars($p['image_url']); ?>" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700">
-                            </div>
-                        <?php else: ?>
-                            <div class="aspect-square bg-zinc-800/50 flex items-center justify-center">
-                                <span class="text-zinc-600 uppercase text-[10px] font-bold tracking-widest">No Media Asset</span>
-                            </div>
-                        <?php endif; ?>
-                        <div class="p-8">
-                            <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500 mb-2 block"><?php echo htmlspecialchars($p['category'] ?? 'Project'); ?></span>
-                            <h3 class="font-bold text-2xl mb-3 tracking-tight"><?php echo htmlspecialchars($p['title']); ?></h3>
-                            <p class="text-zinc-500 text-sm leading-relaxed"><?php echo htmlspecialchars($p['description']); ?></p>
-                        </div>
+                <?php if (empty($projects)): ?>
+                    <div class="col-span-full p-12 border border-white/5 border-dashed rounded-3xl text-center">
+                        <p class="text-zinc-500 uppercase text-xs font-bold tracking-widest">No media assets found in the portfolio.</p>
                     </div>
-                <?php endforeach; ?>
+                <?php else: ?>
+                    <?php foreach ($projects as $p): ?>
+                        <div class="bg-zinc-900/50 rounded-3xl border border-white/5 overflow-hidden group hover:border-emerald-500/50 transition-all scroll-reveal">
+                            <?php if ($p['image_url']): ?>
+                                <div class="aspect-square overflow-hidden">
+                                    <img src="<?php echo htmlspecialchars($p['image_url']); ?>" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700">
+                                </div>
+                            <?php else: ?>
+                                <div class="aspect-square bg-zinc-800/50 flex items-center justify-center">
+                                    <span class="text-zinc-600 uppercase text-[10px] font-bold tracking-widest">No Media Asset</span>
+                                </div>
+                            <?php endif; ?>
+                            <div class="p-8">
+                                <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500 mb-2 block"><?php echo htmlspecialchars($p['category'] ?? 'Project'); ?></span>
+                                <h3 class="font-bold text-2xl mb-3 tracking-tight"><?php echo htmlspecialchars($p['title']); ?></h3>
+                                <p class="text-zinc-500 text-sm leading-relaxed"><?php echo htmlspecialchars($p['description']); ?></p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </section>
 
