@@ -59,10 +59,10 @@
             <ul class="space-y-2 sm:space-y-4 text-sm">
                 <?php
                 $socials = [
-                    'tiktok_link' => ['TikTok', 'https://www.svgrepo.com/show/440011/tiktok.svg'],
-                    'instagram_link' => ['Instagram', 'https://www.svgrepo.com/show/440191/instagram.svg'],
-                    'whatsapp_link' => ['Whatsapp', 'https://www.svgrepo.com/show/439775/whatsapp.svg'],
-                    'telegram_link' => ['Telegram', 'https://www.svgrepo.com/show/439757/telegram.svg']
+                    'tiktok_link' => ['TikTok', 'https://www.svgrepo.com/show/342291/tiktok.svg'],
+                    'instagram_link' => ['Instagram', 'https://www.svgrepo.com/show/342000/instagram.svg'],
+                    'whatsapp_link' => ['Whatsapp', 'https://www.svgrepo.com/show/342345/whatsapp.svg'],
+                    'telegram_link' => ['Telegram', 'https://www.svgrepo.com/show/342301/telegram.svg']
                 ];
                 
                 foreach ($socials as $db_key => $info):
@@ -76,12 +76,15 @@
                         $link = "https://" . $link;
                     }
                 ?>
-                <li class="flex items-center mb-4 group">
-                    <a href="<?php echo htmlspecialchars($link); ?>" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-4 uppercase tracking-widest font-bold text-[11px]">
-                        <div class="w-10 h-10 flex items-center justify-center bg-white/5 rounded-full border border-white/10 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/50 transition-all duration-300 transform group-hover:scale-110">
-                            <img src="<?php echo $info[1]; ?>" class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity" style="filter: brightness(0) invert(1);" alt="<?php echo $info[0]; ?>">
+                <li class="flex items-center mb-5 group">
+                    <a href="<?php echo htmlspecialchars($link); ?>" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-emerald-500 transition-all flex items-center gap-5 uppercase tracking-widest font-black text-[12px]">
+                        <div class="w-12 h-12 flex items-center justify-center bg-zinc-900/50 rounded-2xl border border-white/5 group-hover:bg-emerald-500 group-hover:border-emerald-400 shadow-lg group-hover:shadow-emerald-500/20 transition-all duration-500 transform group-hover:-rotate-6 group-hover:scale-110">
+                            <img src="<?php echo $info[1]; ?>" class="w-6 h-6 brightness-0 invert opacity-60 group-hover:opacity-100 transition-all duration-300" alt="<?php echo $info[0]; ?>">
                         </div>
-                        <span class="inline opacity-80 group-hover:opacity-100 group-hover:translate-x-1 transition-all"><?php echo $info[0]; ?></span>
+                        <div class="flex flex-col">
+                            <span class="inline leading-none"><?php echo $info[0]; ?></span>
+                            <span class="text-[8px] text-zinc-600 group-hover:text-emerald-400/70 transition-colors uppercase tracking-widest mt-1">Join the community</span>
+                        </div>
                     </a>
                 </li>
                 <?php endforeach; ?>
