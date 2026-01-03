@@ -59,14 +59,15 @@
             <ul class="space-y-2 sm:space-y-4 text-sm">
                 <?php
                 $socials = [
-                    'tiktok_link' => ['TikTok', 'https://www.svgrepo.com/show/342291/tiktok.svg'],
-                    'instagram_link' => ['Instagram', 'https://www.svgrepo.com/show/342000/instagram.svg'],
-                    'whatsapp_link' => ['Whatsapp', 'https://www.svgrepo.com/show/342345/whatsapp.svg'],
-                    'telegram_link' => ['Telegram', 'https://www.svgrepo.com/show/342301/telegram.svg']
+                    'tiktok_link' => ['TikTok', 'https://www.svgrepo.com/show/440011/tiktok.svg'],
+                    'instagram_link' => ['Instagram', 'https://www.svgrepo.com/show/440191/instagram.svg'],
+                    'whatsapp_link' => ['Whatsapp', 'https://www.svgrepo.com/show/439775/whatsapp.svg'],
+                    'telegram_link' => ['Telegram', 'https://www.svgrepo.com/show/439757/telegram.svg']
                 ];
                 
                 foreach ($socials as $db_key => $info):
-                    $stmt_social = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = ?");
+                    // Use double quotes for MySQL compatibility on your server
+                    $stmt_social = $pdo->prepare("SELECT value FROM site_settings WHERE `key` = ?");
                     $stmt_social->execute([$db_key]);
                     $link = $stmt_social->fetchColumn();
                     
