@@ -66,7 +66,7 @@
                 ];
                 
                 foreach ($socials as $db_key => $info):
-                    // Use double quotes for MySQL/PostgreSQL compatibility
+                    // Use double quotes for column name compatibility (works in both MySQL and PostgreSQL)
                     $stmt_social = $pdo->prepare("SELECT value FROM site_settings WHERE \"key\" = ?");
                     $stmt_social->execute([$db_key]);
                     $link = $stmt_social->fetchColumn();
